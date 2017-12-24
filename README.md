@@ -1,6 +1,8 @@
 # Song Stage Monitor for Songbeamer
 
 Display the current songtext for vocalists. Use the whole screen for text.
+![Alt text](/screenshot.png?raw=true "Screenshots")
+
 
 ## How does it work?
 
@@ -20,7 +22,7 @@ and activate network in Songbeamer. All described here (http://wiki.songbeamer.d
 (If you do not do that you need to start SBRemoteClient manually)
 * Place a "usong.yml" config file in the same directory as the usong-server.x.y.jar similar to the one found in 
 this project's root directory. Change parameter "songDir" to the path to your songs folder locally.
-![Alt text](/build/setup-example.PNG?raw=true "Example Screenshot")
+![Alt text](/build/setup-example.PNG?raw=true "Setup example Screenshot")
 
 ## Running
 * Simply double click the jar file (or set it to autorun with your system)
@@ -32,12 +34,12 @@ and display the website hosted by the server in the browser. You need the ip add
 If you access "http://<hostname>/song?admin=true": 
 * You can change the current language of a song
 * You can scroll up or down independent of songbeamer and of what is displayed on the beamer
-* You can see the number of active and up to date clients connected
+* You can see the number of active and up-to-date clients connected
 
 ## Don't like the style?
 You can override my css by providing your own "song2.css" file in the same directory as the usong-server.x.y.jar.
 
-##Problems
+## Problems
 * The server gets all information via the songbeamer remote software. But it does not get any information about which 
 language is currently used. 
 Current Solution: use admin control site.
