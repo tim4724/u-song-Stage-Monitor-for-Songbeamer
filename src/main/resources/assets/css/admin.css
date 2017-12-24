@@ -1,0 +1,61 @@
+body {
+    cursor: default;
+}
+
+#bottomSpacer {
+    height: 100px;
+}
+
+#controlsWrapper {
+    width: 100%;
+    z-index: 50;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background-color: #eeeeee;
+    padding: 8px;
+}
+
+.active {
+    background-color: #66FF66;
+}
+
+button {
+    margin: 8px;
+    color: #ffffff;
+    font-size: 1em;
+    background-color: #555555;
+    transition: all 0.5s ease-in-out;
+    padding: 10px 20px 10px 20px;
+    border: 2px solid transparent;
+}
+
+button:hover:enabled {
+    background-color: #212121;
+    cursor: pointer;
+    border-color: #00cc00;
+}
+
+#upButton, #downButton {
+    padding: 10px 30px;
+}
+
+#activeClients {
+    padding: 10px 30px;
+    color: #212121;
+    float: left;
+}
+
+@media only screen and (max-device-width: 1024px) {
+    body {
+        overflow: scroll;
+    }
+
+    button, #activeClients {
+        font-size: 3.5em;
+    }
+
+    #bottomSpacer {
+        height: 550px;
+    }
+}

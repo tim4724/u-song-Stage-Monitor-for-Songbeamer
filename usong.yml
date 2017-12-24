@@ -1,0 +1,23 @@
+app:
+  songDir: C:\Users\Tim\Documents\Songbeamer\Songs\
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 80
+  requestLog:
+
+
+logging:
+  level: INFO
+  appenders:
+    - type: console
+    - type: file
+      threshold: INFO
+      logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
+      currentLogFilename: ./log/usong.log
+      archivedLogFilenamePattern: ./log/usong-%d{yyyy-MM-dd}-%i.log.gz
+      archivedFileCount: 7
+      timeZone: UTC
+      maxFileSize: 10MB
+
