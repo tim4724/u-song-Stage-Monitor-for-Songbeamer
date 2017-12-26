@@ -19,13 +19,14 @@ Es eignet sich zum Beispiel ein Raspberry Pi (~40€)
 Die Seite ist mit Songbeamer synchronisiert und es wird automatisch die aktuelle Folie hervorgehoben.
 
 ## Einrichten
-* Baue die Ausführbare jar mit: ```mvn package``` oder downloade die neueste Version herunter [usong-server-1.0.jar](/build/usong-server-1.0.jar).
+* Baue die Ausführbare jar mit: ```mvn package``` oder lade die neueste Version herunter [usong-server-1.0.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-1.0.jar).
 * Lade Songbeamer Remote herunterund kopiere die Datei "SBRemoteClient.exe" in den selben Ordner in dem auch "usong-server.x.y.jar" liegt.
 Konfiguriere "localhost" als host und aktivier die Netzwerkfunktion in Songbeamer. Siehe: http://wiki.songbeamer.de/index.php?title=Fernsteuerung
 * Erstelle im selben Ordmer eine "usong.yml" Datei. Inhalt sollte folgender sein: [usong.yml](usong.yml). 
 Wichtig: Als <b>songDir</b> sollte der Pfad zum Song Ordner gesetzt sein. 
+
 ![Alt text](/build/setup-example.PNG?raw=true "Setup example Screenshot")
-![Alt text](/build/usong-yml-example.PNG?raw=true "usong.yml example Screenshot")
+![Alt text](/build/usong-yml-example.PNG "usong.yml example Screenshot")
 
 ## Ausführen
 * Doppelklick auf die "usong-server-x.y.jar" führt zum start des Servers. (man sieht kein Fenster, läuft im Hintergrund)
