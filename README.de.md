@@ -20,8 +20,9 @@ Die Seite ist mit Songbeamer synchronisiert und es wird automatisch die aktuelle
 
 ## Einrichten
 * Baue die Ausführbare jar mit: ```mvn package``` oder lade die neueste Version herunter [usong-server-1.0.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-1.0.jar).
-* Lade Songbeamer Remote herunterund kopiere die Datei "SBRemoteClient.exe" in den selben Ordner in dem auch "usong-server.x.y.jar" liegt.
-Konfiguriere "localhost" als host und aktivier die Netzwerkfunktion in Songbeamer. Siehe: http://wiki.songbeamer.de/index.php?title=Fernsteuerung
+* Lade Songbeamer Remote herunter und kopiere die Datei "SBRemoteClient.exe" in den selben Ordner in dem auch "usong-server.x.y.jar" liegt.
+Netzwertkfunktion in Songbeamer aktivieren. ``` Dazu müssen Sie unter Extras -> Anpassen -> Befehle -> Beta das Symbol "Netzwerk" auf die SongBeamer-Symbolleiste ziehen, und dann anklicken, bis dieses gedrückt erscheint.``` 
+Siehe: http://wiki.songbeamer.de/index.php?title=Fernsteuerung
 * Erstelle im selben Ordmer eine "usong.yml" Datei. Inhalt sollte folgender sein: [usong.yml](usong.yml). 
 Wichtig: Als <b>songDir</b> sollte der Pfad zum Song Ordner gesetzt sein. 
 
