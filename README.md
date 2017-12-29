@@ -18,9 +18,11 @@ Scrolling, Highlighting and Refreshing is handled automatically and is synced to
 * Build the jar with: ```mvn package``` or download the latest version: [usong-server-1.0.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-1.0.jar).
 * Download and install the Songbeamer-Remote software and copy the "SBRemoteClient.exe" in the same directory 
 as the usong-server.x.y.jar. Configure "localhost" as host and activate network in Songbeamer. 
-All described here (http://wiki.songbeamer.de/index.php?title=Fernsteuerung). (If you do not do that you need to start SBRemoteClient manually)
+All described here (http://wiki.songbeamer.de/index.php?title=Fernsteuerung). (Do not start Songbemaer Remote Server!)
 * Place a usong.yml config file in the same directory as the usong-server.x.y.jar similar to this one: [usong.yml](usong.yml). 
-Change parameter "songDir" to the path to your songs folder locally.
+Change parameter "songDir" to the path to your songs folder locally. 
+
+Important for usong.yml: Lineending must be indicated by "LF" and not "CRLF". Use an Editor like Notepad++.
 
 ![Alt text](/build/setup-example.PNG?raw=true "Setup example Screenshot")
 ![Alt text](/build/usong-yml-example.PNG "usong.yml example Screenshot")

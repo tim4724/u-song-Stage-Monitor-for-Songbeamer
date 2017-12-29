@@ -24,7 +24,12 @@ Die Seite ist mit Songbeamer synchronisiert und es wird automatisch die aktuelle
 Netzwertkfunktion in Songbeamer aktivieren. ``` Dazu müssen Sie unter Extras -> Anpassen -> Befehle -> Beta das Symbol "Netzwerk" auf die SongBeamer-Symbolleiste ziehen, und dann anklicken, bis dieses gedrückt erscheint.``` 
 Siehe: http://wiki.songbeamer.de/index.php?title=Fernsteuerung
 * Erstelle im selben Ordmer eine "usong.yml" Datei. Inhalt sollte folgender sein: [usong.yml](usong.yml). 
-Wichtig: Als <b>songDir</b> sollte der Pfad zum Song Ordner gesetzt sein. 
+
+Wichtig: 
+* Songbeamer Remote Server darf nicht gestartet werden.
+* <u>usong.yml:</u> Als <b>songDir</b> sollte der Pfad zum Song Ordner gesetzt sein. Pfad endet mit "/"!
+* <u>usong.yml:</u> Zeilenende muss mit "<b>LF</b>" und nicht mit "CRLF" angegeben werden. 
+Am besten einen Editor wie Notepad++ benutzen und sichergehen, dass die Datei richtig eingestellt ist.
 
 ![Alt text](/build/setup-example.PNG?raw=true "Setup example Screenshot")
 ![Alt text](/build/usong-yml-example.PNG "usong.yml example Screenshot")
