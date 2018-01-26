@@ -19,7 +19,7 @@ Es eignet sich zum Beispiel ein Raspberry Pi (~40€)
 Die Seite ist mit Songbeamer synchronisiert und es wird automatisch die aktuelle Folie hervorgehoben.
 
 ## Einrichten
-* Baue die Ausführbare jar mit: ```mvn package``` oder lade die neueste Version herunter [usong-server-1.0.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-1.0.jar).
+* Baue die Ausführbare jar mit: ```mvn package``` oder lade die neueste Version herunter [usong-server-1.0.1.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-1.0.1.jar).
 * Lade Songbeamer Remote herunter und kopiere die Datei "SBRemoteSender.exe" in den selben Ordner in dem auch "usong-server.x.y.jar" liegt.
 Netzwertkfunktion in Songbeamer aktivieren. ``` Dazu müssen Sie unter Extras -> Anpassen -> Befehle -> Beta das Symbol "Netzwerk" auf die SongBeamer-Symbolleiste ziehen, und dann anklicken, bis dieses gedrückt erscheint.``` 
 Siehe: http://wiki.songbeamer.de/index.php?title=Fernsteuerung

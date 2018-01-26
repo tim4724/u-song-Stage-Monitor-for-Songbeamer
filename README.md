@@ -15,7 +15,7 @@ as the server and displays the website in fullscreen.
 Scrolling, Highlighting and Refreshing is handled automatically and is synced to songbeamer.
 
 ## Setup
-* Build the jar with: ```mvn package``` or download the latest version: [usong-server-1.0.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-1.0.jar).
+* Build the jar with: ```mvn package``` or download the latest version: [usong-server-1.0.1.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-1.0.1.jar).
 * Download and install the Songbeamer-Remote software and copy the "SBRemoteSender.exe" in the same directory 
 as the usong-server.x.y.jar. Configure "localhost" as host and activate network in Songbeamer. 
 All described here (http://wiki.songbeamer.de/index.php?title=Fernsteuerung). (Do not start Songbemaer Remote Server!)
