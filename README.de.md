@@ -20,7 +20,7 @@ Die Seite ist mit Songbeamer synchronisiert und es wird automatisch die aktuelle
 
 ## Einrichten
 * Baue die Ausführbare jar mit: ```mvn package``` oder lade die neueste Version herunter [usong-server-1.0.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-1.0.jar).
-* Lade Songbeamer Remote herunter und kopiere die Datei "SBRemoteClient.exe" in den selben Ordner in dem auch "usong-server.x.y.jar" liegt.
+* Lade Songbeamer Remote herunter und kopiere die Datei "SBRemoteSender.exe" in den selben Ordner in dem auch "usong-server.x.y.jar" liegt.
 Netzwertkfunktion in Songbeamer aktivieren. ``` Dazu müssen Sie unter Extras -> Anpassen -> Befehle -> Beta das Symbol "Netzwerk" auf die SongBeamer-Symbolleiste ziehen, und dann anklicken, bis dieses gedrückt erscheint.``` 
 Siehe: http://wiki.songbeamer.de/index.php?title=Fernsteuerung
 * Erstelle im selben Ordmer eine "usong.yml" Datei. Inhalt sollte folgender sein: [usong.yml](usong.yml). 
@@ -52,7 +52,7 @@ Wenn man auf "http://&lt;hostname&gt;/song?admin=true" zugreift, kann man:
 * Anzahl aktiver und aktueller Clients anzeigen.
 
 ## Style ändern?
-Man kann das css überschreiben. Einfache eine Datei "song2.css" im gleichen Ordner hinterlegen.
+Man kann das css überschreiben. Einfache eine Datei "song.css" im gleichen Ordner hinterlegen.
 
 ## Probleme
 * Die Sprache wird nicht erkannt, da ich diese Information nicht über den Songbeamer Remote Client erfahre :(

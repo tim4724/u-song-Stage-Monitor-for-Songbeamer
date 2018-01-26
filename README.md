@@ -16,7 +16,7 @@ Scrolling, Highlighting and Refreshing is handled automatically and is synced to
 
 ## Setup
 * Build the jar with: ```mvn package``` or download the latest version: [usong-server-1.0.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-1.0.jar).
-* Download and install the Songbeamer-Remote software and copy the "SBRemoteClient.exe" in the same directory 
+* Download and install the Songbeamer-Remote software and copy the "SBRemoteSender.exe" in the same directory 
 as the usong-server.x.y.jar. Configure "localhost" as host and activate network in Songbeamer. 
 All described here (http://wiki.songbeamer.de/index.php?title=Fernsteuerung). (Do not start Songbemaer Remote Server!)
 * Place a usong.yml config file in the same directory as the usong-server.x.y.jar similar to this one: [usong.yml](usong.yml). 
@@ -40,7 +40,7 @@ If you access "http://&lt;hostname&gt;/song?admin=true":
 * You can see the number of active and up-to-date clients connected
 
 ## Don't like the style?
-You can override my css by providing your own "song2.css" file in the same directory as the usong-server.x.y.jar.
+You can override my css by providing your own "song.css" file in the same directory as the usong-server.x.y.jar.
 
 ## Problems
 * The server gets all information via the songbeamer remote software. But it does not get any information about which 
