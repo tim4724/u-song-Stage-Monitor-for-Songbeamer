@@ -21,7 +21,7 @@ public class USongApplication extends Application<USongConfiguration> {
             args = new String[]{"server", "usong.yml"};
         }
         try {
-            Runtime.getRuntime().exec("taskkill /F /IM SBRemoteClient.exe");
+            Runtime.getRuntime().exec("taskkill /F /IM SBRemoteSender.exe");
         } catch (Exception ignore) {
         }
         new USongApplication().run(args);

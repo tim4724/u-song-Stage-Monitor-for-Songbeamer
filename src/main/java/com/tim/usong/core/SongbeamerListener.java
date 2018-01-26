@@ -44,16 +44,16 @@ public class SongbeamerListener implements Managed, Runnable {
     @Override
     public void stop() throws Exception {
         currentThread.interrupt();
-        logger.info("Killing SBRemoteClient");
-        Runtime.getRuntime().exec("taskkill /F /IM SBRemoteClient.exe");
+        logger.info("Killing SBRemoteSender");
+        Runtime.getRuntime().exec("taskkill /F /IM SBRemoteSender.exe");
     }
 
     @Override
     public void run() {
         while (!Thread.interrupted()) {
             try {
-                logger.info("Starting SBRemoteClient");
-                new ProcessBuilder("SBRemoteClient.exe").start();
+                logger.info("Starting SBRemoteSender");
+                new ProcessBuilder("SBRemoteSender.exe").start();
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 songResource.setSongAndPage(new Song("Fehler beim starten von SB Remote Client", e), 0);
@@ -102,11 +102,16 @@ public class SongbeamerListener implements Managed, Runnable {
         switch (action) {
             case "SBAction_LoadItem":
                 currentSongFilename = value;
-                if (currentPage == -1 || currentSongFilename.equals(currentSongDisplayedFilename)) {
+                if (currentPage == -1 || currentSongFilename.endsWith(currentSongDisplayedFilename)) {
+                    //Switch song if page is -1 or
+                    //When a song was modified, currentSongFilename will be the absolute path (maybe a bug in SBRemoteSender).
+                    //Reload song if currentSongFilename ends with currentSongDisplayedFilename
                     songResource.setSongAndPage(currentSongFilename, currentPage);
                 }
                 break;
             case "SBAction_Presenter_Black":
+            case "SBAction_Presenter_BGOnly":
+                //currently no text on beamer
                 currentPage = -1;
                 notifySongResource();
                 break;
