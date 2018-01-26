@@ -19,7 +19,7 @@ section {
     margin: 16px auto;
     border-radius: 4px;
     color: #909090;
-    border: 6px solid #00ff7f;
+    border: 6px solid #00ffa5;
 }
 
 .currentSection {
@@ -27,7 +27,7 @@ section {
 }
 
 .sectionName {
-    color: #999999;
+    color: #00ffa5;
     position: absolute;
     text-align: left;
     font-size: 0.45em;
@@ -51,6 +51,14 @@ section {
     color: #008cff;
 }
 
+.PRE_CHORUS {
+    border-color: #862AFF;
+}
+
+.PRE_CHORUS > .sectionName {
+    color: #862AFF;
+}
+
 .CHORUS > .sectionName {
     color: #bf00ff;
 }
@@ -67,8 +75,24 @@ section {
     border-color: #bf00ff;
 }
 
+.PRE_BRIDGE {
+    border-color: #F22E41;
+}
+
+.PRE_BRIDGE > .sectionName {
+    color: #F22E41;
+}
+
 .BRIDGE {
     border-color: #ff3911;
+}
+
+.ENDING > .sectionName {
+    color: #00ce30;
+}
+
+.ENDING {
+    border-color: #00ce30;
 }
 
 #bottomSpacer {
