@@ -23,7 +23,7 @@ public class USongApplication extends Application<USongConfiguration> {
 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
-            args = new String[]{"server", "usong.yml"};
+            args = new String[]{"server"};
         }
         try {
             Runtime.getRuntime().exec("taskkill /F /IM SBRemoteSender.exe");
