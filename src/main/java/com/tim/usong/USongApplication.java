@@ -13,6 +13,11 @@ import org.eclipse.jetty.server.session.SessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 public class USongApplication extends Application<USongConfiguration> {
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -36,6 +41,13 @@ public class USongApplication extends Application<USongConfiguration> {
     @Override
     public void run(USongConfiguration config, Environment environment) throws Exception {
         String songDir = config.getAppConfig().songDir;
+        if (songDir == null || songDir.isEmpty()) {
+            //no songDir provided
+            songDir = extractSongDirFromSBSettings();
+        }
+        if (songDir != null && (!songDir.endsWith("\\"))) {
+            songDir = songDir + "\\";
+        }
         logger.info("Songs directory: " + songDir);
 
         SongParser parser = new SongParser(songDir);
@@ -48,5 +60,24 @@ public class USongApplication extends Application<USongConfiguration> {
 
         SongbeamerListener songBeamerListener = new SongbeamerListener(songResource);
         environment.lifecycle().manage(songBeamerListener);
+    }
+
+    private String extractSongDirFromSBSettings() {
+        try {
+            String path = System.getenv("APPDATA") + "\\SongBeamer\\SongBeamer.ini";
+            Stream<String> lines = Files.lines(Paths.get(path), StandardCharsets.UTF_16LE);
+            String songDir = lines.filter((l) -> l.startsWith("FolienBaseDir=")).findFirst().orElse(null);
+            if (songDir != null) {
+                songDir = songDir.replaceFirst("FolienBaseDir=", "");
+                if (songDir.startsWith("%My Documents%")) {
+                    //%My Documents% is a Songbeamer variable which points to users documents folder
+                    String myDocuments = System.getenv("USERPROFILE") + "\\Documents";
+                    songDir = songDir.replace("%My Documents%", myDocuments);
+                }
+                return songDir;
+            }
+        } catch (Exception ingore) {
+        }
+        return null;
     }
 }

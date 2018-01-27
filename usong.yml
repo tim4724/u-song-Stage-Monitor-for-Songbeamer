@@ -1,6 +1,3 @@
-app:
-  songDir: C:\Users\Tim\Documents\Songbeamer\Songs\
-
 server:
   applicationConnectors:
     - type: http
