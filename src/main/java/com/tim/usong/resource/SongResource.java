@@ -26,7 +26,7 @@ public class SongResource {
 
     public SongResource(SongParser songParser) {
         this.songParser = songParser;
-        this.song = new Song("Warte auf Songbeamer...");
+        this.song = Song.waitForSongbeamer;
         this.songId = song.hashCode();
         this.page = -1;
     }
@@ -79,7 +79,7 @@ public class SongResource {
             }
         }
 
-        if (!Objects.equals(songId, this.songId) ) {
+        if (!Objects.equals(songId, this.songId)) {
             return Response.status(205).build();//song has changed; HTTP 205: Reset Content
         }
         if (!Objects.equals(page, this.page)) {
@@ -115,7 +115,7 @@ public class SongResource {
     @GET
     @Path("activeClients")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getSong(@Session HttpSession session) throws InterruptedException {
+    public Response getActiveClients(@Session HttpSession session) throws InterruptedException {
         synchronized (activeClients) {
             if (Objects.equals(session.getAttribute("clientCount"), activeClients.size())) {
                 activeClients.wait(60000);
@@ -128,5 +128,17 @@ public class SongResource {
         }
         session.setAttribute("clientCount", activeClientsCount);
         return Response.ok(activeClientsCount).build();
+    }
+
+    public int getClientsCount() {
+        return activeClients.size();
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public Song getSong() {
+        return song;
     }
 }

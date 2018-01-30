@@ -2,6 +2,7 @@ package com.tim.usong;
 
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
+import com.tim.usong.core.StatusTray;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import io.dropwizard.Application;
@@ -13,21 +14,38 @@ import org.eclipse.jetty.server.session.SessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.stream.Stream;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class USongApplication extends Application<USongConfiguration> {
+    static {
+        UIManager.put("OptionPane.messageFont", new Font("Helvetica Neue", Font.PLAIN, 14));
+        UIManager.put("OptionPane.buttonFont", new Font("Helvetica Neue", Font.PLAIN, 12));
+        UIManager.put("OptionPane.messageForeground", Color.WHITE);
+        UIManager.put("OptionPane.background", Color.decode("0x111111"));
+        UIManager.put("Panel.background", Color.decode("0x111111"));
+        UIManager.put("TextArea.foreground", Color.WHITE);
+        UIManager.put("TextArea.margin", new Insets(4, 4, 4, 4));
+        UIManager.put("TextArea.background", Color.decode("0x111111"));
+        UIManager.put("TextArea.font", new Font("Helvetica Neue", Font.PLAIN, 14));
+        UIManager.put("Panel.background", Color.decode("0x111111"));
+        UIManager.put("Button.background", Color.decode("0x008cff"));
+        UIManager.put("Button.border", BorderFactory.createEmptyBorder(5, 20, 5, 20));
+        UIManager.put("Button.foreground", Color.WHITE);
+    }
+
+    public static final String appName = USongApplication.class.getPackage().getImplementationTitle();
+    public static final String appVersion = USongApplication.class.getPackage().getImplementationVersion();
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
             args = new String[]{"server"};
-        }
-        try {
-            Runtime.getRuntime().exec("taskkill /F /IM SBRemoteSender.exe");
-        } catch (Exception ignore) {
         }
         new USongApplication().run(args);
     }
@@ -40,44 +58,59 @@ public class USongApplication extends Application<USongConfiguration> {
 
     @Override
     public void run(USongConfiguration config, Environment environment) throws Exception {
+        SongBeamerSettings songBeamerSettings = readSongBeamerSettings();
         String songDir = config.getAppConfig().songDir;
-        if (songDir == null || songDir.isEmpty()) {
-            //no songDir provided
-            songDir = extractSongDirFromSBSettings();
+        if ((songDir == null || songDir.isEmpty())) {
+            //no songDir in app yml config provided
+            songDir = songBeamerSettings.songDir;
         }
         if (songDir != null && (!songDir.endsWith("\\"))) {
             songDir = songDir + "\\";
         }
         logger.info("Songs directory: " + songDir);
 
-        SongParser parser = new SongParser(songDir);
-
-        RootResource rootResource = new RootResource();
-        SongResource songResource = new SongResource(parser);
-        environment.jersey().register(rootResource);
+        SongParser songParser = new SongParser(songDir);
+        SongResource songResource = new SongResource(songParser);
+        environment.jersey().register(new RootResource());
         environment.jersey().register(songResource);
         environment.servlets().setSessionHandler(new SessionHandler());
 
-        SongbeamerListener songBeamerListener = new SongbeamerListener(songResource);
-        environment.lifecycle().manage(songBeamerListener);
+        SongbeamerListener songbeamerListener = new SongbeamerListener(songResource);
+        environment.lifecycle().manage(songbeamerListener);
+        environment.lifecycle().manage(new StatusTray(songBeamerSettings, songbeamerListener, songParser, songResource));
     }
 
-    private String extractSongDirFromSBSettings() {
+    private SongBeamerSettings readSongBeamerSettings() {
+        String songDir = "unbekannt";
+        String version = "unbekannt";
         try {
             String path = System.getenv("APPDATA") + "\\SongBeamer\\SongBeamer.ini";
-            Stream<String> lines = Files.lines(Paths.get(path), StandardCharsets.UTF_16LE);
-            String songDir = lines.filter((l) -> l.startsWith("FolienBaseDir=")).findFirst().orElse(null);
-            if (songDir != null) {
-                songDir = songDir.replaceFirst("FolienBaseDir=", "");
-                if (songDir.startsWith("%My Documents%")) {
-                    //%My Documents% is a Songbeamer variable which points to users documents folder
-                    String myDocuments = System.getenv("USERPROFILE") + "\\Documents";
-                    songDir = songDir.replace("%My Documents%", myDocuments);
+            Set<String> lines = Files.lines(Paths.get(path), StandardCharsets.UTF_16LE).collect(Collectors.toSet());
+            for (String l : lines) {
+                if (l.startsWith("FolienBaseDir=")) {
+                    songDir = l.replaceFirst("FolienBaseDir=", "");
+                    if (songDir.startsWith("%My Documents%")) {
+                        //%My Documents% is a Songbeamer variable which points to users documents folder
+                        String myDocuments = System.getenv("USERPROFILE") + "\\Documents";
+                        songDir = songDir.replace("%My Documents%", myDocuments);
+                    }
+                } else if (l.startsWith("Version=")) {
+                    version = l.replace("Version=", "");
                 }
-                return songDir;
             }
-        } catch (Exception ingore) {
+        } catch (Exception e) {
+            logger.error(e.getMessage());
         }
-        return null;
+        return new SongBeamerSettings(version, songDir);
+    }
+
+    public class SongBeamerSettings {
+        public final String version;
+        public final String songDir;
+
+        SongBeamerSettings(String version, String songDir) {
+            this.version = version;
+            this.songDir = songDir;
+        }
     }
 }

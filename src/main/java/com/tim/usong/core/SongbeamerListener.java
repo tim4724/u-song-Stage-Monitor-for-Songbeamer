@@ -28,6 +28,7 @@ public class SongbeamerListener implements Managed, Runnable {
     private String currentSongFilename = null;
     private String currentSongDisplayedFilename = null;
     private int currentPage = -1;
+    private boolean connected = false;
 
     public SongbeamerListener(SongResource songResource) throws ParserConfigurationException, IOException {
         this.songResource = songResource;
@@ -44,6 +45,7 @@ public class SongbeamerListener implements Managed, Runnable {
     @Override
     public void stop() throws Exception {
         currentThread.interrupt();
+        serverSocket.close();
         logger.info("Killing SBRemoteSender");
         Runtime.getRuntime().exec("taskkill /F /IM SBRemoteSender.exe");
     }
@@ -53,6 +55,7 @@ public class SongbeamerListener implements Managed, Runnable {
         while (!Thread.interrupted()) {
             try {
                 logger.info("Starting SBRemoteSender");
+                Runtime.getRuntime().exec("taskkill /F /IM SBRemoteSender.exe");
                 new ProcessBuilder("SBRemoteSender.exe").start();
             } catch (Exception e) {
                 logger.error(e.getMessage());
@@ -60,8 +63,10 @@ public class SongbeamerListener implements Managed, Runnable {
             }
 
             try (Socket socket = serverSocket.accept()) {
+                connected = true;
                 receive(socket);
             } catch (Exception e) {
+                connected = false;
                 logger.error(e.getMessage());
                 songResource.setSongAndPage(new Song("Verbindung zu Songbeamer unterbrochen", e), 0);
             }
@@ -69,6 +74,8 @@ public class SongbeamerListener implements Managed, Runnable {
     }
 
     private void receive(Socket socket) throws IOException {
+        songResource.setSongAndPage(Song.noSongSelected, 0);
+
         final String startTag = "<SongBeamerIPC>";
         final String endTag = "</SongBeamerIPC>";
 
@@ -123,11 +130,17 @@ public class SongbeamerListener implements Managed, Runnable {
     }
 
     private void notifySongResource() {
-        if (!currentSongFilename.equals(currentSongDisplayedFilename)) {
+        if (currentSongFilename == null) {
+            songResource.setSongAndPage(Song.noSongSelected, currentPage);
+        } else if (!currentSongFilename.equals(currentSongDisplayedFilename)) {
             currentSongDisplayedFilename = currentSongFilename;
             songResource.setSongAndPage(currentSongFilename, currentPage);
         } else {
             songResource.setPage(currentPage);
         }
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 }

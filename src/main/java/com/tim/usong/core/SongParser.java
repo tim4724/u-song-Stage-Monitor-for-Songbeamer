@@ -26,7 +26,7 @@ public class SongParser {
 
     public Song parse(String fileName) {
         if (!fileName.endsWith(".sng")) {
-            return new Song("Kein Song ausgewählt");
+            return Song.noSongSelected;
         }
 
         try {
@@ -180,5 +180,17 @@ public class SongParser {
 
     private <T> T lastOf(List<T> list) {
         return !list.isEmpty() ? list.get(list.size() - 1) : null;
+    }
+
+    public String getSongDir() {
+        return path;
+    }
+
+    public int getLangForSong(String songTitle) {
+        Integer lang = langMap.get(songTitle);
+        if (lang == null) {
+            return 1;
+        }
+        return lang;
     }
 }
