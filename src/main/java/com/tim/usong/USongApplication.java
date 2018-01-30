@@ -50,6 +50,14 @@ public class USongApplication extends Application<USongConfiguration> {
         new USongApplication().run(args);
     }
 
+    public static void showErrorDialog(Object msg) {
+        new Thread(() -> {
+            JFrame jf = new JFrame();
+            jf.setAlwaysOnTop(true);
+            JOptionPane.showMessageDialog(jf, msg, appName, JOptionPane.ERROR_MESSAGE);
+        }).start();
+    }
+
     @Override
     public void initialize(Bootstrap<USongConfiguration> bootstrap) {
         bootstrap.addBundle(new AssetsBundle());
@@ -58,26 +66,34 @@ public class USongApplication extends Application<USongConfiguration> {
 
     @Override
     public void run(USongConfiguration config, Environment environment) throws Exception {
-        SongBeamerSettings songBeamerSettings = readSongBeamerSettings();
-        String songDir = config.getAppConfig().songDir;
-        if ((songDir == null || songDir.isEmpty())) {
-            //no songDir in app yml config provided
-            songDir = songBeamerSettings.songDir;
-        }
-        if (songDir != null && (!songDir.endsWith("\\"))) {
-            songDir = songDir + "\\";
-        }
-        logger.info("Songs directory: " + songDir);
+        try {
+            SongBeamerSettings songBeamerSettings = readSongBeamerSettings();
+            String songDir = config.getAppConfig().songDir;
+            if ((songDir == null || songDir.isEmpty())) {
+                //no songDir in app yml config provided
+                songDir = songBeamerSettings.songDir;
+            }
+            if (songDir != null && (!songDir.endsWith("\\"))) {
+                songDir = songDir + "\\";
+            }
+            logger.info("Songs directory: " + songDir);
 
-        SongParser songParser = new SongParser(songDir);
-        SongResource songResource = new SongResource(songParser);
-        environment.jersey().register(new RootResource());
-        environment.jersey().register(songResource);
-        environment.servlets().setSessionHandler(new SessionHandler());
+            SongParser songParser = new SongParser(songDir);
+            SongResource songResource = new SongResource(songParser);
+            environment.jersey().register(new RootResource());
+            environment.jersey().register(songResource);
+            environment.servlets().setSessionHandler(new SessionHandler());
 
-        SongbeamerListener songbeamerListener = new SongbeamerListener(songResource);
-        environment.lifecycle().manage(songbeamerListener);
-        environment.lifecycle().manage(new StatusTray(songBeamerSettings, songbeamerListener, songParser, songResource));
+            SongbeamerListener songbeamerListener = new SongbeamerListener(songResource);
+            environment.lifecycle().manage(songbeamerListener);
+            environment.lifecycle().manage(new StatusTray(songBeamerSettings, songbeamerListener, songParser, songResource));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            JFrame jf = new JFrame();
+            jf.setAlwaysOnTop(true);
+            JOptionPane.showMessageDialog(jf, e, appName, JOptionPane.ERROR_MESSAGE);
+            throw e;
+        }
     }
 
     private SongBeamerSettings readSongBeamerSettings() {

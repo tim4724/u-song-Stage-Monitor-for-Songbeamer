@@ -1,5 +1,6 @@
 package com.tim.usong.core;
 
+import com.tim.usong.USongApplication;
 import com.tim.usong.core.entity.Song;
 import com.tim.usong.resource.SongResource;
 import io.dropwizard.lifecycle.Managed;
@@ -60,6 +61,7 @@ public class SongbeamerListener implements Managed, Runnable {
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 songResource.setSongAndPage(new Song("Fehler beim starten von SB Remote Client", e), 0);
+                USongApplication.showErrorDialog("Fehler beim starten von SB Remote Client\n" + e);
             }
 
             try (Socket socket = serverSocket.accept()) {
@@ -69,6 +71,7 @@ public class SongbeamerListener implements Managed, Runnable {
                 connected = false;
                 logger.error(e.getMessage());
                 songResource.setSongAndPage(new Song("Verbindung zu Songbeamer unterbrochen", e), 0);
+                USongApplication.showErrorDialog("Verbindung zu Songbeamer unterbrochen \n" + e);
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.tim.usong.core;
 
+import com.tim.usong.USongApplication;
 import com.tim.usong.core.entity.Page;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
@@ -7,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -28,24 +30,26 @@ public class SongParser {
         if (!fileName.endsWith(".sng")) {
             return Song.noSongSelected;
         }
-
+        if (!fileName.contains(":")) {
+            fileName = path + fileName;
+        }
         try {
             return parseSong(fileName);
         } catch (Exception e) {
             logger.error(e.getMessage());
+            if (e instanceof NoSuchFileException) {
+                USongApplication.showErrorDialog("Datei nicht gefunden:\n" + fileName + "\n" + e);
+                return new Song("Datei nicht gefunden:\n" + fileName, e);
+            }
+            USongApplication.showErrorDialog("Fehler beim Verarbeiten von " + fileName + "\n" + e);
             return new Song("Fehler beim Verarbeiten von " + fileName, e);
         }
     }
 
     private Song parseSong(String songFile) throws IOException {
         long startTime = System.currentTimeMillis();
-        String title = songFile.replace(".sng", "");
+        String title = songFile.replace(path, "").replace(".sng", "");
         List<String> pages = new ArrayList<>();
-
-        //String pathToSong = songName;
-        if (!songFile.contains(":")) {
-            songFile = path + songFile;
-        }
 
         try (Scanner scanner = new Scanner(Paths.get(songFile), "ISO-8859-1")) {
             scanner.useDelimiter("-(-)+\\r?\\n");
