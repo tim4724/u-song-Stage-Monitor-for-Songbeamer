@@ -30,14 +30,20 @@ public class USongApplication extends Application<USongConfiguration> {
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
         UIManager.put("OptionPane.background", Color.decode("0x111111"));
         UIManager.put("Panel.background", Color.decode("0x111111"));
+        UIManager.put("Label.foreground", Color.WHITE);
+        UIManager.put("Label.font", new Font("Helvetica Neue", Font.PLAIN, 14));
         UIManager.put("TextArea.foreground", Color.WHITE);
         UIManager.put("TextArea.margin", new Insets(4, 4, 4, 4));
         UIManager.put("TextArea.background", Color.decode("0x111111"));
         UIManager.put("TextArea.font", new Font("Helvetica Neue", Font.PLAIN, 14));
         UIManager.put("Panel.background", Color.decode("0x111111"));
+        UIManager.put("Panel.foregrount", Color.WHITE);
         UIManager.put("Button.background", Color.decode("0x008cff"));
         UIManager.put("Button.border", BorderFactory.createEmptyBorder(5, 20, 5, 20));
         UIManager.put("Button.foreground", Color.WHITE);
+
+        UIManager.put("ProgressBar.background", Color.decode("0x111111"));
+        UIManager.put("ProgressBar.foreground", Color.decode("0x008cff"));
     }
 
     public static final String appName = USongApplication.class.getPackage().getImplementationTitle();
@@ -46,10 +52,16 @@ public class USongApplication extends Application<USongConfiguration> {
     private Server server;
 
     public static void main(String[] args) throws Exception {
+        JFrame jf = new JFrame();
+        jf.setAlwaysOnTop(true);
         if (args.length == 0) {
             args = new String[]{"server"};
         }
         new USongApplication().run(args);
+    }
+
+    private USongApplication() {
+        new SplashScreen();
     }
 
     public static void showErrorDialog(Object msg) {
