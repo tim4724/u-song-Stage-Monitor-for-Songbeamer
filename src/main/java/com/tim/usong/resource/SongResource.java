@@ -51,6 +51,15 @@ public class SongResource {
         }
     }
 
+    public void shutDown() {
+        synchronized (longPollingLock) {
+            longPollingLock.notifyAll();
+        }
+        synchronized (activeClients) {
+            activeClients.notifyAll();
+        }
+    }
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public SongView getSong(@Session HttpSession session, @QueryParam("admin") boolean admin) {

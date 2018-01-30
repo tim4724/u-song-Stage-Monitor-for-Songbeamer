@@ -10,6 +10,7 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ public class USongApplication extends Application<USongConfiguration> {
     public static final String appName = USongApplication.class.getPackage().getImplementationTitle();
     public static final String appVersion = USongApplication.class.getPackage().getImplementationVersion();
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private Server server;
 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
@@ -86,13 +88,21 @@ public class USongApplication extends Application<USongConfiguration> {
 
             SongbeamerListener songbeamerListener = new SongbeamerListener(songResource);
             environment.lifecycle().manage(songbeamerListener);
-            environment.lifecycle().manage(new StatusTray(songBeamerSettings, songbeamerListener, songParser, songResource));
+            environment.lifecycle().manage(new StatusTray(this, songBeamerSettings, songbeamerListener, songParser, songResource));
+            environment.lifecycle().addServerLifecycleListener(server -> this.server = server);
         } catch (Exception e) {
             logger.error(e.getMessage());
             JFrame jf = new JFrame();
             jf.setAlwaysOnTop(true);
             JOptionPane.showMessageDialog(jf, e, appName, JOptionPane.ERROR_MESSAGE);
             throw e;
+        }
+    }
+
+    public void shutdown() {
+        try {
+            if (server != null) server.stop();
+        } catch (Exception ignore) {
         }
     }
 

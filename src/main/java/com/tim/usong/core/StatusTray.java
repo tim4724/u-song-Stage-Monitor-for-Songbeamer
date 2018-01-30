@@ -16,7 +16,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 
 public class StatusTray implements Managed {
-
+    private final USongApplication app;
     private final USongApplication.SongBeamerSettings songBeamerSettings;
     private final SongbeamerListener songbeamerListener;
     private final SongParser songParser;
@@ -24,10 +24,10 @@ public class StatusTray implements Managed {
     private final SystemTray systemTray;
     private final TrayIcon trayIcon;
 
-    public StatusTray(USongApplication.SongBeamerSettings songBeamerSettings,
-                      SongbeamerListener songbeamerListener,
-                      SongParser songParser,
+    public StatusTray(USongApplication app, USongApplication.SongBeamerSettings songBeamerSettings,
+                      SongbeamerListener songbeamerListener, SongParser songParser,
                       SongResource songResource) {
+        this.app = app;
         this.songBeamerSettings = songBeamerSettings;
         this.songbeamerListener = songbeamerListener;
         this.songParser = songParser;
@@ -55,7 +55,8 @@ public class StatusTray implements Managed {
             } else if (actionComand.startsWith("http://")) {
                 openBrowser(actionComand + "/song?admin=true");
             } else if (actionComand.equals("Beenden")) {
-                System.exit(0);
+                songResource.shutDown();
+                app.shutdown();
             }
         });
         trayIcon.addActionListener(e -> showStatusWindow());

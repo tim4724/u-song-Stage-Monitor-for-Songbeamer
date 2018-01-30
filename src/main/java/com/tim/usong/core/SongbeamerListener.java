@@ -68,10 +68,12 @@ public class SongbeamerListener implements Managed, Runnable {
                 connected = true;
                 receive(socket);
             } catch (Exception e) {
-                connected = false;
-                logger.error(e.getMessage());
-                songResource.setSongAndPage(new Song("Verbindung zu Songbeamer unterbrochen", e), 0);
-                USongApplication.showErrorDialog("Verbindung zu Songbeamer unterbrochen \n" + e);
+                if (!Thread.currentThread().isInterrupted()) {
+                    connected = false;
+                    logger.error(e.getMessage());
+                    songResource.setSongAndPage(new Song("Verbindung zu Songbeamer unterbrochen", e), 0);
+                    USongApplication.showErrorDialog("Verbindung zu Songbeamer unterbrochen \n" + e);
+                }
             }
         }
     }
