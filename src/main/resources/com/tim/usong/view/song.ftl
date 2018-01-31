@@ -8,8 +8,8 @@
 <#if admin>
     <link rel="stylesheet" href="/assets/css/admin.css">
 </#if>
-    <script src="/assets/js/update.js"></script>
     <script src="/assets/js/zenscroll.js"></script>
+    <script src="/assets/js/update.js"></script>
     <script>
         var titleElement = undefined;
         var pages = undefined;
@@ -48,13 +48,9 @@
 
 <div id="bottomSpacer"></div>
 
-<#if admin>
-    <#include "admin-controls.ftl">
-</#if>
+<#if admin><#include "admin-controls.ftl"></#if>
 
-<div id="errorBox">
-    &#9888; VERBINDUNG VERLOREN
-</div>
+<div id="errorBox">&#9888; VERBINDUNG VERLOREN</div>
 
 </body>
 </html>
