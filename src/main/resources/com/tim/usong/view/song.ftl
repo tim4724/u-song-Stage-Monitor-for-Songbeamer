@@ -14,11 +14,13 @@
         var titleElement = undefined;
         var pages = undefined;
         var currentPage = undefined;
+        var errorElement = undefined;
         var lastPageNumber = -1;
 
         function init() {
             window.titleElement = document.getElementById('title');
             window.pages = document.getElementsByClassName('page');
+            window.errorElement = document.getElementById("errorBox");
             update();
         }
     </script>
@@ -38,7 +40,7 @@
     </#if>
     <#list section.pages as page>
         <div class="page">
-        ${page.content}
+            ${page.content}
         </div>
     </#list>
 </section>
@@ -49,6 +51,10 @@
 <#if admin>
     <#include "admin-controls.ftl">
 </#if>
+
+<div id="errorBox">
+    &#9888; VERBINDUNG VERLOREN
+</div>
 
 </body>
 </html>

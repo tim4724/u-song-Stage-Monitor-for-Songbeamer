@@ -98,3 +98,16 @@ section {
 #bottomSpacer {
     height: 50px;
 }
+
+#errorBox {
+    display: none;
+    position: fixed;
+    font-size: 0.7em;
+    color: white;
+    background: #d80000;
+    padding: 10px 20px;
+    border: 6px solid white;
+    border-radius: 2px;
+    bottom: 20px;
+    right: 20px;
+}

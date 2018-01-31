@@ -2,6 +2,7 @@ function update() {
     let xhr = new XMLHttpRequest();
     xhr.open('GET', '/song/page', true);
     xhr.onload = function () {
+        window.errorElement.style.display = "none";
         if (xhr.status === 205) {
             location.reload(true);
             return;
@@ -10,15 +11,17 @@ function update() {
             if (xhr.status === 200) {
                 updatePageNumber(parseInt(xhr.responseText));
             }
+            update()
         } catch (e) {
+            window.errorElement.style.display = "block";
             console.error(e);
-        } finally {
-            update();
+            setTimeout(update(), 500);
         }
     };
     xhr.onerror = function (e) {
-        console.log(e.toString());
-        setTimeout(update(), 250);
+        window.errorElement.style.display = "block";
+        console.error(e);
+        setTimeout(update(), 500);
     };
     xhr.send(null);
 }
