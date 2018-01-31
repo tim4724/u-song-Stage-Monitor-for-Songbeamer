@@ -2,6 +2,8 @@ package com.tim.usong.resource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
@@ -17,11 +19,12 @@ public class RootResource {
 
     @GET
     @Path("assets2/css/song2.css")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getAdditionalCss() {
         File f = new File("song.css");
         if (f.exists()) {
-            return Response.ok(f).build();
+            return Response.ok(f).header("Content-Type", "text/css").build();
         }
-        return Response.ok().build();
+        return Response.ok().header("Content-Type", "text/css").build();
     }
 }
