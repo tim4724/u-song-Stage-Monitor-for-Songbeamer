@@ -20,8 +20,7 @@ import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 public class USongApplication extends Application<USongConfiguration> {
     static {
@@ -41,7 +40,6 @@ public class USongApplication extends Application<USongConfiguration> {
         UIManager.put("Button.background", Color.decode("0x008cff"));
         UIManager.put("Button.border", BorderFactory.createEmptyBorder(5, 20, 5, 20));
         UIManager.put("Button.foreground", Color.WHITE);
-
         UIManager.put("ProgressBar.background", Color.decode("0x111111"));
         UIManager.put("ProgressBar.foreground", Color.decode("0x008cff"));
     }
@@ -52,19 +50,12 @@ public class USongApplication extends Application<USongConfiguration> {
     private Server server;
 
     public static void main(String[] args) throws Exception {
-        JFrame jf = new JFrame();
-        jf.setAlwaysOnTop(true);
-        if (args.length == 0) {
-            args = new String[]{"server"};
-        }
+        SplashScreen.showSplashScreen();
+        if (args.length == 0) args = new String[]{"server"};
         new USongApplication().run(args);
     }
 
-    private USongApplication() {
-        new SplashScreen();
-    }
-
-    public static void showErrorDialog(Object msg) {
+    public static void showErrorDialogAsync(Object msg) {
         new Thread(() -> {
             JFrame jf = new JFrame();
             jf.setAlwaysOnTop(true);
@@ -84,8 +75,7 @@ public class USongApplication extends Application<USongConfiguration> {
             SongBeamerSettings songBeamerSettings = readSongBeamerSettings();
             String songDir = config.getAppConfig().songDir;
             if ((songDir == null || songDir.isEmpty())) {
-                //no songDir in app yml config provided
-                songDir = songBeamerSettings.songDir;
+                songDir = songBeamerSettings.songDir; //no songDir in app yml config provided
             }
             if (songDir != null && (!songDir.endsWith("\\"))) {
                 songDir = songDir + "\\";
@@ -100,7 +90,8 @@ public class USongApplication extends Application<USongConfiguration> {
 
             SongbeamerListener songbeamerListener = new SongbeamerListener(songResource);
             environment.lifecycle().manage(songbeamerListener);
-            environment.lifecycle().manage(new StatusTray(this, songBeamerSettings, songbeamerListener, songParser, songResource));
+            environment.lifecycle().manage(
+                    new StatusTray(this, songBeamerSettings, songbeamerListener, songParser, songResource));
             environment.lifecycle().addServerLifecycleListener(server -> this.server = server);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -115,6 +106,7 @@ public class USongApplication extends Application<USongConfiguration> {
         try {
             if (server != null) server.stop();
         } catch (Exception ignore) {
+            System.exit(0);
         }
     }
 
@@ -123,12 +115,12 @@ public class USongApplication extends Application<USongConfiguration> {
         String version = "unbekannt";
         try {
             String path = System.getenv("APPDATA") + "\\SongBeamer\\SongBeamer.ini";
-            Set<String> lines = Files.lines(Paths.get(path), StandardCharsets.UTF_16LE).collect(Collectors.toSet());
+            List<String> lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_16LE);
             for (String l : lines) {
                 if (l.startsWith("FolienBaseDir=")) {
                     songDir = l.replaceFirst("FolienBaseDir=", "");
                     if (songDir.startsWith("%My Documents%")) {
-                        //%My Documents% is a Songbeamer variable which points to users documents folder
+                        //"%My Documents%" is a Songbeamer variable which points to users documents folder
                         String myDocuments = System.getenv("USERPROFILE") + "\\Documents";
                         songDir = songDir.replace("%My Documents%", myDocuments);
                     }

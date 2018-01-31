@@ -21,6 +21,7 @@ public class StatusTray implements Managed {
     private final SongbeamerListener songbeamerListener;
     private final SongParser songParser;
     private final SongResource songResource;
+
     private final SystemTray systemTray;
     private final TrayIcon trayIcon;
 
@@ -107,10 +108,10 @@ public class StatusTray implements Managed {
                 JOptionPane.PLAIN_MESSAGE, new ImageIcon(StatusTray.class.getResource("/icon-small.png")));
     }
 
-    private int countSongs(String songPath) {
+    private long countSongs(String songPath) {
         String[] files = new File(songPath).list();
         if (files == null) return -1;
-        return (int) Arrays.stream(files).filter(s -> s.endsWith(".sng")).count();
+        return Arrays.stream(files).filter(s -> s.endsWith(".sng")).count();
     }
 
     private String getHostAddress(String defaultValue) {
