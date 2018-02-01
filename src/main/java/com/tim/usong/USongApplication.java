@@ -24,24 +24,27 @@ import java.util.List;
 
 public class USongApplication extends Application<USongConfiguration> {
     static {
-        UIManager.put("OptionPane.messageFont", new Font("Helvetica Neue", Font.PLAIN, 14));
-        UIManager.put("OptionPane.buttonFont", new Font("Helvetica Neue", Font.PLAIN, 12));
+        Font font = new Font("Helvetica Neue", Font.PLAIN, 14);
+        Color darkGrayBg = Color.decode("0x111111");
+        Color accent = Color.decode("0x008cff");
+        UIManager.put("OptionPane.messageFont", font);
+        UIManager.put("OptionPane.buttonFont", font);
         UIManager.put("OptionPane.messageForeground", Color.WHITE);
-        UIManager.put("OptionPane.background", Color.decode("0x111111"));
-        UIManager.put("Panel.background", Color.decode("0x111111"));
+        UIManager.put("OptionPane.background", darkGrayBg);
+        UIManager.put("Panel.background", darkGrayBg);
         UIManager.put("Label.foreground", Color.WHITE);
-        UIManager.put("Label.font", new Font("Helvetica Neue", Font.PLAIN, 14));
+        UIManager.put("Label.font", font);
         UIManager.put("TextArea.foreground", Color.WHITE);
-        UIManager.put("TextArea.margin", new Insets(4, 4, 4, 4));
-        UIManager.put("TextArea.background", Color.decode("0x111111"));
-        UIManager.put("TextArea.font", new Font("Helvetica Neue", Font.PLAIN, 14));
-        UIManager.put("Panel.background", Color.decode("0x111111"));
+        UIManager.put("TextArea.margin", font);
+        UIManager.put("TextArea.background", darkGrayBg);
+        UIManager.put("TextArea.font", font);
+        UIManager.put("Panel.background", darkGrayBg);
         UIManager.put("Panel.foregrount", Color.WHITE);
-        UIManager.put("Button.background", Color.decode("0x008cff"));
+        UIManager.put("Button.background", accent);
         UIManager.put("Button.border", BorderFactory.createEmptyBorder(5, 20, 5, 20));
         UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("ProgressBar.background", Color.decode("0x111111"));
-        UIManager.put("ProgressBar.foreground", Color.decode("0x008cff"));
+        UIManager.put("ProgressBar.background", darkGrayBg);
+        UIManager.put("ProgressBar.foreground", accent);
     }
 
     public static final String appName = USongApplication.class.getPackage().getImplementationTitle();
@@ -55,12 +58,16 @@ public class USongApplication extends Application<USongConfiguration> {
         new USongApplication().run(args);
     }
 
-    public static void showErrorDialogAsync(Object msg) {
-        new Thread(() -> {
-            JFrame jf = new JFrame();
-            jf.setAlwaysOnTop(true);
+    public static void showErrorDialogAsync(Object msg, boolean async) {
+        JFrame jf = new JFrame();
+        jf.setAlwaysOnTop(true);
+        if (async) {
+            new Thread(() -> {
+                JOptionPane.showMessageDialog(jf, msg, appName, JOptionPane.ERROR_MESSAGE);
+            }).start();
+        } else {
             JOptionPane.showMessageDialog(jf, msg, appName, JOptionPane.ERROR_MESSAGE);
-        }).start();
+        }
     }
 
     @Override
@@ -95,9 +102,7 @@ public class USongApplication extends Application<USongConfiguration> {
             environment.lifecycle().addServerLifecycleListener(server -> this.server = server);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            JFrame jf = new JFrame();
-            jf.setAlwaysOnTop(true);
-            JOptionPane.showMessageDialog(jf, e, appName, JOptionPane.ERROR_MESSAGE);
+            showErrorDialogAsync(e, false);
             throw e;
         }
     }
@@ -105,7 +110,7 @@ public class USongApplication extends Application<USongConfiguration> {
     public void shutdown() {
         try {
             if (server != null) server.stop();
-        } catch (Exception ignore) {
+        } catch (Exception e) {
             System.exit(0);
         }
     }

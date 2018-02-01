@@ -38,10 +38,10 @@ public class SongParser {
         } catch (Exception e) {
             logger.error(e.getMessage());
             if (e instanceof NoSuchFileException) {
-                USongApplication.showErrorDialogAsync("Datei nicht gefunden:\n" + fileName + "\n" + e);
+                USongApplication.showErrorDialogAsync("Datei nicht gefunden:\n" + fileName + "\n" + e, true);
                 return new Song("Datei nicht gefunden:\n" + fileName, e);
             }
-            USongApplication.showErrorDialogAsync("Fehler beim Verarbeiten von " + fileName + "\n" + e);
+            USongApplication.showErrorDialogAsync("Fehler beim Verarbeiten von " + fileName + "\n" + e, true);
             return new Song("Fehler beim Verarbeiten von " + fileName, e);
         }
     }

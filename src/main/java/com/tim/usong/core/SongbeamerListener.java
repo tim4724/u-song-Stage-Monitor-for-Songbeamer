@@ -61,7 +61,7 @@ public class SongbeamerListener implements Managed, Runnable {
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 songResource.setSongAndPage(new Song("Fehler beim starten von SB Remote Client", e), 0);
-                USongApplication.showErrorDialogAsync("Fehler beim starten von SB Remote Client\n" + e);
+                USongApplication.showErrorDialogAsync("Fehler beim starten von SB Remote Client\n" + e, true);
             }
 
             try (Socket socket = serverSocket.accept()) {
@@ -72,7 +72,7 @@ public class SongbeamerListener implements Managed, Runnable {
                     connected = false;
                     logger.error(e.getMessage());
                     songResource.setSongAndPage(new Song("Verbindung zu Songbeamer unterbrochen", e), 0);
-                    USongApplication.showErrorDialogAsync("Verbindung zu Songbeamer unterbrochen \n" + e);
+                    USongApplication.showErrorDialogAsync("Verbindung zu Songbeamer unterbrochen \n" + e, true);
                 }
             }
         }
