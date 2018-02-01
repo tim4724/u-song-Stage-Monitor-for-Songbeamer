@@ -23,7 +23,7 @@ abstract class Setupper {
 
             Path configYamlPath = Paths.get(USongApplication.LOCAL_DIR, "usong.yml");
             if (!Files.exists(configYamlPath)) {
-                Files.copy(USongApplication.class.getResourceAsStream("/usojng.yml"), configYamlPath);
+                Files.copy(USongApplication.class.getResourceAsStream("/usong.yml"), configYamlPath);
             }
         } catch (Exception ignore) {
         }
