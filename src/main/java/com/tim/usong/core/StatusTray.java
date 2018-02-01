@@ -62,9 +62,9 @@ public class StatusTray implements Managed {
             } else if (actionComand.startsWith("http://")) {
                 openBrowser(actionComand + "/song?admin=true");
             } else if (actionComand.equals("Beenden")) {
+                if (uSongControlProcess != null) uSongControlProcess.destroy();
                 songResource.shutDown();
                 app.shutdown();
-                if (uSongControlProcess != null) uSongControlProcess.destroy();
             }
         });
 

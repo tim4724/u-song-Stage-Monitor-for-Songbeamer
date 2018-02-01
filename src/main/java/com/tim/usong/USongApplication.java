@@ -16,60 +16,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 public class USongApplication extends Application<USongConfiguration> {
-    static {
-        Font font = new Font("Helvetica Neue", Font.PLAIN, 14);
-        Color darkGrayBg = Color.decode("0x111111");
-        Color accent = Color.decode("0x008cff");
-        UIManager.put("OptionPane.messageFont", font);
-        UIManager.put("OptionPane.buttonFont", font);
-        UIManager.put("OptionPane.messageForeground", Color.WHITE);
-        UIManager.put("OptionPane.background", darkGrayBg);
-        UIManager.put("Panel.background", darkGrayBg);
-        UIManager.put("Label.foreground", Color.WHITE);
-        UIManager.put("Label.font", font);
-        UIManager.put("TextArea.foreground", Color.WHITE);
-        UIManager.put("TextArea.margin", font);
-        UIManager.put("TextArea.background", darkGrayBg);
-        UIManager.put("TextArea.font", font);
-        UIManager.put("Panel.background", darkGrayBg);
-        UIManager.put("Panel.foregrount", Color.WHITE);
-        UIManager.put("Button.background", accent);
-        UIManager.put("Button.border", BorderFactory.createEmptyBorder(5, 20, 5, 20));
-        UIManager.put("Button.foreground", Color.WHITE);
-        UIManager.put("ProgressBar.background", darkGrayBg);
-        UIManager.put("ProgressBar.foreground", accent);
-    }
 
     public static final String APP_NAME = USongApplication.class.getPackage().getImplementationTitle();
     public static final String APP_VERSION = USongApplication.class.getPackage().getImplementationVersion();
     public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
+
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private Server server;
 
     public static void main(String[] args) throws Exception {
-        SplashScreen.showSplashScreen();
-
-        Files.createDirectories(Paths.get(LOCAL_DIR));
-        Path songControlPath = Paths.get(LOCAL_DIR, "uSongControl.jar");
-        if (!Files.exists(songControlPath)) {
-            //write the uSongControl.jar to the appdata directory
-            Files.copy(USongApplication.class.getResourceAsStream("/uSongControl.jar"), songControlPath);
-        }
-
-        Path configYamlPath = Paths.get(LOCAL_DIR, "usong.yml");
-        if (!Files.exists(configYamlPath)) {
-            Files.copy(USongApplication.class.getResourceAsStream("/usong.yml"), configYamlPath);
-        }
-
-        if (args.length == 0) args = new String[]{"server", configYamlPath.toString()};
+        Setupper.setUpEverything(true);
+        if (args.length == 0) args = new String[]{"server", LOCAL_DIR + "usong.yml"};
         new USongApplication().run(args);
     }
 
@@ -91,35 +54,35 @@ public class USongApplication extends Application<USongConfiguration> {
 
     @Override
     public void run(USongConfiguration config, Environment environment) throws Exception {
-        try {
-            SongBeamerSettings SBSettings = readSongBeamerSettings();
-            String songDir = config.getAppConfig().songDir;
-            if ((songDir == null || songDir.isEmpty())) {
-                songDir = SBSettings.songDir; //no songDir in app yml config provided
-            }
-            if (songDir != null && (!songDir.endsWith("\\"))) {
-                songDir = songDir + "\\";
-            }
-            logger.info("Songs directory: " + songDir);
-
-            SongParser songParser = new SongParser(songDir);
-            SongResource songResource = new SongResource(songParser);
-            environment.jersey().register(new RootResource());
-            environment.jersey().register(songResource);
-            environment.servlets().setSessionHandler(new SessionHandler());
-
-            SongbeamerListener SBListener = new SongbeamerListener(songResource);
-            environment.lifecycle().manage(SBListener);
-            StatusTray statusTray = new StatusTray(this, SBSettings, SBListener, songParser, songResource);
-            environment.lifecycle().manage(statusTray);
-            environment.lifecycle().addServerLifecycleListener(server -> {
-                this.server = server;
-            });
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            showErrorDialogAsync(e, false);
-            throw e;
+        SongBeamerSettings SBSettings = readSongBeamerSettings();
+        String songDir = config.getAppConfig().songDir;
+        if ((songDir == null || songDir.isEmpty())) {
+            songDir = SBSettings.songDir; //no songDir in app yml config provided
         }
+        if (songDir != null && (!songDir.endsWith("\\"))) {
+            songDir = songDir + "\\";
+        }
+        logger.info("Songs directory: " + songDir);
+
+        SongParser songParser = new SongParser(songDir);
+        SongResource songResource = new SongResource(songParser);
+        environment.jersey().register(new RootResource());
+        environment.jersey().register(songResource);
+        environment.servlets().setSessionHandler(new SessionHandler());
+
+        SongbeamerListener SBListener = new SongbeamerListener(songResource);
+        environment.lifecycle().manage(SBListener);
+        StatusTray statusTray = new StatusTray(this, SBSettings, SBListener, songParser, songResource);
+        environment.lifecycle().manage(statusTray);
+        environment.lifecycle().addServerLifecycleListener(server -> {
+            this.server = server;
+        });
+    }
+
+    @Override
+    protected void onFatalError() {
+        showErrorDialogAsync("Fataler Fehler", false);
+        super.onFatalError();
     }
 
     public void shutdown() {
