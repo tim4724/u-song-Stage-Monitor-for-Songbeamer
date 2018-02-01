@@ -8,7 +8,7 @@ abstract class SplashScreen {
         new Thread(() -> {
             JWindow window = new JWindow();
 
-            String text = String.format("%s %s", USongApplication.appName, USongApplication.appVersion);
+            String text = String.format("%s %s", USongApplication.APP_NAME, USongApplication.APP_VERSION);
             ImageIcon imageIcon = new ImageIcon(SplashScreen.class.getResource("/icon-small.png"));
             JLabel label = new JLabel(text.toUpperCase(), imageIcon, SwingConstants.CENTER);
             label.setIconTextGap(10);

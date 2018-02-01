@@ -19,6 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -47,13 +48,22 @@ public class USongApplication extends Application<USongConfiguration> {
         UIManager.put("ProgressBar.foreground", accent);
     }
 
-    public static final String appName = USongApplication.class.getPackage().getImplementationTitle();
-    public static final String appVersion = USongApplication.class.getPackage().getImplementationVersion();
+    public static final String APP_NAME = USongApplication.class.getPackage().getImplementationTitle();
+    public static final String APP_VERSION = USongApplication.class.getPackage().getImplementationVersion();
+    public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
     private final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private Server server;
 
     public static void main(String[] args) throws Exception {
         SplashScreen.showSplashScreen();
+
+        Files.createDirectories(Paths.get(LOCAL_DIR));
+        Path songControlPath = Paths.get(LOCAL_DIR, "uSongControl.jar");
+        if (!Files.exists(songControlPath)) {
+            //write the uSongControl.jar to the appdata directory
+            Files.copy(USongApplication.class.getResourceAsStream("/uSongControl.jar"), songControlPath);
+        }
+
         if (args.length == 0) args = new String[]{"server"};
         new USongApplication().run(args);
     }
@@ -62,11 +72,9 @@ public class USongApplication extends Application<USongConfiguration> {
         JFrame jf = new JFrame();
         jf.setAlwaysOnTop(true);
         if (async) {
-            new Thread(() -> {
-                JOptionPane.showMessageDialog(jf, msg, appName, JOptionPane.ERROR_MESSAGE);
-            }).start();
+            new Thread(() -> JOptionPane.showMessageDialog(jf, msg, APP_NAME, JOptionPane.ERROR_MESSAGE)).start();
         } else {
-            JOptionPane.showMessageDialog(jf, msg, appName, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(jf, msg, APP_NAME, JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -79,10 +87,10 @@ public class USongApplication extends Application<USongConfiguration> {
     @Override
     public void run(USongConfiguration config, Environment environment) throws Exception {
         try {
-            SongBeamerSettings songBeamerSettings = readSongBeamerSettings();
+            SongBeamerSettings SBSettings = readSongBeamerSettings();
             String songDir = config.getAppConfig().songDir;
             if ((songDir == null || songDir.isEmpty())) {
-                songDir = songBeamerSettings.songDir; //no songDir in app yml config provided
+                songDir = SBSettings.songDir; //no songDir in app yml config provided
             }
             if (songDir != null && (!songDir.endsWith("\\"))) {
                 songDir = songDir + "\\";
@@ -95,11 +103,13 @@ public class USongApplication extends Application<USongConfiguration> {
             environment.jersey().register(songResource);
             environment.servlets().setSessionHandler(new SessionHandler());
 
-            SongbeamerListener songbeamerListener = new SongbeamerListener(songResource);
-            environment.lifecycle().manage(songbeamerListener);
-            environment.lifecycle().manage(
-                    new StatusTray(this, songBeamerSettings, songbeamerListener, songParser, songResource));
-            environment.lifecycle().addServerLifecycleListener(server -> this.server = server);
+            SongbeamerListener SBListener = new SongbeamerListener(songResource);
+            environment.lifecycle().manage(SBListener);
+            StatusTray statusTray = new StatusTray(this, SBSettings, SBListener, songParser, songResource);
+            environment.lifecycle().manage(statusTray);
+            environment.lifecycle().addServerLifecycleListener(server -> {
+                this.server = server;
+            });
         } catch (Exception e) {
             logger.error(e.getMessage());
             showErrorDialogAsync(e, false);

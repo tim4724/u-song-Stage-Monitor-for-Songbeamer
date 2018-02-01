@@ -7,9 +7,9 @@ import io.dropwizard.lifecycle.Managed;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ItemEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -24,6 +24,7 @@ public class StatusTray implements Managed {
 
     private final SystemTray systemTray;
     private final TrayIcon trayIcon;
+    private Process uSongControlProcess;
 
     public StatusTray(USongApplication app, USongApplication.SongBeamerSettings songBeamerSettings,
                       SongbeamerListener songbeamerListener, SongParser songParser,
@@ -36,30 +37,37 @@ public class StatusTray implements Managed {
         systemTray = SystemTray.getSystemTray();
 
         Image image = Toolkit.getDefaultToolkit().getImage(StatusTray.class.getResource("/icon-small2.png"));
-        trayIcon = new TrayIcon(image, USongApplication.appName, new PopupMenu());
+        trayIcon = new TrayIcon(image, USongApplication.APP_NAME, new PopupMenu());
         trayIcon.setImageAutoSize(true);
     }
 
     @Override
     public void start() {
         PopupMenu popupMenu = trayIcon.getPopupMenu();
-        trayIcon.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                populatePopupMenu(popupMenu);
-            }
-        });
+
+        popupMenu.add("Status");
+        CheckboxMenuItem previewCheckBox = new CheckboxMenuItem("Vorschau", false);
+        previewCheckBox.addItemListener(this::onPreviewCheckboxStateChange);
+        popupMenu.add(previewCheckBox);
+        popupMenu.addSeparator();
+        String hostname = getHostname(null);
+        if (hostname != null) popupMenu.add("http://" + hostname);
+        popupMenu.addSeparator();
+        popupMenu.add("Beenden");
+
         popupMenu.addActionListener(e -> {
             String actionComand = e.getActionCommand();
-            if (actionComand.equals("Zeige Status")) {
+            if (actionComand.equals("Status")) {
                 showStatusWindow();
             } else if (actionComand.startsWith("http://")) {
                 openBrowser(actionComand + "/song?admin=true");
             } else if (actionComand.equals("Beenden")) {
                 songResource.shutDown();
                 app.shutdown();
+                if (uSongControlProcess != null) uSongControlProcess.destroy();
             }
         });
+
         trayIcon.addActionListener(e -> showStatusWindow());
         try {
             systemTray.add(trayIcon);
@@ -72,16 +80,18 @@ public class StatusTray implements Managed {
         systemTray.remove(trayIcon);
     }
 
-    private void populatePopupMenu(PopupMenu popupMenu) {
-        String hostname = getHostname(null);
-        String hostAdress = getHostAddress(null);
-
-        popupMenu.removeAll();
-        popupMenu.add("Zeige Status");
-        if (hostname != null) popupMenu.add("http://" + hostname);
-        if (hostAdress != null) popupMenu.add("http://" + hostAdress);
-        popupMenu.addSeparator();
-        popupMenu.add("Beenden");
+    private void onPreviewCheckboxStateChange(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            try {
+                String pathTojar = USongApplication.LOCAL_DIR + "uSongControl.jar";
+                uSongControlProcess = Runtime.getRuntime().exec("java -jar " + pathTojar);
+            } catch (IOException e1) {
+                USongApplication.showErrorDialogAsync("Fehler beim Öffnen des Vorschau Fensters\n" + e1, true);
+                ((CheckboxMenuItem) e.getItem()).setState(false);
+            }
+        } else if (uSongControlProcess != null) {
+            uSongControlProcess.destroy();
+        }
     }
 
     private void showStatusWindow() {
@@ -90,11 +100,11 @@ public class StatusTray implements Managed {
 
         StringBuilder messageBuilder = new StringBuilder()
                 .append("Hostname: \t\t").append(getHostname("unbekannt"))
-                .append("\nIP Addresse: \t\t").append(getHostAddress("unbekannt"))
+                .append("\nIP Addresse: \t\t").append(getHostAddress())
                 .append("\nSongBeamer Sender: \t")
                 .append(songbeamerListener.isConnected() ? "Verbunden" : "Nicht verbunden")
                 .append("\nAnzahl aktiver Clients: \t").append(songResource.getClientsCount())
-                .append("\n\nOrdner für Songs: \t").append(songParser.getSongDir()).append("    ")
+                .append("\n\nOrdner für Songs: \t").append(songParser.getSongDir()).append("  ")
                 .append("\nAnzahl Songs: \t").append(countSongs(songParser.getSongDir()))
                 .append("\n\nAktueller Song: \t").append(song.getTitle())
                 .append("\nAktuelle Foliennummer: \t").append(page == -1 ? "-" : page + 1);
@@ -103,8 +113,8 @@ public class StatusTray implements Managed {
             messageBuilder.append("\nAktuelle Sprache: \t").append(currentLang);
         }
         messageBuilder.append("\n\nSongBeamer Version: \t").append(songBeamerSettings.version)
-                .append("\nVersion: \t\t").append(USongApplication.appVersion);
-        JOptionPane.showMessageDialog(null, new JTextArea(messageBuilder.toString()), USongApplication.appName,
+                .append("\nVersion: \t\t").append(USongApplication.APP_VERSION);
+        JOptionPane.showMessageDialog(null, new JTextArea(messageBuilder.toString()), USongApplication.APP_NAME,
                 JOptionPane.PLAIN_MESSAGE, new ImageIcon(StatusTray.class.getResource("/icon-small.png")));
     }
 
@@ -114,11 +124,11 @@ public class StatusTray implements Managed {
         return Arrays.stream(files).filter(s -> s.endsWith(".sng")).count();
     }
 
-    private String getHostAddress(String defaultValue) {
+    private String getHostAddress() {
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            return defaultValue;
+            return "unbekannt";
         }
     }
 
