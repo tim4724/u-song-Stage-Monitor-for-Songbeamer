@@ -64,7 +64,12 @@ public class USongApplication extends Application<USongConfiguration> {
             Files.copy(USongApplication.class.getResourceAsStream("/uSongControl.jar"), songControlPath);
         }
 
-        if (args.length == 0) args = new String[]{"server"};
+        Path configYamlPath = Paths.get(LOCAL_DIR, "usong.yml");
+        if (!Files.exists(configYamlPath)) {
+            Files.copy(USongApplication.class.getResourceAsStream("/usong.yml"), configYamlPath);
+        }
+
+        if (args.length == 0) args = new String[]{"server", configYamlPath.toString()};
         new USongApplication().run(args);
     }
 
