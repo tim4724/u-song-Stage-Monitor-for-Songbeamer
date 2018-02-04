@@ -1,5 +1,6 @@
 package com.tim.usong;
 
+import com.google.common.base.Strings;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
 import com.tim.usong.core.StatusTray;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -31,12 +33,12 @@ public class USongApplication extends Application<USongConfiguration> {
     private Server server;
 
     public static void main(String[] args) throws Exception {
-        Setupper.setUpEverything(true);
+        Setup.setUpEverything(true);
         if (args.length == 0) args = new String[]{"server", LOCAL_DIR + "usong.yml"};
         new USongApplication().run(args);
     }
 
-    public static void showErrorDialogAsync(Object msg, boolean async) {
+    public static void showErrorDialog(Object msg, boolean async) {
         JFrame jf = new JFrame();
         jf.setAlwaysOnTop(true);
         if (async) {
@@ -55,14 +57,15 @@ public class USongApplication extends Application<USongConfiguration> {
     @Override
     public void run(USongConfiguration config, Environment environment) throws Exception {
         SongBeamerSettings SBSettings = readSongBeamerSettings();
+
         String songDir = config.getAppConfig().songDir;
-        if ((songDir == null || songDir.isEmpty())) {
+        if (Strings.isNullOrEmpty(songDir)) {
             songDir = SBSettings.songDir; //no songDir in app yml config provided
         }
         if (songDir != null && (!songDir.endsWith("\\"))) {
             songDir = songDir + "\\";
         }
-        logger.info("Songs directory: " + songDir);
+        logger.info("Using songs directory: " + songDir);
 
         SongParser songParser = new SongParser(songDir);
         SongResource songResource = new SongResource(songParser);
@@ -81,7 +84,7 @@ public class USongApplication extends Application<USongConfiguration> {
 
     @Override
     protected void onFatalError() {
-        showErrorDialogAsync("Fataler Fehler", false);
+        showErrorDialog("Fataler Fehler", false);
         super.onFatalError();
     }
 
@@ -98,7 +101,14 @@ public class USongApplication extends Application<USongConfiguration> {
         String version = "unbekannt";
         try {
             String path = System.getenv("APPDATA") + "\\SongBeamer\\SongBeamer.ini";
-            List<String> lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_16LE);
+            //Apparently the file can be UTF_16LE or UTF_8 encoeded. yay
+            List<String> lines;
+            try {
+                lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_16LE);
+            } catch (CharacterCodingException e) {
+                lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
+            }
+
             for (String l : lines) {
                 if (l.startsWith("FolienBaseDir=")) {
                     songDir = l.replaceFirst("FolienBaseDir=", "");
@@ -112,7 +122,7 @@ public class USongApplication extends Application<USongConfiguration> {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error while reading Songbeamer.ini", e);
         }
         return new SongBeamerSettings(version, songDir);
     }

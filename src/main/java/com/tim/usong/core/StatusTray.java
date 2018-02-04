@@ -86,7 +86,7 @@ public class StatusTray implements Managed {
                 String pathTojar = USongApplication.LOCAL_DIR + "uSongControl.jar";
                 uSongControlProcess = Runtime.getRuntime().exec("java -jar " + pathTojar);
             } catch (IOException e1) {
-                USongApplication.showErrorDialogAsync("Fehler beim Öffnen des Vorschau Fensters\n" + e1, true);
+                USongApplication.showErrorDialog("Fehler beim Öffnen des Vorschau Fensters\n" + e1, true);
                 ((CheckboxMenuItem) e.getItem()).setState(false);
             }
         } else if (uSongControlProcess != null) {

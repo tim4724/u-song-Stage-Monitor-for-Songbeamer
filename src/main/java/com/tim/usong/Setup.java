@@ -1,12 +1,17 @@
 package com.tim.usong;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.*;
 import java.awt.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-abstract class Setupper {
+abstract class Setup {
+
+    private static final Logger logger = LoggerFactory.getLogger(Setup.class.getName());
 
     static void setUpEverything(boolean showSplash) {
         setUpUI();
@@ -16,16 +21,17 @@ abstract class Setupper {
         try {
             Files.createDirectories(Paths.get(USongApplication.LOCAL_DIR));
 
-            Path songControlPath = Paths.get(USongApplication.LOCAL_DIR, "uSongControl.jar");
-            if (!Files.exists(songControlPath)) {
-                Files.copy(USongApplication.class.getResourceAsStream("/uSongControl.jar"), songControlPath);
-            }
-
             Path configYamlPath = Paths.get(USongApplication.LOCAL_DIR, "usong.yml");
             if (!Files.exists(configYamlPath)) {
                 Files.copy(USongApplication.class.getResourceAsStream("/usong.yml"), configYamlPath);
             }
-        } catch (Exception ignore) {
+
+            Path songControlPath = Paths.get(USongApplication.LOCAL_DIR, "uSongControl.jar");
+            if (!Files.exists(songControlPath)) {
+                Files.copy(USongApplication.class.getResourceAsStream("/uSongControl.jar"), songControlPath);
+            }
+        } catch (Exception e) {
+            logger.error("Error during setup", e);
         }
     }
 
@@ -56,7 +62,7 @@ abstract class Setupper {
     private static void showSplashScreen() {
         new Thread(() -> {
             String text = String.format("%s %s", USongApplication.APP_NAME, USongApplication.APP_VERSION);
-            ImageIcon imageIcon = new ImageIcon(Setupper.class.getResource("/icon-small.png"));
+            ImageIcon imageIcon = new ImageIcon(Setup.class.getResource("/icon-small.png"));
             JLabel label = new JLabel(text.toUpperCase(), imageIcon, SwingConstants.CENTER);
             label.setIconTextGap(10);
             label.setHorizontalTextPosition(JLabel.CENTER);
