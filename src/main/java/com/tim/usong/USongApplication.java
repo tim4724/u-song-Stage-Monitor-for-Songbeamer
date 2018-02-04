@@ -8,6 +8,8 @@ import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
@@ -29,7 +31,7 @@ public class USongApplication extends Application<USongConfiguration> {
     public static final String APP_VERSION = USongApplication.class.getPackage().getImplementationVersion();
     public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Server server;
 
     public static void main(String[] args) throws Exception {
@@ -50,6 +52,10 @@ public class USongApplication extends Application<USongConfiguration> {
 
     @Override
     public void initialize(Bootstrap<USongConfiguration> bootstrap) {
+        bootstrap.setConfigurationSourceProvider(
+                new SubstitutingSourceProvider(
+                        bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor())
+        );
         bootstrap.addBundle(new AssetsBundle());
         bootstrap.addBundle(new ViewBundle<>());
     }
@@ -67,23 +73,29 @@ public class USongApplication extends Application<USongConfiguration> {
         }
         logger.info("Using songs directory: " + songDir);
 
-        SongParser songParser = new SongParser(songDir);
-        SongResource songResource = new SongResource(songParser);
-        environment.jersey().register(new RootResource());
-        environment.jersey().register(songResource);
-        environment.servlets().setSessionHandler(new SessionHandler());
+        try {
+            SongParser songParser = new SongParser(songDir);
+            SongResource songResource = new SongResource(songParser);
+            environment.jersey().register(new RootResource());
+            environment.jersey().register(songResource);
+            environment.servlets().setSessionHandler(new SessionHandler());
 
-        SongbeamerListener SBListener = new SongbeamerListener(songResource);
-        environment.lifecycle().manage(SBListener);
-        StatusTray statusTray = new StatusTray(this, SBSettings, SBListener, songParser, songResource);
-        environment.lifecycle().manage(statusTray);
-        environment.lifecycle().addServerLifecycleListener(server -> {
-            this.server = server;
-        });
+            SongbeamerListener SBListener = new SongbeamerListener(songResource);
+            environment.lifecycle().manage(SBListener);
+            StatusTray statusTray = new StatusTray(this, SBSettings, SBListener, songParser, songResource);
+            environment.lifecycle().manage(statusTray);
+            environment.lifecycle().addServerLifecycleListener(server -> {
+                this.server = server;
+            });
+        } catch (Exception e) {
+            logger.error("Failed to start server", e);
+            throw e;
+        }
     }
 
     @Override
     protected void onFatalError() {
+        logger.error("Fatal error");
         showErrorDialog("Fataler Fehler", false);
         super.onFatalError();
     }

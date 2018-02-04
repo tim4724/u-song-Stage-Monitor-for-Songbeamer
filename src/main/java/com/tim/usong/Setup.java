@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 
 abstract class Setup {
 
-    private static final Logger logger = LoggerFactory.getLogger(Setup.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(Setup.class);
 
     static void setUpEverything(boolean showSplash) {
         setUpUI();
@@ -31,7 +31,7 @@ abstract class Setup {
                 Files.copy(USongApplication.class.getResourceAsStream("/uSongControl.jar"), songControlPath);
             }
         } catch (Exception e) {
-            logger.error("Error during setup", e);
+            logger.error("Setup failed", e);
         }
     }
 

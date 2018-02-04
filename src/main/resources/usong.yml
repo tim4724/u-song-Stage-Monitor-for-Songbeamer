@@ -3,3 +3,15 @@ server:
     - type: http
       port: 80
 
+logging:
+  level: INFO
+  appenders:
+    - type: console
+    - type: file
+      threshold: ERROR
+      logFormat: "%-6level [%d{HH:mm:ss.SSS}] [%t] %logger{5} - %X{code} %msg %n"
+      currentLogFilename: ${APPDATA}/uSongServer/log/usong.log
+      archivedLogFilenamePattern: ${APPDATA}/uSongServer/log/usong-%d{yyyy-MM-dd}-%i.log.gz
+      archivedFileCount: 7
+      timeZone: UTC
+      maxFileSize: 10MB

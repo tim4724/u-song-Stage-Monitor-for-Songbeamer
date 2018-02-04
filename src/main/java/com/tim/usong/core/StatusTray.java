@@ -4,6 +4,8 @@ import com.tim.usong.USongApplication;
 import com.tim.usong.core.entity.Song;
 import com.tim.usong.resource.SongResource;
 import io.dropwizard.lifecycle.Managed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,12 +18,12 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 
 public class StatusTray implements Managed {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final USongApplication app;
     private final USongApplication.SongBeamerSettings songBeamerSettings;
     private final SongbeamerListener songbeamerListener;
     private final SongParser songParser;
     private final SongResource songResource;
-
     private final SystemTray systemTray;
     private final TrayIcon trayIcon;
     private Process uSongControlProcess;
@@ -71,7 +73,8 @@ public class StatusTray implements Managed {
         trayIcon.addActionListener(e -> showStatusWindow());
         try {
             systemTray.add(trayIcon);
-        } catch (AWTException ignore) {
+        } catch (AWTException e) {
+            logger.error("Failed to add tray icon to system tray", e);
         }
     }
 
@@ -80,14 +83,16 @@ public class StatusTray implements Managed {
         systemTray.remove(trayIcon);
     }
 
-    private void onPreviewCheckboxStateChange(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED) {
+    private void onPreviewCheckboxStateChange(ItemEvent event) {
+        if (event.getStateChange() == ItemEvent.SELECTED) {
             try {
-                String pathTojar = USongApplication.LOCAL_DIR + "uSongControl.jar";
-                uSongControlProcess = Runtime.getRuntime().exec("java -jar " + pathTojar);
-            } catch (IOException e1) {
-                USongApplication.showErrorDialog("Fehler beim Öffnen des Vorschau Fensters\n" + e1, true);
-                ((CheckboxMenuItem) e.getItem()).setState(false);
+                String path = USongApplication.LOCAL_DIR + "uSongControl.jar";
+                File workingDir = new File(System.getProperty("java.home"));
+                uSongControlProcess = Runtime.getRuntime().exec("java -jar " + path, null, workingDir);
+            } catch (IOException e) {
+                logger.error("Failed to open preview window", e);
+                USongApplication.showErrorDialog("Fehler beim Öffnen des Vorschau Fensters\n" + e, true);
+                ((CheckboxMenuItem) event.getItem()).setState(false);
             }
         } else if (uSongControlProcess != null) {
             uSongControlProcess.destroy();

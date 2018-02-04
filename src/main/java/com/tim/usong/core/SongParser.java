@@ -14,7 +14,7 @@ import java.util.*;
 
 public class SongParser {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass().getSimpleName());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String path;
     private Map<String, Integer> langMap = new HashMap<>();
 
@@ -36,7 +36,7 @@ public class SongParser {
         try {
             return parseSong(fileName);
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Failed to parse song", e);
             if (e instanceof NoSuchFileException) {
                 USongApplication.showErrorDialog("Datei nicht gefunden:\n" + fileName + "\n" + e, true);
                 return new Song("Datei nicht gefunden:\n" + fileName, e);
@@ -98,7 +98,8 @@ public class SongParser {
             }
         }
 
-        logger.info(String.format("Parsed song \"%s (Language %d)\" in %dms", title, desiredLang, System.currentTimeMillis() - startTime));
+        long duration = System.currentTimeMillis() - startTime;
+        logger.info(String.format("Parsed song \"%s (Language %d)\" in %dms", title, desiredLang, duration));
         return new Song(songFile, title, finalSectionList, desiredLang, header.langCount);
     }
 
@@ -130,7 +131,7 @@ public class SongParser {
                 if (lang == desiredLang) {
                     newPage.addLine(line.trim());
                 }
-                lineCounter++;//TODO: May need to be modified if lang ist given explicitly (##1, ##2...)
+                lineCounter++;//TODO: May need to be modified if lang is given explicitly (##1, ##2...)
             }
 
             Section lastSection = lastOf(allSections);
@@ -172,7 +173,7 @@ public class SongParser {
                         verseOrder = getValue(line).split(",");
                     }
                 } catch (Exception e) {
-                    logger.error(e.getMessage());
+                    logger.error("Failed to parse song-header", e);
                 }
             }
         }
