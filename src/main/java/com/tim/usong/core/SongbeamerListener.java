@@ -39,7 +39,7 @@ public class SongbeamerListener implements Managed, Runnable {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         currentThread.start();
     }
 
@@ -57,7 +57,7 @@ public class SongbeamerListener implements Managed, Runnable {
             try {
                 logger.info("Starting SBRemoteSender");
                 Runtime.getRuntime().exec("taskkill /F /IM SBRemoteSender.exe");
-                new ProcessBuilder("SBRemoteSender.exe").start();
+                new ProcessBuilder(USongApplication.LOCAL_DIR + "SBRemoteSender.exe").start();
             } catch (Exception e) {
                 logger.error("Starting SBRemoteSender failed", e);
                 songResource.setSongAndPage(new Song("Fehler beim starten von SB Remote Client", e), 0);

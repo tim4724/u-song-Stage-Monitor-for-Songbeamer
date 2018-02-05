@@ -1,5 +1,6 @@
 package com.tim.usong.core;
 
+import com.google.common.base.Strings;
 import com.tim.usong.USongApplication;
 import com.tim.usong.core.entity.Song;
 import com.tim.usong.resource.SongResource;
@@ -38,7 +39,7 @@ public class StatusTray implements Managed {
         this.songResource = songResource;
         systemTray = SystemTray.getSystemTray();
 
-        Image image = Toolkit.getDefaultToolkit().getImage(StatusTray.class.getResource("/icon-small2.png"));
+        Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon-small2.png"));
         trayIcon = new TrayIcon(image, USongApplication.APP_NAME, new PopupMenu());
         trayIcon.setImageAutoSize(true);
     }
@@ -102,6 +103,8 @@ public class StatusTray implements Managed {
     private void showStatusWindow() {
         Song song = songResource.getSong();
         int page = songResource.getPage();
+        String sbVersion = songBeamerSettings.version;
+        if (Strings.isNullOrEmpty(sbVersion)) sbVersion = "unbekannt";
 
         StringBuilder messageBuilder = new StringBuilder()
                 .append("Hostname: \t\t").append(getHostname("unbekannt"))
@@ -109,7 +112,7 @@ public class StatusTray implements Managed {
                 .append("\nSongBeamer Sender: \t")
                 .append(songbeamerListener.isConnected() ? "Verbunden" : "Nicht verbunden")
                 .append("\nAnzahl aktiver Clients: \t").append(songResource.getClientsCount())
-                .append("\n\nOrdner für Songs: \t").append(songParser.getSongDir()).append("  ")
+                .append("\n\nOrdner für Songs: \t").append(Strings.nullToEmpty(songParser.getSongDir())).append("  ")
                 .append("\nAnzahl Songs: \t").append(countSongs(songParser.getSongDir()))
                 .append("\n\nAktueller Song: \t").append(song.getTitle())
                 .append("\nAktuelle Foliennummer: \t").append(page == -1 ? "-" : page + 1);
@@ -117,10 +120,13 @@ public class StatusTray implements Managed {
             int currentLang = songParser.getLangForSong(song.getTitle());
             messageBuilder.append("\nAktuelle Sprache: \t").append(currentLang);
         }
-        messageBuilder.append("\n\nSongBeamer Version: \t").append(songBeamerSettings.version)
+        messageBuilder.append("\n\nSongBeamer Version: \t").append(sbVersion)
                 .append("\nVersion: \t\t").append(USongApplication.APP_VERSION);
-        JOptionPane.showMessageDialog(null, new JTextArea(messageBuilder.toString()), USongApplication.APP_NAME,
-                JOptionPane.PLAIN_MESSAGE, new ImageIcon(StatusTray.class.getResource("/icon-small.png")));
+
+
+        ImageIcon logoIcon = new ImageIcon(StatusTray.class.getResource("/icon-small.png"));
+        JOptionPane.showMessageDialog(null, new JTextArea(messageBuilder.toString()),
+                USongApplication.APP_NAME, JOptionPane.PLAIN_MESSAGE, logoIcon);
     }
 
     private long countSongs(String songPath) {

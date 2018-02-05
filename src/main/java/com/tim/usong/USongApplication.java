@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.net.BindException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -68,7 +69,12 @@ public class USongApplication extends Application<USongConfiguration> {
         if (Strings.isNullOrEmpty(songDir)) {
             songDir = SBSettings.songDir; //no songDir in app yml config provided
         }
-        if (songDir != null && (!songDir.endsWith("\\"))) {
+        if (Strings.isNullOrEmpty(songDir)) {
+            logger.error("No directory for songs found.");
+            showErrorDialog("Der Songs Ordner konnte nicht ausgelesen werden.\nDie Anwendung wird beendet.", false);
+            System.exit(-1);
+        }
+        if (!songDir.endsWith("\\")) {
             songDir = songDir + "\\";
         }
         logger.info("Using songs directory: " + songDir);
@@ -87,6 +93,10 @@ public class USongApplication extends Application<USongConfiguration> {
             environment.lifecycle().addServerLifecycleListener(server -> {
                 this.server = server;
             });
+        } catch (BindException e) {
+            logger.error("Server already running", e);
+            showErrorDialog("Die Anwendung läuft bereits.", false);
+            System.exit(-1);
         } catch (Exception e) {
             logger.error("Failed to start server", e);
             throw e;
@@ -96,7 +106,7 @@ public class USongApplication extends Application<USongConfiguration> {
     @Override
     protected void onFatalError() {
         logger.error("Fatal error");
-        showErrorDialog("Fataler Fehler", false);
+        showErrorDialog("Fataler Fehler!\nDie Anwendung wird beendet.", false);
         super.onFatalError();
     }
 
@@ -109,8 +119,8 @@ public class USongApplication extends Application<USongConfiguration> {
     }
 
     private SongBeamerSettings readSongBeamerSettings() {
-        String songDir = "unbekannt";
-        String version = "unbekannt";
+        String songDir = null;
+        String version = null;
         try {
             String path = System.getenv("APPDATA") + "\\SongBeamer\\SongBeamer.ini";
             //Apparently the file can be UTF_16LE or UTF_8 encoeded. yay

@@ -26,6 +26,11 @@ abstract class Setup {
                 Files.copy(USongApplication.class.getResourceAsStream("/usong.yml"), configYamlPath);
             }
 
+            Path sbRemoteSenderPath = Paths.get(USongApplication.LOCAL_DIR, "SBRemoteSender.exe");
+            if (!Files.exists(sbRemoteSenderPath)) {
+                Files.copy(USongApplication.class.getResourceAsStream("/SBRemoteSender.exe"), sbRemoteSenderPath);
+            }
+
             Path songControlPath = Paths.get(USongApplication.LOCAL_DIR, "uSongControl.jar");
             if (!Files.exists(songControlPath)) {
                 Files.copy(USongApplication.class.getResourceAsStream("/uSongControl.jar"), songControlPath);
