@@ -56,7 +56,6 @@ public class SongbeamerListener implements Managed, Runnable {
         while (!Thread.interrupted()) {
             try {
                 logger.info("Starting SBRemoteSender");
-                Runtime.getRuntime().exec("taskkill /F /IM SBRemoteSender.exe");
                 new ProcessBuilder(USongApplication.LOCAL_DIR + "SBRemoteSender.exe").start();
             } catch (Exception e) {
                 logger.error("Starting SBRemoteSender failed", e);
