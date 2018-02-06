@@ -13,6 +13,14 @@ abstract class Setup {
 
     private static final Logger logger = LoggerFactory.getLogger(Setup.class);
 
+    /**
+     * On the first start this method will copy some required files to the local directory:
+     * - usong.yml is a config file i.e. for http and logging settings
+     * - SBRemoteSender.exe is an application to receive actions from songbeamer about current song and current page
+     * - "uSongControl.jar is an application to display and control the song website
+     *
+     * @param showSplash wether to display a splash screen
+     */
     static void setUpEverything(boolean showSplash) {
         setUpUI();
         if (showSplash) {
@@ -64,6 +72,9 @@ abstract class Setup {
         UIManager.put("ProgressBar.foreground", accent);
     }
 
+    /**
+     * Shows a splashscrren of fixed duration.
+     */
     private static void showSplashScreen() {
         new Thread(() -> {
             String text = String.format("%s %s", USongApplication.APP_NAME, USongApplication.APP_VERSION);

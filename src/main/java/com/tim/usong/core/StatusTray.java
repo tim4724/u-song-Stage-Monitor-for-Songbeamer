@@ -84,6 +84,12 @@ public class StatusTray implements Managed {
         systemTray.remove(trayIcon);
     }
 
+    /**
+     * The preview window is an external application displaying the "song/admin=true" website
+     * This application is called "uSongControl.jar" and will be loaded to the local directory in the initial setup
+     *
+     * @param event SELECTED or UNSELECTED will open/terminate the application
+     */
     private void onPreviewCheckboxStateChange(ItemEvent event) {
         if (event.getStateChange() == ItemEvent.SELECTED) {
             try {

@@ -19,7 +19,6 @@ public class SongResource {
     private final Object longPollingLock = new Object();
     private final Set<String> activeClients = Collections.synchronizedSet(new HashSet<>());
     private final SongParser songParser;
-
     private Song song;
     private int songId;
     private int page;

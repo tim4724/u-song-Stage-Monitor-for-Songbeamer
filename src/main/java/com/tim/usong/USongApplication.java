@@ -118,6 +118,12 @@ public class USongApplication extends Application<USongConfiguration> {
         }
     }
 
+    /**
+     * Read the directory of the songs from the SongBeamer.ini file
+     * Read the installed songbeamer version string from Songbeamer.ini file
+     *
+     * @return data object with the values
+     */
     private SongBeamerSettings readSongBeamerSettings() {
         String songDir = null;
         String version = null;
