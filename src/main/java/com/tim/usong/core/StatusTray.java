@@ -124,9 +124,11 @@ public class StatusTray implements Managed {
                 .append("\nVersion: \t\t").append(USongApplication.APP_VERSION);
 
 
+        JTextArea textArea = new JTextArea(messageBuilder.toString());
+        textArea.setEditable(false);
         ImageIcon logoIcon = new ImageIcon(StatusTray.class.getResource("/icon-small.png"));
-        JOptionPane.showMessageDialog(null, new JTextArea(messageBuilder.toString()),
-                USongApplication.APP_NAME, JOptionPane.PLAIN_MESSAGE, logoIcon);
+        JOptionPane.showMessageDialog(null, textArea, USongApplication.APP_NAME,
+                JOptionPane.PLAIN_MESSAGE, logoIcon);
     }
 
     private long countSongs(String songPath) {

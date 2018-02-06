@@ -74,8 +74,6 @@ abstract class Setup {
             label.setVerticalTextPosition(JLabel.BOTTOM);
 
             JProgressBar progressBar = new JProgressBar();
-            progressBar.setMaximum(100);
-            progressBar.setBorderPainted(false);
 
             JWindow window = new JWindow();
             window.getContentPane().add(label);
