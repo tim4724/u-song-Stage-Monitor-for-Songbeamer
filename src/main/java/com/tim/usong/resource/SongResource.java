@@ -9,13 +9,11 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Path("song")
 public class SongResource {
+    private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Object longPollingLock = new Object();
     private final Set<String> activeClients = Collections.synchronizedSet(new HashSet<>());
     private final SongParser songParser;
@@ -25,7 +23,7 @@ public class SongResource {
 
     public SongResource(SongParser songParser) {
         this.songParser = songParser;
-        this.song = Song.waitForSongbeamer;
+        this.song = new Song(messages.getString("waitingForSongbeamer"));
         this.songId = song.hashCode();
         this.page = -1;
     }

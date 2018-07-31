@@ -5,16 +5,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class Song {
-    public static final Song noSongSelected = new Song("Kein Song ausgewählt");
-    public static final Song waitForSongbeamer = new Song("Warte auf Songbeamer");
-
     private final String fileName;
     private final String title;
     private final List<Section> sections;
     private final int lang;
     private final int langCount;
 
-    private Song(String title) {
+    public Song(String title) {
         this(null, title, new ArrayList<>(), 1, 1);
     }
 

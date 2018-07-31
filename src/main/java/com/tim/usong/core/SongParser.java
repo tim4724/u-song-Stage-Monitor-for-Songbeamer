@@ -8,12 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.*;
 
 public class SongParser {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final String path;
     private Map<String, Integer> langMap = new HashMap<>();
 
@@ -27,7 +29,8 @@ public class SongParser {
 
     public Song parse(String fileName) {
         if (!fileName.endsWith(".sng")) {
-            return Song.noSongSelected;
+            String title = messages.getString("noSongSelected") + "<br>" + fileName;
+            return new Song(title);
         }
         if (!fileName.contains(":")) {
             fileName = path + fileName;
@@ -37,11 +40,11 @@ public class SongParser {
         } catch (Exception e) {
             logger.error("Failed to parse song", e);
             if (e instanceof NoSuchFileException) {
-                USongApplication.showErrorDialog("Datei nicht gefunden:\n" + fileName + "\n" + e, true);
-                return new Song("Datei nicht gefunden:\n" + fileName, e);
+                USongApplication.showErrorDialog("fileNotFoundError", fileName + "\n" + e, true);
+                return new Song(messages.getString("fileNotFoundError") + fileName, e);
             }
-            USongApplication.showErrorDialog("Fehler beim Verarbeiten von " + fileName + "\n" + e, true);
-            return new Song("Fehler beim Verarbeiten von " + fileName, e);
+            USongApplication.showErrorDialog("fileParseError", fileName + "\n" + e, true);
+            return new Song(messages.getString("fileParseError") + fileName, e);
         }
     }
 
@@ -50,7 +53,7 @@ public class SongParser {
         String title = songFile.replace(path, "").replace(".sng", "");
         List<String> pages = new ArrayList<>();
 
-        try (Scanner scanner = new Scanner(Paths.get(songFile), "ISO-8859-1")) {
+        try (Scanner scanner = new Scanner(Paths.get(songFile), StandardCharsets.ISO_8859_1)) {
             scanner.useDelimiter("-(-)+\\r?\\n");
             while (scanner.hasNext()) {
                 pages.add(scanner.next());

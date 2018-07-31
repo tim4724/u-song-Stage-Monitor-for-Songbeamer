@@ -14,6 +14,7 @@ import javafx.scene.web.WebView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class Preview implements Managed {
@@ -55,8 +56,9 @@ public class Preview implements Managed {
         private double zoom;
 
         PreviewFrame() {
+            ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
             Toolkit toolkit = Toolkit.getDefaultToolkit();
-            setTitle("Stage Monitor Vorschau");
+            setTitle(messages.getString("previewTitle"));
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setType(Type.NORMAL);
             setAlwaysOnTop(true);

@@ -26,11 +26,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class USongApplication extends Application<USongConfiguration> {
     public static final String APP_NAME = USongApplication.class.getPackage().getImplementationTitle();
     public static final String APP_VERSION = USongApplication.class.getPackage().getImplementationVersion();
     public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
+    private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private Server server;
 
@@ -40,13 +42,14 @@ public class USongApplication extends Application<USongConfiguration> {
         new USongApplication().run(args);
     }
 
-    public static void showErrorDialog(Object msg, boolean async) {
+    public static void showErrorDialog(String msg, Object extra, boolean async) {
         JFrame jf = new JFrame();
         jf.setAlwaysOnTop(true);
+        String text = messages.getString(msg) + "\n" + extra.toString();
         if (async) {
-            new Thread(() -> JOptionPane.showMessageDialog(jf, msg, APP_NAME, JOptionPane.ERROR_MESSAGE)).start();
+            new Thread(() -> JOptionPane.showMessageDialog(jf, text, APP_NAME, JOptionPane.ERROR_MESSAGE)).start();
         } else {
-            JOptionPane.showMessageDialog(jf, msg, APP_NAME, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(jf, text, APP_NAME, JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -71,7 +74,7 @@ public class USongApplication extends Application<USongConfiguration> {
         }
         if (Strings.isNullOrEmpty(songDir)) {
             logger.error("No directory for songs found.");
-            showErrorDialog("Der Songs Ordner konnte nicht ausgelesen werden.\nDie Anwendung wird beendet.", false);
+            showErrorDialog("songsDirNotFoundError", null, false);
             System.exit(-1);
         }
         if (!songDir.endsWith("\\")) {
@@ -97,7 +100,7 @@ public class USongApplication extends Application<USongConfiguration> {
             });
         } catch (BindException e) {
             logger.error("Server already running", e);
-            showErrorDialog("Die Anwendung läuft bereits.", false);
+            showErrorDialog("alreadyRunningError", null, false);
             System.exit(-1);
         } catch (Exception e) {
             logger.error("Failed to start server", e);
@@ -108,7 +111,7 @@ public class USongApplication extends Application<USongConfiguration> {
     @Override
     protected void onFatalError() {
         logger.error("Fatal error");
-        showErrorDialog("Fataler Fehler!\nDie Anwendung wird beendet.", false);
+        showErrorDialog("fatalError", null, false);
         super.onFatalError();
     }
 

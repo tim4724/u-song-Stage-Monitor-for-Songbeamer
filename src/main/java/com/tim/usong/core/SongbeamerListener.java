@@ -18,9 +18,11 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ResourceBundle;
 
 public class SongbeamerListener implements Managed, Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final SongResource songResource;
     private final ServerSocket serverSocket;
     private final DocumentBuilder builder;
@@ -58,8 +60,8 @@ public class SongbeamerListener implements Managed, Runnable {
                 new ProcessBuilder(USongApplication.LOCAL_DIR + "SBRemoteSender.exe").start();
             } catch (Exception e) {
                 logger.error("Starting SBRemoteSender failed", e);
-                songResource.setSongAndPage(new Song("Fehler beim starten von SB Remote Client", e), 0);
-                USongApplication.showErrorDialog("Fehler beim starten von SB Remote Client\n" + e, true);
+                songResource.setSongAndPage(new Song(messages.getString("startSBRemoteClientError"), e), 0);
+                USongApplication.showErrorDialog("startSBRemoteClientError", e, true);
             }
 
             try (Socket socket = serverSocket.accept()) {
@@ -69,15 +71,15 @@ public class SongbeamerListener implements Managed, Runnable {
                 if (!Thread.currentThread().isInterrupted()) {
                     connected = false;
                     logger.error("Conenction to SBRemoteSender lost", e);
-                    songResource.setSongAndPage(new Song("Verbindung zu Songbeamer unterbrochen", e), 0);
-                    USongApplication.showErrorDialog("Verbindung zu Songbeamer unterbrochen \n" + e, true);
+                    songResource.setSongAndPage(new Song(messages.getString("lostConnectionToSB"), e), 0);
+                    USongApplication.showErrorDialog("lostConnectionToSB", e, true);
                 }
             }
         }
     }
 
     private void receive(Socket socket) throws IOException {
-        songResource.setSongAndPage(Song.noSongSelected, 0);
+        songResource.setSongAndPage(new Song(messages.getString("noSongSelected")), 0);
 
         final String startTag = "<SongBeamerIPC>";
         final String endTag = "</SongBeamerIPC>";
@@ -98,8 +100,9 @@ public class SongbeamerListener implements Managed, Runnable {
                     newActionFromSongbeamer(actionNode);
                 } catch (Exception e) {
                     logger.error("Failed to parse data from SongBeamerSender", e);
-                    USongApplication.showErrorDialog("Fehler beim verarbeiten der Songbeamer Aktion.\n" + e, true);
-                    songResource.setSongAndPage(new Song("Fehler beim verarbeiten der Songbeamer Aktion", e), 0);
+                    Song errorSong = new Song(messages.getString("handlingSongbeamerActionError"), e);
+                    songResource.setSongAndPage(errorSong, 0);
+                    USongApplication.showErrorDialog("handlingSongbeamerActionError", e, true);
                 }
                 in = in.substring(in.indexOf(endTag) + endTag.length());
             }
@@ -137,7 +140,7 @@ public class SongbeamerListener implements Managed, Runnable {
 
     private void notifySongResource() {
         if (nextSongFilename == null) {
-            songResource.setSongAndPage(Song.noSongSelected, currentPage);
+            songResource.setSongAndPage(new Song(messages.getString("noSongSelected")), currentPage);
         } else if (!nextSongFilename.equals(currentSongDisplayedFilename)) {
             currentSongDisplayedFilename = nextSongFilename;
             songResource.setSongAndPage(nextSongFilename, currentPage);

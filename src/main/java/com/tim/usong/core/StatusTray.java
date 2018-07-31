@@ -18,9 +18,11 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
 public class StatusTray implements Managed {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final ResourceBundle msg = ResourceBundle.getBundle("MessagesBundle");
     private final USongApplication app;
     private final USongApplication.SongBeamerSettings songBeamerSettings;
     private final SongbeamerListener songbeamerListener;
@@ -51,24 +53,28 @@ public class StatusTray implements Managed {
 
     @Override
     public void start() {
+        String statusMsg = msg.getString("status");
+        String previewMsg = msg.getString("preview");
+        String exitMsg = msg.getString("exit");
+
         PopupMenu popupMenu = trayIcon.getPopupMenu();
-        popupMenu.add("Status");
-        CheckboxMenuItem previewCheckBox = new CheckboxMenuItem("Vorschau", preview.isVisible());
+        popupMenu.add(statusMsg);
+        CheckboxMenuItem previewCheckBox = new CheckboxMenuItem(previewMsg, preview.isVisible());
         previewCheckBox.addItemListener(event -> preview.setVisible(event.getStateChange() == ItemEvent.SELECTED));
         popupMenu.add(previewCheckBox);
         popupMenu.addSeparator();
         String hostname = getHostname(null);
         popupMenu.add(hostname != null ? "http://" + hostname : "http://localhost");
         popupMenu.addSeparator();
-        popupMenu.add("Beenden");
+        popupMenu.add(exitMsg);
 
         popupMenu.addActionListener(e -> {
             String actionComand = e.getActionCommand();
-            if (actionComand.equals("Status")) {
+            if (actionComand.equals(statusMsg)) {
                 showStatusWindow();
             } else if (actionComand.startsWith("http://")) {
                 openBrowser(actionComand + "/song?admin=true");
-            } else if (actionComand.equals("Beenden")) {
+            } else if (actionComand.equals(exitMsg)) {
                 songResource.shutDown();
                 app.shutdown();
             }
@@ -95,33 +101,48 @@ public class StatusTray implements Managed {
     }
 
     private void showStatusWindow() {
-        Song song = songResource.getSong();
-        int page = songResource.getPage();
-        String sbVersion = songBeamerSettings.version;
-        if (Strings.isNullOrEmpty(sbVersion)) sbVersion = "Unbekannt";
+        try {
+            String unknown = msg.getString("unknown");
+            String connectedState = songbeamerListener.isConnected() ? msg.getString("connected") : msg.getString("notConnected");
+            String songDir = Strings.nullToEmpty(songParser.getSongDir()) + "  ";
+            Song song = songResource.getSong();
+            String songTitle = song.getTitle();
+            if (songTitle.length() > 50) {
+                songTitle = songTitle.substring(0, 47) + "...   ";
+            }
+            int page = songResource.getPage();
+            String sbVersion = songBeamerSettings.version;
+            if (Strings.isNullOrEmpty(sbVersion)) sbVersion = unknown;
 
-        StringBuilder messageBuilder = new StringBuilder()
-                .append("Hostname: \t\t").append(getHostname("Unbekannt"))
-                .append("\nIP Addresse: \t\t").append(getHostAddress())
-                .append("\nSongBeamer Sender: \t")
-                .append(songbeamerListener.isConnected() ? "Verbunden" : "Nicht verbunden")
-                .append("\nAnzahl aktiver Clients: \t").append(songResource.getClientsCount())
-                .append("\n\nOrdner für Songs: \t").append(Strings.nullToEmpty(songParser.getSongDir())).append("  ")
-                .append("\nAnzahl Songs: \t\t").append(countSongs(songParser.getSongDir()))
-                .append("\n\nAktueller Song: \t").append(song.getTitle())
-                .append("\nAktuelle Foliennummer: \t").append(page == -1 ? "-" : page + 1);
-        if (song.getLangCount() > 1) {
-            int currentLang = songParser.getLangForSong(song.getTitle());
-            messageBuilder.append("\nAktuelle Sprache: \t").append(currentLang);
+            StringBuilder messageBuilder = new StringBuilder()
+                    .append(msg.getString("hostname")).append("\t\t").append(getHostname(unknown)).append("\n")
+                    .append(msg.getString("ipAddress")).append(" \t\t").append(getHostAddress()).append("\n")
+                    .append(msg.getString("songbeamerSender")).append(" \t").append(connectedState).append("\n")
+                    .append(msg.getString("activeClientsCount")).append("\t\t").append(songResource.getClientsCount())
+                    .append("\n\n")
+                    .append(msg.getString("songDir")).append("\t").append(songDir).append("\n")
+                    .append(msg.getString("songCount")).append("\t\t").append(countSongs(songDir))
+                    .append("\n\n")
+                    .append(msg.getString("currentSong")).append("\t\t").append(songTitle).append("\n")
+                    .append(msg.getString("currentPage")).append("\t\t").append(page == -1 ? "-" : page + 1);
+            if (song.getLangCount() > 1) {
+                int currentLang = songParser.getLangForSong(song.getTitle());
+                messageBuilder.append("\n").append(msg.getString("currentLang")).append("\t").append(currentLang);
+            }
+            messageBuilder
+                    .append("\n\n")
+                    .append(msg.getString("songbeamerVersion")).append("\t").append(sbVersion)
+                    .append("\n").append(msg.getString("version")).append("\t\t").append(USongApplication.APP_VERSION);
+
+            JTextArea textArea = new JTextArea(messageBuilder.toString());
+            textArea.setEditable(false);
+            ImageIcon logoIcon = new ImageIcon(StatusTray.class.getResource("/icon-small.png"));
+            JOptionPane.showMessageDialog(null, textArea, USongApplication.APP_NAME,
+                    JOptionPane.PLAIN_MESSAGE, logoIcon);
+        } catch (Exception e) {
+            logger.error("Failed to open status window", e);
+            USongApplication.showErrorDialog("statusWindowError", e, true);
         }
-        messageBuilder.append("\n\nSongBeamer Version: \t").append(sbVersion)
-                .append("\nVersion: \t\t").append(USongApplication.APP_VERSION);
-
-        JTextArea textArea = new JTextArea(messageBuilder.toString());
-        textArea.setEditable(false);
-        ImageIcon logoIcon = new ImageIcon(StatusTray.class.getResource("/icon-small.png"));
-        JOptionPane.showMessageDialog(null, textArea, USongApplication.APP_NAME,
-                JOptionPane.PLAIN_MESSAGE, logoIcon);
     }
 
     private long countSongs(String songPath) {
@@ -134,7 +155,7 @@ public class StatusTray implements Managed {
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            return "Unbekannt";
+            return msg.getString("unknown");
         }
     }
 
@@ -151,7 +172,7 @@ public class StatusTray implements Managed {
             Desktop.getDesktop().browse(new URL(url).toURI());
         } catch (Exception e) {
             logger.error("Failed to open browser", e);
-            USongApplication.showErrorDialog("Fehler beim Öffnen des Browsers", true);
+            USongApplication.showErrorDialog("browserOpenError", e, true);
         }
     }
 }
