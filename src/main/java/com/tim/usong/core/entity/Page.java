@@ -14,7 +14,7 @@ public class Page {
         line = line.trim();
         if (!line.isEmpty()) {
             if (!content.isEmpty()) {
-                content += "\n<br />";
+                content += "\n<br>";
             }
             content += line;
         }

@@ -20,7 +20,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class SongbeamerListener implements Managed, Runnable {
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final SongResource songResource;
     private final ServerSocket serverSocket;
@@ -115,16 +114,17 @@ public class SongbeamerListener implements Managed, Runnable {
         switch (action) {
             case "SBAction_LoadItem":
                 nextSongFilename = value;
-                if (currentPage == -1 || nextSongFilename.endsWith(currentSongDisplayedFilename)) {
-                    //Switch song if page is -1 or
-                    //When a song was modified, nextSongFilename will be the absolute path (maybe a bug in SB).
-                    //Reload song if nextSongFilename ends with currentSongDisplayedFilename
+                if (currentPage == -1 || currentSongDisplayedFilename == null
+                        || nextSongFilename.endsWith(currentSongDisplayedFilename)) {
+                    // Switch song if page is -1 or
+                    // When a song was modified, nextSongFilename will be the absolute path (maybe a bug in SB).
+                    // Reload song if nextSongFilename ends with currentSongDisplayedFilename
                     songResource.setSongAndPage(nextSongFilename, currentPage);
                 }
                 break;
             case "SBAction_Presenter_Black":
             case "SBAction_Presenter_BGOnly":
-                //currently no text on beamer
+                // Currently no text on projector
                 currentPage = -1;
                 notifySongResource();
                 break;

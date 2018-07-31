@@ -1,6 +1,7 @@
 package com.tim.usong;
 
 import com.google.common.base.Strings;
+import com.tim.usong.core.Preview;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
 import com.tim.usong.core.StatusTray;
@@ -27,11 +28,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class USongApplication extends Application<USongConfiguration> {
-
     public static final String APP_NAME = USongApplication.class.getPackage().getImplementationTitle();
     public static final String APP_VERSION = USongApplication.class.getPackage().getImplementationVersion();
     public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private Server server;
 
@@ -63,9 +62,10 @@ public class USongApplication extends Application<USongConfiguration> {
 
     @Override
     public void run(USongConfiguration config, Environment environment) throws Exception {
+        final USongConfiguration.AppConfigHolder appConfig = config.getAppConfig();
         SongBeamerSettings SBSettings = readSongBeamerSettings();
 
-        String songDir = config.getAppConfig().songDir;
+        String songDir = appConfig.songDir;
         if (Strings.isNullOrEmpty(songDir)) {
             songDir = SBSettings.songDir; //no songDir in app yml config provided
         }
@@ -88,7 +88,9 @@ public class USongApplication extends Application<USongConfiguration> {
 
             SongbeamerListener SBListener = new SongbeamerListener(songResource);
             environment.lifecycle().manage(SBListener);
-            StatusTray statusTray = new StatusTray(this, SBSettings, SBListener, songParser, songResource);
+            Preview preview = new Preview();
+            StatusTray statusTray = new StatusTray(this, SBSettings, SBListener, songParser, songResource, preview);
+            environment.lifecycle().manage(preview);
             environment.lifecycle().manage(statusTray);
             environment.lifecycle().addServerLifecycleListener(server -> {
                 this.server = server;
@@ -112,9 +114,10 @@ public class USongApplication extends Application<USongConfiguration> {
 
     public void shutdown() {
         try {
-            if (server != null) server.stop();
-        } catch (Exception e) {
+            server.stop();
             System.exit(0);
+        } catch (Exception e) {
+            System.exit(-1);
         }
     }
 
@@ -155,9 +158,9 @@ public class USongApplication extends Application<USongConfiguration> {
         return new SongBeamerSettings(version, songDir);
     }
 
-    public class SongBeamerSettings {
+    public static class SongBeamerSettings {
         public final String version;
-        public final String songDir;
+        final String songDir;
 
         SongBeamerSettings(String version, String songDir) {
             this.version = version;

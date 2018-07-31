@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class SongParser {
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String path;
     private Map<String, Integer> langMap = new HashMap<>();

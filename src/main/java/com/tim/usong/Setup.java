@@ -9,7 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-abstract class Setup {
+class Setup {
+
+    private Setup() {
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(Setup.class);
 
@@ -17,7 +20,6 @@ abstract class Setup {
      * On the first start this method will copy some required files to the local directory:
      * - usong.yml is a config file i.e. for http and logging settings
      * - SBRemoteSender.exe is an application to receive actions from songbeamer about current song and current page
-     * - "uSongControl.jar is an application to display and control the song website
      *
      * @param showSplash wether to display a splash screen
      */
@@ -37,11 +39,6 @@ abstract class Setup {
             Path sbRemoteSenderPath = Paths.get(USongApplication.LOCAL_DIR, "SBRemoteSender.exe");
             if (!Files.exists(sbRemoteSenderPath)) {
                 Files.copy(USongApplication.class.getResourceAsStream("/SBRemoteSender.exe"), sbRemoteSenderPath);
-            }
-
-            Path songControlPath = Paths.get(USongApplication.LOCAL_DIR, "uSongControl.jar");
-            if (!Files.exists(songControlPath)) {
-                Files.copy(USongApplication.class.getResourceAsStream("/uSongControl.jar"), songControlPath);
             }
         } catch (Exception e) {
             logger.error("Setup failed", e);

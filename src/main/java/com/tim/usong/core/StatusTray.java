@@ -11,8 +11,9 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -25,18 +26,22 @@ public class StatusTray implements Managed {
     private final SongbeamerListener songbeamerListener;
     private final SongParser songParser;
     private final SongResource songResource;
+    private final Preview preview;
     private final SystemTray systemTray;
     private final TrayIcon trayIcon;
-    private Process uSongControlProcess;
 
-    public StatusTray(USongApplication app, USongApplication.SongBeamerSettings songBeamerSettings,
-                      SongbeamerListener songbeamerListener, SongParser songParser,
-                      SongResource songResource) {
+    public StatusTray(USongApplication app,
+                      USongApplication.SongBeamerSettings songBeamerSettings,
+                      SongbeamerListener songbeamerListener,
+                      SongParser songParser,
+                      SongResource songResource,
+                      Preview preview) {
         this.app = app;
         this.songBeamerSettings = songBeamerSettings;
         this.songbeamerListener = songbeamerListener;
         this.songParser = songParser;
         this.songResource = songResource;
+        this.preview = preview;
         systemTray = SystemTray.getSystemTray();
 
         Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon-small2.png"));
@@ -47,14 +52,13 @@ public class StatusTray implements Managed {
     @Override
     public void start() {
         PopupMenu popupMenu = trayIcon.getPopupMenu();
-
         popupMenu.add("Status");
-        CheckboxMenuItem previewCheckBox = new CheckboxMenuItem("Vorschau", false);
-        previewCheckBox.addItemListener(this::onPreviewCheckboxStateChange);
+        CheckboxMenuItem previewCheckBox = new CheckboxMenuItem("Vorschau", preview.isVisible());
+        previewCheckBox.addItemListener(event -> preview.setVisible(event.getStateChange() == ItemEvent.SELECTED));
         popupMenu.add(previewCheckBox);
         popupMenu.addSeparator();
         String hostname = getHostname(null);
-        if (hostname != null) popupMenu.add("http://" + hostname);
+        popupMenu.add(hostname != null ? "http://" + hostname : "http://localhost");
         popupMenu.addSeparator();
         popupMenu.add("Beenden");
 
@@ -65,13 +69,19 @@ public class StatusTray implements Managed {
             } else if (actionComand.startsWith("http://")) {
                 openBrowser(actionComand + "/song?admin=true");
             } else if (actionComand.equals("Beenden")) {
-                if (uSongControlProcess != null) uSongControlProcess.destroy();
                 songResource.shutDown();
                 app.shutdown();
             }
         });
 
         trayIcon.addActionListener(e -> showStatusWindow());
+        trayIcon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                // update the checkbox state
+                previewCheckBox.setState(preview.isVisible());
+            }
+        });
         try {
             systemTray.add(trayIcon);
         } catch (AWTException e) {
@@ -84,42 +94,20 @@ public class StatusTray implements Managed {
         systemTray.remove(trayIcon);
     }
 
-    /**
-     * The preview window is an external application displaying the "song/admin=true" website
-     * This application is called "uSongControl.jar" and will be loaded to the local directory in the initial setup
-     *
-     * @param event SELECTED or UNSELECTED will open/terminate the application
-     */
-    private void onPreviewCheckboxStateChange(ItemEvent event) {
-        if (event.getStateChange() == ItemEvent.SELECTED) {
-            try {
-                String path = USongApplication.LOCAL_DIR + "uSongControl.jar";
-                File workingDir = new File(System.getProperty("java.home"));
-                uSongControlProcess = Runtime.getRuntime().exec("java -jar " + path, null, workingDir);
-            } catch (IOException e) {
-                logger.error("Failed to open preview window", e);
-                USongApplication.showErrorDialog("Fehler beim Öffnen des Vorschau Fensters\n" + e, true);
-                ((CheckboxMenuItem) event.getItem()).setState(false);
-            }
-        } else if (uSongControlProcess != null) {
-            uSongControlProcess.destroy();
-        }
-    }
-
     private void showStatusWindow() {
         Song song = songResource.getSong();
         int page = songResource.getPage();
         String sbVersion = songBeamerSettings.version;
-        if (Strings.isNullOrEmpty(sbVersion)) sbVersion = "unbekannt";
+        if (Strings.isNullOrEmpty(sbVersion)) sbVersion = "Unbekannt";
 
         StringBuilder messageBuilder = new StringBuilder()
-                .append("Hostname: \t\t").append(getHostname("unbekannt"))
+                .append("Hostname: \t\t").append(getHostname("Unbekannt"))
                 .append("\nIP Addresse: \t\t").append(getHostAddress())
                 .append("\nSongBeamer Sender: \t")
                 .append(songbeamerListener.isConnected() ? "Verbunden" : "Nicht verbunden")
                 .append("\nAnzahl aktiver Clients: \t").append(songResource.getClientsCount())
                 .append("\n\nOrdner für Songs: \t").append(Strings.nullToEmpty(songParser.getSongDir())).append("  ")
-                .append("\nAnzahl Songs: \t").append(countSongs(songParser.getSongDir()))
+                .append("\nAnzahl Songs: \t\t").append(countSongs(songParser.getSongDir()))
                 .append("\n\nAktueller Song: \t").append(song.getTitle())
                 .append("\nAktuelle Foliennummer: \t").append(page == -1 ? "-" : page + 1);
         if (song.getLangCount() > 1) {
@@ -128,7 +116,6 @@ public class StatusTray implements Managed {
         }
         messageBuilder.append("\n\nSongBeamer Version: \t").append(sbVersion)
                 .append("\nVersion: \t\t").append(USongApplication.APP_VERSION);
-
 
         JTextArea textArea = new JTextArea(messageBuilder.toString());
         textArea.setEditable(false);
@@ -147,7 +134,7 @@ public class StatusTray implements Managed {
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
-            return "unbekannt";
+            return "Unbekannt";
         }
     }
 
@@ -162,7 +149,9 @@ public class StatusTray implements Managed {
     private void openBrowser(String url) {
         try {
             Desktop.getDesktop().browse(new URL(url).toURI());
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            logger.error("Failed to open browser", e);
+            USongApplication.showErrorDialog("Fehler beim Öffnen des Browsers", true);
         }
     }
 }
