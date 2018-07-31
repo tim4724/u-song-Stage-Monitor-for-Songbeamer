@@ -68,8 +68,8 @@ public class Preview implements Managed {
                     .getDefaultConfiguration();
             Rectangle screenBounds = config.getBounds();
             Insets screenInsets = toolkit.getScreenInsets(config);
-            int height = prefs.getInt("height", 200);
             int width = prefs.getInt("width", 300);
+            int height = prefs.getInt("height", 200);
             int x = prefs.getInt("x", 0);
             int y = prefs.getInt("y", screenBounds.height - height - screenInsets.bottom);
             setBounds(x, y, width, height);

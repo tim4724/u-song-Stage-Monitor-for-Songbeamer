@@ -49,7 +49,6 @@ Aktuelle Lösung: Sprache auf der Admin Oberfläche wählen.
 ## Ideen / Verbesserung
 * Lied Sprache automatisch erkennen
 * Automatisch mit Windows starten als Option
-* Vorschaufenster soll Größe, Zoom, Position fürs nächste mal speichern
 * Zoom Buttons / Zoom Funktionalität auf der Website für Tablets
 * ...
 
