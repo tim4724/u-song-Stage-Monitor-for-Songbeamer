@@ -55,17 +55,19 @@ public class Preview implements Managed {
         private double zoom;
 
         PreviewFrame() {
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
             setTitle("Stage Monitor Vorschau");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setType(Type.NORMAL);
             setAlwaysOnTop(true);
+            setIconImage(toolkit.getImage(getClass().getResource("/icon-small2.png")));
 
             GraphicsConfiguration config = GraphicsEnvironment
                     .getLocalGraphicsEnvironment()
                     .getDefaultScreenDevice()
                     .getDefaultConfiguration();
             Rectangle screenBounds = config.getBounds();
-            Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(config);
+            Insets screenInsets = toolkit.getScreenInsets(config);
             int height = prefs.getInt("height", 200);
             int width = prefs.getInt("width", 300);
             int x = prefs.getInt("x", 0);
