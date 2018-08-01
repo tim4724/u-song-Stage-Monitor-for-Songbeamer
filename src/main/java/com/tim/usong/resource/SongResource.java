@@ -81,12 +81,12 @@ public class SongResource {
         Integer page = (Integer) session.getAttribute("page");
         synchronized (longPollingLock) {
             if (Objects.equals(songId, this.songId) && Objects.equals(page, this.page)) {
-                longPollingLock.wait(60000);//no changes yet, therefore wait;
+                longPollingLock.wait(60000); // no changes yet, therefore wait;
             }
         }
 
         if (!Objects.equals(songId, this.songId)) {
-            return Response.status(205).build();//song has changed; HTTP 205: Reset Content
+            return Response.status(205).build(); // song has changed; HTTP 205: Reset Content
         }
         if (!Objects.equals(page, this.page)) {
             session.setAttribute("page", this.page);

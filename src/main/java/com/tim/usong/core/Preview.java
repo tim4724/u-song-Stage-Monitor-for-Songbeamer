@@ -1,6 +1,7 @@
 package com.tim.usong.core;
 
 import io.dropwizard.lifecycle.Managed;
+
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 

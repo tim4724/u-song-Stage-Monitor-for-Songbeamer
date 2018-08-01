@@ -45,7 +45,7 @@ public class USongApplication extends Application<USongConfiguration> {
     public static void showErrorDialog(String msg, Object extra, boolean async) {
         JFrame jf = new JFrame();
         jf.setAlwaysOnTop(true);
-        String text = messages.getString(msg) + "\n" + extra.toString();
+        String text = messages.getString(msg) + "\n" + (extra != null ? extra.toString() : "");
         if (async) {
             new Thread(() -> JOptionPane.showMessageDialog(jf, text, APP_NAME, JOptionPane.ERROR_MESSAGE)).start();
         } else {

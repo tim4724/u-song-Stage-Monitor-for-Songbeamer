@@ -29,7 +29,7 @@ public class SongParser {
 
     public Song parse(String fileName) {
         if (!fileName.endsWith(".sng")) {
-            String title = messages.getString("noSongSelected") + "<br>" + fileName;
+            String title = messages.getString("noSongSelected") + "<br>\n" + fileName;
             return new Song(title);
         }
         if (!fileName.contains(":")) {
@@ -37,12 +37,12 @@ public class SongParser {
         }
         try {
             return parseSong(fileName);
+        } catch (NoSuchFileException e) {
+            logger.error("Failed to parse song", e);
+            USongApplication.showErrorDialog("fileNotFoundError", fileName + "\n" + e, true);
+            return new Song(messages.getString("fileNotFoundError") + fileName, e);
         } catch (Exception e) {
             logger.error("Failed to parse song", e);
-            if (e instanceof NoSuchFileException) {
-                USongApplication.showErrorDialog("fileNotFoundError", fileName + "\n" + e, true);
-                return new Song(messages.getString("fileNotFoundError") + fileName, e);
-            }
             USongApplication.showErrorDialog("fileParseError", fileName + "\n" + e, true);
             return new Song(messages.getString("fileParseError") + fileName, e);
         }
@@ -53,7 +53,7 @@ public class SongParser {
         String title = songFile.replace(path, "").replace(".sng", "");
         List<String> pages = new ArrayList<>();
 
-        try (Scanner scanner = new Scanner(Paths.get(songFile), StandardCharsets.ISO_8859_1)) {
+        try (Scanner scanner = new Scanner(Paths.get(songFile), "ISO-8859-1")) {
             scanner.useDelimiter("-(-)+\\r?\\n");
             while (scanner.hasNext()) {
                 pages.add(scanner.next());
@@ -126,7 +126,7 @@ public class SongParser {
                 }
 
                 int lang = (lineCounter % langCount) + 1;
-                if (line.length() >= 4 && line.substring(0, 4).matches("^#?#[0-9] (.)*")) {//substring(0, 4) because o fbug with special characters
+                if (line.length() >= 4 && line.substring(0, 4).matches("^#?#[0-9] (.)*")) { //substring(0, 4) because of bug with special characters
                     lang = Integer.parseInt(line.substring(0, line.indexOf(" ")).replaceAll("#", ""));
                     line = line.substring(line.indexOf(" "));
                 }
@@ -181,7 +181,7 @@ public class SongParser {
         }
 
         private String getValue(String line) {
-            return line.substring(line.indexOf("=") + 1, line.length());
+            return line.substring(line.indexOf("=") + 1);
         }
     }
 
