@@ -94,9 +94,9 @@ class Setup {
             sleep(500);
             for (int i = 0; i < 100; i++) {
                 progressBar.setValue(i + 1);
-                sleep(16);
+                sleep(15);
             }
-            sleep(1000);
+            sleep(500);
 
             window.setVisible(false);
         }).start();
