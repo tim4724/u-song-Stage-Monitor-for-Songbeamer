@@ -117,6 +117,7 @@ public class USongApplication extends Application<USongConfiguration> {
 
     public void shutdown() {
         try {
+            //TODO sometimes it does not work
             server.stop();
             System.exit(0);
         } catch (Exception e) {
@@ -135,7 +136,7 @@ public class USongApplication extends Application<USongConfiguration> {
         String version = null;
         try {
             String path = System.getenv("APPDATA") + "\\SongBeamer\\SongBeamer.ini";
-            //Apparently the file can be UTF_16LE or UTF_8 encoeded. yay
+            // Apparently the file can be UTF_16LE or UTF_8 encoeded. yay
             List<String> lines;
             try {
                 lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_16LE);
@@ -147,7 +148,7 @@ public class USongApplication extends Application<USongConfiguration> {
                 if (l.startsWith("FolienBaseDir=")) {
                     songDir = l.replaceFirst("FolienBaseDir=", "");
                     if (songDir.startsWith("%My Documents%")) {
-                        //"%My Documents%" is a Songbeamer variable which points to users documents folder
+                        // "%My Documents%" is a Songbeamer variable which points to users documents folder
                         String myDocuments = System.getenv("USERPROFILE") + "\\Documents";
                         songDir = songDir.replace("%My Documents%", myDocuments);
                     }

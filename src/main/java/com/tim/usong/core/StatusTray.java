@@ -13,14 +13,16 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.net.InetAddress;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class StatusTray implements Managed {
+    private static final String REG_RUN_KEY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+    private static final String VALUE = "uSong Stage Monitor";
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle msg = ResourceBundle.getBundle("MessagesBundle");
     private final USongApplication app;
@@ -62,6 +64,10 @@ public class StatusTray implements Managed {
         CheckboxMenuItem previewCheckBox = new CheckboxMenuItem(previewMsg, preview.isVisible());
         previewCheckBox.addItemListener(event -> preview.setVisible(event.getStateChange() == ItemEvent.SELECTED));
         popupMenu.add(previewCheckBox);
+
+        CheckboxMenuItem autoStartCheckbox = new CheckboxMenuItem(msg.getString("autostart"), isAutostartEnabled());
+        autoStartCheckbox.addItemListener(event -> setAutoStartEnabled(event.getStateChange() == ItemEvent.SELECTED));
+        popupMenu.add(autoStartCheckbox);
         popupMenu.addSeparator();
         String hostname = getHostname(null);
         popupMenu.add(hostname != null ? "http://" + hostname : "http://localhost");
@@ -84,8 +90,9 @@ public class StatusTray implements Managed {
         trayIcon.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                // update the checkbox state
+                // update the checkbox states
                 previewCheckBox.setState(preview.isVisible());
+                autoStartCheckbox.setState(isAutostartEnabled());
             }
         });
         try {
@@ -153,7 +160,12 @@ public class StatusTray implements Managed {
 
     private String getHostAddress() {
         try {
-            return InetAddress.getLocalHost().getHostAddress();
+            try (DatagramSocket socket = new DatagramSocket()) {
+                socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+                return socket.getLocalAddress().getHostAddress();
+            } catch (SocketException e) {
+                return InetAddress.getLocalHost().getHostAddress();
+            }
         } catch (UnknownHostException e) {
             return msg.getString("unknown");
         }
@@ -174,5 +186,54 @@ public class StatusTray implements Managed {
             logger.error("Failed to open browser", e);
             USongApplication.showErrorDialog("browserOpenError", e, true);
         }
+    }
+
+    private void setAutoStartEnabled(boolean enable) {
+        try {
+            String cmd;
+            if (enable) {
+                String path = getJarPath();
+                File f = new File(path);
+                if (!f.exists()) {
+                    throw new FileNotFoundException(path);
+                } else {
+                    cmd = "reg add %s /v \"%s\" /d \"%s\" /t REG_SZ";
+                    cmd = String.format(cmd, REG_RUN_KEY, VALUE, "cmd /c START javaw -jar " + path);
+                }
+            } else {
+                cmd = String.format("reg delete %s /v \"%s\" /f", REG_RUN_KEY, VALUE);
+            }
+            Runtime.getRuntime().exec(cmd);
+        } catch (Exception e) {
+            logger.error("Failed to edit registry", e);
+            USongApplication.showErrorDialog("autostartChangeFailed", e, true);
+        }
+    }
+
+    private boolean isAutostartEnabled() {
+        try {
+            String path = getJarPath();
+            String cmd = String.format("reg query \"%s\" /v \"%s\"", REG_RUN_KEY, VALUE);
+            Process process = Runtime.getRuntime().exec(cmd);
+            String result = new BufferedReader(new InputStreamReader(process.getInputStream()))
+                    .lines().collect(Collectors.joining(""));
+            return path != null && result.contains(path);
+        } catch (Exception e) {
+            logger.error("Failed to query registry for autostart entry", e);
+            return false;
+        }
+    }
+
+    private static String getJarPath() {
+        String path = USongApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        try {
+            path = URLDecoder.decode(path, "UTF-8");
+        } catch (UnsupportedEncodingException ignore) {
+        }
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+        path = path.replace("/", "\\");
+        return path;
     }
 }
