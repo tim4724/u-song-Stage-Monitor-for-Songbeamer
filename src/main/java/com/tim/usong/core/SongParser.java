@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.*;
@@ -40,11 +39,11 @@ public class SongParser {
             return parseSong(fileName);
         } catch (NoSuchFileException e) {
             logger.error("Failed to parse song", e);
-            USongApplication.showErrorDialog("fileNotFoundError", fileName + "\n" + e, true);
+            USongApplication.showErrorDialog("fileNotFoundError", fileName + "\n" + e, false);
             return new Song(messages.getString("fileNotFoundError") + fileName, e);
         } catch (Exception e) {
             logger.error("Failed to parse song", e);
-            USongApplication.showErrorDialog("fileParseError", fileName + "\n" + e, true);
+            USongApplication.showErrorDialog("fileParseError", fileName + "\n" + e, false);
             return new Song(messages.getString("fileParseError") + fileName, e);
         }
     }

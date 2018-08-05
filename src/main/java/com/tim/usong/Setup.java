@@ -14,20 +14,14 @@ class Setup {
     private Setup() {
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(Setup.class);
-
     /**
      * On the first start this method will copy some required files to the local directory:
      * - usong.yml is a config file i.e. for http and logging settings
      * - SBRemoteSender.exe is an application to receive actions from songbeamer about current song and current page
-     *
-     * @param showSplash wether to display a splash screen
-     */
-    static void setUpEverything(boolean showSplash) {
+     **/
+    static void setUpEverything() {
+        Logger logger = LoggerFactory.getLogger(Setup.class);
         setUpUI();
-        if (showSplash) {
-            showSplashScreen();
-        }
         try {
             Files.createDirectories(Paths.get(USongApplication.LOCAL_DIR));
 
@@ -67,45 +61,5 @@ class Setup {
         UIManager.put("Button.foreground", Color.WHITE);
         UIManager.put("ProgressBar.background", darkGrayBg);
         UIManager.put("ProgressBar.foreground", accent);
-    }
-
-    /**
-     * Shows a splashscrren of fixed duration.
-     */
-    private static void showSplashScreen() {
-        new Thread(() -> {
-            String text = String.format("%s %s", USongApplication.APP_NAME, USongApplication.APP_VERSION);
-            ImageIcon imageIcon = new ImageIcon(Setup.class.getResource("/icon-small.png"));
-            JLabel label = new JLabel(text.toUpperCase(), imageIcon, SwingConstants.CENTER);
-            label.setIconTextGap(10);
-            label.setHorizontalTextPosition(JLabel.CENTER);
-            label.setVerticalTextPosition(JLabel.BOTTOM);
-
-            JProgressBar progressBar = new JProgressBar();
-
-            JWindow window = new JWindow();
-            window.getContentPane().add(label);
-            window.getContentPane().add(progressBar, BorderLayout.SOUTH);
-            window.setBounds(0, 0, 300, 200);
-            window.setLocationRelativeTo(null);
-            window.setAlwaysOnTop(true);
-            window.setVisible(true);
-
-            sleep(500);
-            for (int i = 0; i < 100; i++) {
-                progressBar.setValue(i + 1);
-                sleep(15);
-            }
-            sleep(500);
-
-            window.setVisible(false);
-        }).start();
-    }
-
-    private static void sleep(int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException ignore) {
-        }
     }
 }

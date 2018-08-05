@@ -1,4 +1,4 @@
-package com.tim.usong.core;
+package com.tim.usong.core.ui;
 
 import com.tim.usong.USongApplication;
 import io.dropwizard.lifecycle.Managed;
@@ -155,7 +155,7 @@ public class Preview implements Managed {
                 Desktop.getDesktop().browse(new URL(url).toURI());
             } catch (Exception e) {
                 logger.error("Failed to open browser", e);
-                USongApplication.showErrorDialog("browserOpenError", e, true);
+                USongApplication.showErrorDialog("browserOpenError", e, false);
             }
         }
     }

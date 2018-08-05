@@ -3,6 +3,7 @@ package com.tim.usong.core;
 import com.google.common.base.Strings;
 import com.tim.usong.USongApplication;
 import com.tim.usong.core.entity.Song;
+import com.tim.usong.core.ui.Preview;
 import com.tim.usong.resource.SongResource;
 import io.dropwizard.lifecycle.Managed;
 import org.slf4j.Logger;
@@ -147,7 +148,7 @@ public class StatusTray implements Managed {
                     JOptionPane.PLAIN_MESSAGE, logoIcon);
         } catch (Exception e) {
             logger.error("Failed to open status window", e);
-            USongApplication.showErrorDialog("statusWindowError", e, true);
+            USongApplication.showErrorDialog("statusWindowError", e, false);
         }
     }
 
@@ -183,7 +184,7 @@ public class StatusTray implements Managed {
             Desktop.getDesktop().browse(new URL(url).toURI());
         } catch (Exception e) {
             logger.error("Failed to open browser", e);
-            USongApplication.showErrorDialog("browserOpenError", e, true);
+            USongApplication.showErrorDialog("browserOpenError", e, false);
         }
     }
 
@@ -205,7 +206,7 @@ public class StatusTray implements Managed {
             Runtime.getRuntime().exec(cmd);
         } catch (Exception e) {
             logger.error("Failed to edit registry", e);
-            USongApplication.showErrorDialog("autostartChangeFailed", e, true);
+            USongApplication.showErrorDialog("autostartChangeFailed", e, false);
         }
     }
 

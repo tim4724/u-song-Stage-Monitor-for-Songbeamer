@@ -1,10 +1,11 @@
 package com.tim.usong;
 
 import com.google.common.base.Strings;
-import com.tim.usong.core.Preview;
+import com.tim.usong.core.ui.Preview;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
 import com.tim.usong.core.StatusTray;
+import com.tim.usong.core.ui.SplashScreen;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import io.dropwizard.Application;
@@ -15,7 +16,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import io.dropwizard.websockets.WebsocketBundle;
-import org.apache.log4j.Level;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,19 +37,22 @@ public class USongApplication extends Application<USongConfiguration> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static void main(String[] args) throws Exception {
-        Setup.setUpEverything(true);
+        Setup.setUpEverything();
+        SplashScreen.showSplash();
         if (args.length == 0) args = new String[]{"server", LOCAL_DIR + "usong.yml"};
         new USongApplication().run(args);
     }
 
-    public static void showErrorDialog(String msg, Object extra, boolean async) {
+    public static void showErrorDialog(String msg, Object extra, boolean terminateApplication) {
         JFrame jf = new JFrame();
         jf.setAlwaysOnTop(true);
         String text = messages.getString(msg) + "\n" + (extra != null ? extra.toString() : "");
-        if (async) {
-            new Thread(() -> JOptionPane.showMessageDialog(jf, text, APP_NAME, JOptionPane.ERROR_MESSAGE)).start();
-        } else {
+        if (terminateApplication) {
+            SplashScreen.error();
             JOptionPane.showMessageDialog(jf, text, APP_NAME, JOptionPane.ERROR_MESSAGE);
+            System.exit(-1);
+        } else {
+            new Thread(() -> JOptionPane.showMessageDialog(jf, text, APP_NAME, JOptionPane.ERROR_MESSAGE)).start();
         }
     }
 
@@ -74,8 +78,8 @@ public class USongApplication extends Application<USongConfiguration> {
         }
         if (Strings.isNullOrEmpty(songDir)) {
             logger.error("No directory for songs found.");
-            showErrorDialog("songsDirNotFoundError", null, false);
-            System.exit(-1);
+            showErrorDialog("songsDirNotFoundError", null, true);
+            return;
         }
         if (!songDir.endsWith("\\")) {
             songDir = songDir + "\\";
@@ -95,10 +99,12 @@ public class USongApplication extends Application<USongConfiguration> {
             environment.lifecycle().manage(SBListener);
             environment.lifecycle().manage(preview);
             environment.lifecycle().manage(statusTray);
+            environment.lifecycle().addServerLifecycleListener(server -> {
+                SplashScreen.started();
+            });
         } catch (BindException e) {
             logger.error("Server already running", e);
-            showErrorDialog("alreadyRunningError", null, false);
-            System.exit(-1);
+            showErrorDialog("alreadyRunningError", null, true);
         } catch (Exception e) {
             logger.error("Failed to start server", e);
             throw e;
@@ -108,7 +114,7 @@ public class USongApplication extends Application<USongConfiguration> {
     @Override
     protected void onFatalError() {
         logger.error("Fatal error");
-        showErrorDialog("fatalError", null, false);
+        showErrorDialog("fatalError", null, true);
         super.onFatalError();
     }
 
