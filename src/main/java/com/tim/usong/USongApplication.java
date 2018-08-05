@@ -14,8 +14,8 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.session.SessionHandler;
+import io.dropwizard.websockets.WebsocketBundle;
+import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,6 @@ public class USongApplication extends Application<USongConfiguration> {
     public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
     private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Server server;
 
     public static void main(String[] args) throws Exception {
         Setup.setUpEverything(true);
@@ -55,6 +54,7 @@ public class USongApplication extends Application<USongConfiguration> {
 
     @Override
     public void initialize(Bootstrap<USongConfiguration> bootstrap) {
+        bootstrap.addBundle(new WebsocketBundle(SongResource.SongWebSocket.class));
         bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(
                         bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor())
@@ -87,17 +87,14 @@ public class USongApplication extends Application<USongConfiguration> {
             SongResource songResource = new SongResource(songParser);
             environment.jersey().register(new RootResource());
             environment.jersey().register(songResource);
-            environment.servlets().setSessionHandler(new SessionHandler());
 
             SongbeamerListener SBListener = new SongbeamerListener(songResource);
-            environment.lifecycle().manage(SBListener);
             Preview preview = new Preview();
-            StatusTray statusTray = new StatusTray(this, SBSettings, SBListener, songParser, songResource, preview);
+            StatusTray statusTray = new StatusTray(SBSettings, SBListener, songParser, songResource, preview);
+
+            environment.lifecycle().manage(SBListener);
             environment.lifecycle().manage(preview);
             environment.lifecycle().manage(statusTray);
-            environment.lifecycle().addServerLifecycleListener(server -> {
-                this.server = server;
-            });
         } catch (BindException e) {
             logger.error("Server already running", e);
             showErrorDialog("alreadyRunningError", null, false);
@@ -113,16 +110,6 @@ public class USongApplication extends Application<USongConfiguration> {
         logger.error("Fatal error");
         showErrorDialog("fatalError", null, false);
         super.onFatalError();
-    }
-
-    public void shutdown() {
-        try {
-            //TODO sometimes it does not work
-            server.stop();
-            System.exit(0);
-        } catch (Exception e) {
-            System.exit(-1);
-        }
     }
 
     /**

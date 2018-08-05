@@ -3,10 +3,14 @@ package com.tim.usong.resource;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.entity.Song;
 import com.tim.usong.view.SongView;
-import io.dropwizard.jersey.sessions.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.websocket.*;
+import javax.websocket.server.ServerEndpoint;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.*;
@@ -14,92 +18,40 @@ import java.util.*;
 @Path("song")
 public class SongResource {
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-    private final Object longPollingLock = new Object();
-    private final Set<String> activeClients = Collections.synchronizedSet(new HashSet<>());
     private final SongParser songParser;
     private Song song;
-    private int songId;
-    private int page;
 
     public SongResource(SongParser songParser) {
         this.songParser = songParser;
-        this.song = new Song(messages.getString("waitingForSongbeamer"));
-        this.songId = song.hashCode();
-        this.page = -1;
+        setSongAndPage(new Song(messages.getString("waitingForSongbeamer")), -1);
     }
 
     public void setSongAndPage(String songFileName, int page) {
         setSongAndPage(songParser.parse(songFileName), page);
     }
 
-    public void setPage(int page) {
-        setSongAndPage(song, page);
-    }
-
     public void setSongAndPage(Song song, int page) {
-        if (!this.song.equals(song) || this.page != page) {
-            this.song = song;
-            this.page = page;
-            this.songId = song.hashCode();
-            activeClients.clear();
-            synchronized (longPollingLock) {
-                longPollingLock.notifyAll();
-            }
-        }
+        this.song = song;
+        SongWebSocket.songId = song.hashCode();
+        SongWebSocket.page = page;
+        SongWebSocket.notifyDataChanged();
     }
 
-    public void shutDown() {
-        synchronized (longPollingLock) {
-            longPollingLock.notifyAll();
-        }
-        synchronized (activeClients) {
-            activeClients.notifyAll();
-        }
+    public void setPage(int page) {
+        SongWebSocket.page = page;
+        SongWebSocket.notifyDataChanged();
     }
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public SongView getSong(@Session HttpSession session, @QueryParam("admin") boolean admin) {
-        session.setAttribute("clientCount", 0);
-        session.setAttribute("song", songId);
-        session.setAttribute("page", -2);
-        return new SongView(song, admin);
-    }
-
-    @GET
-    @Path("page")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response getCurrentPage(@Session HttpSession session) throws InterruptedException {
-        if (!activeClients.contains(session.getId())) {
-            synchronized (activeClients) {
-                activeClients.add(session.getId());
-                activeClients.notifyAll();
-            }
-        }
-
-        Integer songId = (Integer) session.getAttribute("song");
-        Integer page = (Integer) session.getAttribute("page");
-        synchronized (longPollingLock) {
-            if (Objects.equals(songId, this.songId) && Objects.equals(page, this.page)) {
-                longPollingLock.wait(60000); // no changes yet, therefore wait;
-            }
-        }
-
-        if (!Objects.equals(songId, this.songId)) {
-            return Response.status(205).build(); // song has changed; HTTP 205: Reset Content
-        }
-        if (!Objects.equals(page, this.page)) {
-            session.setAttribute("page", this.page);
-            return Response.ok(this.page).build();
-        }
-        return Response.status(304).build();
+    public SongView getSong(@Context HttpServletRequest request, @QueryParam("admin") boolean admin) {
+        return new SongView(song, request.getLocale(), admin);
     }
 
     @POST
     @Path("page/{newPage}")
-    public Response setPageForCurrentSong(@PathParam("newPage") Integer newPage) {
-        int totalPages = song.getSections().stream().mapToInt(s -> s.getPages().size()).sum();
-        if (newPage == null || newPage < 0 || newPage >= totalPages) {
+    public Response setPageForCurrentSong(@PathParam("newPage") int newPage) {
+        if (newPage < 0 || newPage >= song.getPageCount()) {
             return Response.status(400).build();
         }
         setPage(newPage);
@@ -108,43 +60,65 @@ public class SongResource {
 
     @POST
     @Path("lang/{newLang}")
-    public Response setLangForCurrentSong(@PathParam("newLang") Integer newLang) {
-        if (newLang == null || newLang > song.getLangCount() || newLang <= 0) {
+    public Response setLangForCurrentSong(@PathParam("newLang") int newLang) {
+        if (newLang <= 0 || newLang > song.getLangCount()) {
             return Response.status(400).build();
         }
         songParser.setLangForSong(song.getTitle(), newLang);
-        Song newSong = songParser.parse(song.getFileName());
-        setSongAndPage(newSong, page);
+        setSongAndPage(song.getFileName(), SongWebSocket.page);
         return Response.ok().build();
     }
 
-    @GET
-    @Path("activeClients")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response getActiveClients(@Session HttpSession session) throws InterruptedException {
-        synchronized (activeClients) {
-            if (Objects.equals(session.getAttribute("clientCount"), activeClients.size())) {
-                activeClients.wait(60000);
-            }
-        }
-
-        int activeClientsCount = activeClients.size();
-        if (Objects.equals(session.getAttribute("clientCount"), activeClientsCount)) {
-            return Response.status(304).build();
-        }
-        session.setAttribute("clientCount", activeClientsCount);
-        return Response.ok(activeClientsCount).build();
-    }
-
-    public int getClientsCount() {
-        return activeClients.size();
-    }
-
     public int getPage() {
-        return page;
+        return SongWebSocket.page;
     }
 
     public Song getSong() {
         return song;
+    }
+
+    public int getClientCount() {
+        return SongWebSocket.sessions.size();
+    }
+
+    @ServerEndpoint("/song/ws")
+    public static class SongWebSocket {
+        private static final Logger logger = LoggerFactory.getLogger(SongWebSocket.class);
+        private static final List<Session> sessions = Collections.synchronizedList(new ArrayList<>());
+        private static int songId;
+        private static int page;
+
+        static void notifyDataChanged() {
+            int clientsCount = sessions.size();
+            String data = String.format("{\"songId\": %d, \"page\": %d, \"clients\": %d}", songId, page, clientsCount);
+            logger.debug("send data to clients");
+            for (javax.websocket.Session session : sessions) {
+                session.getAsyncRemote().sendText(data);
+            }
+        }
+
+        @OnOpen
+        public void onOpen(Session session) {
+            logger.debug("session open ");
+            session.setMaxIdleTimeout(Long.MAX_VALUE);
+            sessions.add(session);
+            notifyDataChanged();
+        }
+
+        @OnClose
+        public void onClose(Session session, CloseReason closeReason) {
+            sessions.remove(session);
+            logger.debug("session close ", closeReason);
+            notifyDataChanged();
+        }
+
+        @OnMessage
+        public void onMessage(String s) {
+        }
+
+        @OnError
+        public void onError(Session session, Throwable thr) {
+            logger.error("session error", thr);
+        }
     }
 }

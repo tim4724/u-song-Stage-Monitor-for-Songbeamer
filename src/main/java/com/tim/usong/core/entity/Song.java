@@ -8,6 +8,7 @@ public class Song {
     private final String fileName;
     private final String title;
     private final List<Section> sections;
+    private final int pageCount;
     private final int lang;
     private final int langCount;
 
@@ -19,6 +20,7 @@ public class Song {
         this.fileName = fileName;
         this.title = title;
         this.sections = sections;
+        this.pageCount = sections.stream().mapToInt(s -> s.getPages().size()).sum();
         this.lang = lang;
         this.langCount = langCount;
     }
@@ -41,6 +43,10 @@ public class Song {
         return fileName;
     }
 
+    public int getPageCount() {
+        return pageCount;
+    }
+
     public int getLang() {
         return lang;
     }
@@ -60,6 +66,6 @@ public class Song {
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, sections);
+        return Objects.hash(title, sections, langCount);
     }
 }

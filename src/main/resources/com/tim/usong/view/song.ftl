@@ -9,26 +9,12 @@
     <link rel="stylesheet" href="/assets/css/admin.css">
 </#if>
     <script src="/assets/js/zenscroll.js"></script>
-    <script src="/assets/js/update.js"></script>
-    <script>
-        var titleElement = undefined;
-        var pages = undefined;
-        var currentPage = undefined;
-        var errorElement = undefined;
-        var lastPageNumber = -1;
-
-        function init() {
-            window.titleElement = document.getElementById('title');
-            window.pages = document.getElementsByClassName('page');
-            window.errorElement = document.getElementById("errorBox");
-            update();
-        }
-    </script>
+    <script src="/assets/js/main.js"></script>
 </head>
 
-<body onload="init()">
+<body onload="backend = main(); backend.connectToWebSocket()">
 <header>
-    <h1 id="title">
+    <h1 id="title" data-songId="#{song.hashCode()}">
     <#if song.title?? && song.title?has_content>${song.title}</#if>
     </h1>
 </header>
@@ -48,9 +34,21 @@
 
 <div id="bottomSpacer"></div>
 
-<#if admin><#include "admin-controls.ftl"></#if>
-
-<div id="errorBox">&#9888; VERBINDUNG VERLOREN</div>
-
+<#if admin>
+<footer id="controlsWrapper">
+    <span id="activeClients">-</span>
+    <button type="button" id="upButton" onclick="backend.pageUp()">&#9650;</button>
+    <button type="button" id="downButton" onclick="backend.pageDown()">&#9660;</button>
+<#if (song.langCount > 1)>
+    <#list 1..song.langCount as i>
+        <button type="button" <#if i == song.lang> class="active" disabled</#if>
+                onclick="backend.setLang(${i});">Sprache ${i}</button>
+    </#list>
+</#if>
+</footer>
+</#if>
+<div id="errorBox">
+    &#9888; ${messages.getString("connectionLost")}
+</div>
 </body>
 </html>

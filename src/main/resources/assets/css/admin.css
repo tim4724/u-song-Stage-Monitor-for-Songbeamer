@@ -3,7 +3,7 @@ body {
 }
 
 #bottomSpacer {
-    height: 100px;
+    height: 150px;
 }
 
 #controlsWrapper {
@@ -44,6 +44,12 @@ button:hover:enabled {
     padding: 10px 30px;
     color: #212121;
     float: left;
+}
+
+#errorBox {
+    top: 20px;
+    right: 20px;
+    bottom: unset;
 }
 
 @media only screen and (max-device-width: 1024px) {
