@@ -21,11 +21,9 @@ import java.util.stream.Collectors;
 
 public class StatusTray implements Managed {
     private static final String REG_RUN_KEY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-    private static final String VALUE = "uSong Stage Monitor";
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final String VALUE = "uSongStageMonitor";
+    private final Logger logger = LoggerFactory.getLogger(StatusTray.class);
     private final ResourceBundle msg = ResourceBundle.getBundle("MessagesBundle");
-    private final USongApplication app;
     private final USongApplication.SongBeamerSettings songBeamerSettings;
     private final SongbeamerListener songbeamerListener;
     private final SongParser songParser;
@@ -34,13 +32,11 @@ public class StatusTray implements Managed {
     private final SystemTray systemTray;
     private final TrayIcon trayIcon;
 
-    public StatusTray(USongApplication app,
-                      USongApplication.SongBeamerSettings songBeamerSettings,
+    public StatusTray(USongApplication.SongBeamerSettings songBeamerSettings,
                       SongbeamerListener songbeamerListener,
                       SongParser songParser,
                       SongResource songResource,
                       Preview preview) {
-        this.app = app;
         this.songBeamerSettings = songBeamerSettings;
         this.songbeamerListener = songbeamerListener;
         this.songParser = songParser;
@@ -81,8 +77,11 @@ public class StatusTray implements Managed {
             } else if (actionComand.startsWith("http://")) {
                 openBrowser(actionComand + "/song?admin=true");
             } else if (actionComand.equals(exitMsg)) {
-                songResource.shutDown();
-                app.shutdown();
+                try {
+                    System.exit(0);
+                } catch (Exception e1) {
+                    System.exit(-1);
+                }
             }
         });
 
@@ -104,7 +103,6 @@ public class StatusTray implements Managed {
 
     @Override
     public void stop() {
-        systemTray.remove(trayIcon);
     }
 
     private void showStatusWindow() {
@@ -118,6 +116,7 @@ public class StatusTray implements Managed {
                 songTitle = songTitle.substring(0, 47) + "...   ";
             }
             int page = songResource.getPage();
+            int clientsCount = songResource.getClientCount();
             String sbVersion = songBeamerSettings.version;
             if (Strings.isNullOrEmpty(sbVersion)) sbVersion = unknown;
 
@@ -125,7 +124,7 @@ public class StatusTray implements Managed {
                     .append(msg.getString("hostname")).append("\t\t").append(getHostname(unknown)).append("\n")
                     .append(msg.getString("ipAddress")).append(" \t\t").append(getHostAddress()).append("\n")
                     .append(msg.getString("songbeamerSender")).append(" \t").append(connectedState).append("\n")
-                    .append(msg.getString("activeClientsCount")).append("\t\t").append(songResource.getClientsCount())
+                    .append(msg.getString("activeClientsCount")).append("\t\t").append(clientsCount)
                     .append("\n\n")
                     .append(msg.getString("songDir")).append("\t").append(songDir).append("\n")
                     .append(msg.getString("songCount")).append("\t\t").append(countSongs(songDir))
@@ -194,11 +193,11 @@ public class StatusTray implements Managed {
             if (enable) {
                 String path = getJarPath();
                 File f = new File(path);
-                if (!f.exists()) {
-                    throw new FileNotFoundException(path);
-                } else {
-                    cmd = "reg add %s /v \"%s\" /d \"%s\" /t REG_SZ";
+                if (f.exists() && f.getName().endsWith(".jar")) {
+                    cmd = "reg add %s /v \"%s\" /d \"%s\" /t REG_SZ /f";
                     cmd = String.format(cmd, REG_RUN_KEY, VALUE, "cmd /c START javaw -jar " + path);
+                } else {
+                    throw new FileNotFoundException(path);
                 }
             } else {
                 cmd = String.format("reg delete %s /v \"%s\" /f", REG_RUN_KEY, VALUE);
@@ -217,7 +216,7 @@ public class StatusTray implements Managed {
             Process process = Runtime.getRuntime().exec(cmd);
             String result = new BufferedReader(new InputStreamReader(process.getInputStream()))
                     .lines().collect(Collectors.joining(""));
-            return path != null && result.contains(path);
+            return result != null && result.contains(path);
         } catch (Exception e) {
             logger.error("Failed to query registry for autostart entry", e);
             return false;
@@ -233,7 +232,6 @@ public class StatusTray implements Managed {
         if (path.startsWith("/")) {
             path = path.substring(1);
         }
-        path = path.replace("/", "\\");
-        return path;
+        return path.replace("/", "\\");
     }
 }
