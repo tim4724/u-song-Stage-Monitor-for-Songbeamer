@@ -3,6 +3,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width,initial-scale=0.15"/>
+    <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/song.css">
     <link rel="stylesheet" href="/assets2/css/song2.css">
 <#if admin>
