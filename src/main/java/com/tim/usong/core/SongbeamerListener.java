@@ -27,6 +27,7 @@ public class SongbeamerListener implements Managed, Runnable {
     private final ServerSocket serverSocket;
     private final DocumentBuilder builder;
     private final Thread currentThread;
+    private Process songBeamerProcess;
     private String nextSongFilename = null;
     private String currentSongDisplayedFilename = null;
     private int currentPage = -1;
@@ -45,11 +46,11 @@ public class SongbeamerListener implements Managed, Runnable {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() throws IOException {
         currentThread.interrupt();
         serverSocket.close();
         logger.info("Killing SBRemoteSender");
-        Runtime.getRuntime().exec("taskkill /F /IM SBRemoteSender.exe");
+        songBeamerProcess.destroy();
     }
 
     @Override
@@ -57,7 +58,8 @@ public class SongbeamerListener implements Managed, Runnable {
         while (!Thread.interrupted()) {
             try {
                 logger.info("Starting SBRemoteSender");
-                new ProcessBuilder(USongApplication.LOCAL_DIR + "SBRemoteSender.exe").start();
+                String cmd = USongApplication.LOCAL_DIR + "SBRemoteSender.exe";
+                songBeamerProcess = Runtime.getRuntime().exec(cmd);
             } catch (Exception e) {
                 logger.error("Starting SBRemoteSender failed", e);
                 songResource.setSongAndPage(new Song(messages.getString("startSBRemoteClientError"), e), 0);
