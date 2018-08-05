@@ -1,5 +1,6 @@
 package com.tim.usong.core;
 
+import com.google.common.base.Strings;
 import com.tim.usong.USongApplication;
 import com.tim.usong.core.entity.Page;
 import com.tim.usong.core.entity.Section;
@@ -93,7 +94,7 @@ public class SongParser {
             }
         }
 
-        if (finalSectionList.size() == 1) {
+        if (finalSectionList.size() == 1 && Strings.isNullOrEmpty(finalSectionList.get(0).getName())) {
             Section onlySection = finalSectionList.remove(0);
             for (Page p : onlySection.getPages()) {
                 finalSectionList.add(new Section("", p));
@@ -120,6 +121,9 @@ public class SongParser {
             int lineCounter = 0;
             for (String line : page.split("\\r?\\n")) {
                 line = line.trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
                 if (isBlockName(line)) {
                     currentSectionName = line;
                     continue;
