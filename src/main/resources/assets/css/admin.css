@@ -41,6 +41,7 @@ button:hover:enabled {
 }
 
 #activeClients {
+    margin: 8px;
     padding: 10px 30px;
     color: #212121;
     float: left;

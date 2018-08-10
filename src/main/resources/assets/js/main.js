@@ -31,7 +31,13 @@ let main = () => {
                 updatePageNumber(data.page);
             }
             if (clientsCountElement) {
+                if (data.clients === 1) {
+                    clientsCountElement.classList.add('negative');
+                } else {
+                    clientsCountElement.classList.remove('negative');
+                }
                 clientsCountElement.innerText = data.clients;
+
             }
         };
         ws.onclose = ev => {

@@ -52,7 +52,7 @@
         <tr>
             <th>${messages.getString("activeClientsCount")}</th>
             <td>
-                <#if status.clientCount == 0>
+                <#if status.clientCount == 0 || (status.clientCount == 1 && status.preview)>
                     <span class="negative">#{status.clientCount}</span>
                 <#else>
                     ${status.clientCount}

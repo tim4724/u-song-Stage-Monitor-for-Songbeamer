@@ -73,11 +73,11 @@ public class USongApplication extends Application<USongConfiguration> {
     @Override
     public void run(USongConfiguration config, Environment environment) {
         final USongConfiguration.AppConfigHolder appConfig = config.getAppConfig();
-        SongBeamerSettings SBSettings = readSongBeamerSettings();
+        SongBeamerSettings sBSettings = readSongBeamerSettings();
 
         String songDir = appConfig.songDir;
         if (Strings.isNullOrEmpty(songDir)) {
-            songDir = SBSettings.songDir; //no songDir in app yml config provided
+            songDir = sBSettings.songDir; //no songDir in app yml config provided
         }
         if (Strings.isNullOrEmpty(songDir)) {
             logger.error("No directory for songs found.");
@@ -96,7 +96,7 @@ public class USongApplication extends Application<USongConfiguration> {
             SongbeamerListener sBListener = new SongbeamerListener(songResource);
             UsongTray usongTray = new UsongTray(previewFrame);
             StatusResource statusResource = new StatusResource(
-                    sBListener, songResource, songParser, SBSettings);
+                    sBListener, songResource, songParser, previewFrame, sBSettings);
 
             environment.jersey().register(new RootResource());
             environment.jersey().register(songResource);

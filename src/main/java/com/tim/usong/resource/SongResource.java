@@ -77,7 +77,7 @@ public class SongResource {
         return song;
     }
 
-    public int getClientCount() {
+    int getClientCount() {
         return SongWebSocket.sessions.size();
     }
 

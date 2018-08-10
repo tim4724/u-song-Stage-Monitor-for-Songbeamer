@@ -6,6 +6,7 @@ import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
+import com.tim.usong.core.ui.PreviewFrame;
 import com.tim.usong.util.AutoStartUtil;
 import com.tim.usong.util.NetworkHostUtils;
 import com.tim.usong.view.StatusView;
@@ -15,28 +16,27 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 @Path("status")
 public class StatusResource {
-    private SongbeamerListener songbeamerListener;
-    private SongResource songResource;
-    private SongParser songParser;
-    private USongApplication.SongBeamerSettings settings;
+    private final SongbeamerListener songbeamerListener;
+    private final SongResource songResource;
+    private final SongParser songParser;
+    private final PreviewFrame previewFrame;
+    private final USongApplication.SongBeamerSettings settings;
 
     public StatusResource(SongbeamerListener songbeamerListener,
                           SongResource songResource,
                           SongParser songParser,
+                          PreviewFrame previewFrame,
                           USongApplication.SongBeamerSettings settings) {
         this.songbeamerListener = songbeamerListener;
         this.songResource = songResource;
         this.songParser = songParser;
+        this.previewFrame = previewFrame;
         this.settings = settings;
     }
 
@@ -44,29 +44,31 @@ public class StatusResource {
     @Produces(MediaType.TEXT_HTML)
     public StatusView getStatus(@Context HttpServletRequest request) {
         Locale locale = request.getLocale();
-        Status status = new Status(locale, songbeamerListener, songResource, songParser, settings);
+        Status status = new Status(locale, songbeamerListener, songResource, songParser, previewFrame, settings);
         return new StatusView(locale, status);
     }
 
 
     public class Status {
         private final String version, hostname, ipAddress, sbVersion, songDir, songTitle, currentSection;
-        private final boolean startWithWindows, connected;
+        private final boolean startWithWindows, connected, preview;
         private final int clientCount, songCount, currentPage, lang, langCount;
 
         public Status(Locale locale,
                       SongbeamerListener songbeamerListener,
                       SongResource songResource,
                       SongParser songParser,
+                      PreviewFrame previewFrame,
                       USongApplication.SongBeamerSettings songBeamerSettings) {
             ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle", locale);
             Song song = songResource.getSong();
             String hostname = NetworkHostUtils.getHostname();
             String ipAddress = NetworkHostUtils.getHostAddress();
 
-            version = USongApplication.APP_VERSION;
-            startWithWindows = AutoStartUtil.isAutostartEnabled();
-            clientCount = songResource.getClientCount();
+            this.version = USongApplication.APP_VERSION;
+            this.startWithWindows = AutoStartUtil.isAutostartEnabled();
+            this.clientCount = songResource.getClientCount();
+            this.preview = previewFrame.isVisible();
             this.hostname = hostname != null ? hostname : messages.getString("unknown");
             this.ipAddress = ipAddress != null ? ipAddress : messages.getString("unknown");
             this.sbVersion = songBeamerSettings.version;
@@ -152,6 +154,10 @@ public class StatusResource {
 
         public int getLangCount() {
             return langCount;
+        }
+
+        public boolean isPreview() {
+            return preview;
         }
     }
 }
