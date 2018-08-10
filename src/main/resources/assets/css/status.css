@@ -23,16 +23,16 @@ section {
 }
 
 table {
-    text-align: left;
     width: 100%;
     padding: 8px;
 }
 
 th, td {
+    text-align: left;
     background: #111111;
     padding: 12px 24px;
     font-style: normal;
-    font-weight: unset;
+    font-weight: normal;
 }
 
 th {

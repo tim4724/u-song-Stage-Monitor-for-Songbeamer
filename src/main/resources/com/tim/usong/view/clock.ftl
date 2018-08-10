@@ -8,7 +8,7 @@
 
 <script>
     const timeBox = document.getElementById("timeBox");
-    const updateTimeBox = () => {
+    const updateTimeBox = function () {
         timeBox.innerHTML = (new Date()).toLocaleTimeString(navigator.language).replace("MESZ", "");
     };
     updateTimeBox();

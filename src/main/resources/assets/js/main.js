@@ -1,4 +1,4 @@
-let main = () => {
+function main() {
     const titleElement = document.getElementById('title');
     const pages = document.getElementsByClassName('page');
     const errorElement = document.getElementById("errorBox");
@@ -7,22 +7,24 @@ let main = () => {
     let currentPage = undefined; // element
     let lastPageNumber = -1; // number
 
-    let setLang = (newLang) => {
+    function setLang(newLang) {
         let xhr = new XMLHttpRequest();
         xhr.open('POST', 'song/lang/' + newLang, true);
         xhr.send();
-    };
-    let setPage = (newPage) => {
+    }
+
+    function setPage(newPage) {
         let xhr = new XMLHttpRequest();
         xhr.open('POST', 'song/page/' + newPage, true);
         xhr.send();
-    };
-    let connectToWebSocket = () => {
+    }
+
+    function connectToWebSocket() {
         const ws = new WebSocket("ws://" + location.host + "/song/ws");
-        ws.onopen = () => {
+        ws.onopen = function () {
             errorElement.style.display = "none";
         };
-        ws.onmessage = ev => {
+        ws.onmessage = function (ev) {
             let data = JSON.parse(ev.data);
             if (songId !== parseInt(data.songId)) {
                 location.reload(true);
@@ -40,13 +42,14 @@ let main = () => {
 
             }
         };
-        ws.onclose = ev => {
+        ws.onclose = function (ev) {
             setTimeout(connectToWebSocket, 500);
             console.error("ws closed" + ev.reason);
             errorElement.style.display = "block";
         };
-    };
-    let updatePageNumber = (newPageNumber) => {
+    }
+
+    function updatePageNumber(newPageNumber) {
         const oldPage = currentPage;
         currentPage = pages[newPageNumber];
 
@@ -84,35 +87,40 @@ let main = () => {
             let duration = isVisible(currentPage) ? 2000 : 300;
             scroll(scrollTarget, offset, duration);
         }
-    };
+    }
+
     return {
         setLang: setLang,
-        pageUp: () => setPage(lastPageNumber - 1),
-        pageDown: () => setPage(lastPageNumber + 1),
+        pageUp: function () {
+            return setPage(lastPageNumber - 1);
+        },
+        pageDown: function () {
+            return setPage(lastPageNumber + 1);
+        },
         connectToWebSocket: connectToWebSocket
     }
-};
+}
 
-let scroll = (e, offset, duration) => {
+function scroll(e, offset, duration) {
     zenscroll.setup(duration, offset);
 
     zenscroll.to(e, duration);
-    setTimeout(() => {
+    setTimeout(function () {
         if (!zenscroll.moving()) {
             zenscroll.to(e, duration);
         }
     }, 100);//sometimes its buggy and doesnt scroll right away
 
     //backup plan
-    setTimeout(() => {
+    setTimeout(function () {
         if (!zenscroll.moving()) {
             e.scrollIntoView(true);
         }
     }, 200);
-};
+}
 
-let isVisible = (el) => {
+function isVisible(el) {
     const elemTop = el.getBoundingClientRect().top;
     const elemBottom = el.getBoundingClientRect().bottom;
     return (elemTop >= 0) && (elemBottom <= innerHeight);
-};
+}

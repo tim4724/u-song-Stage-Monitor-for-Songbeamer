@@ -6,16 +6,16 @@
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/status.css">
     <script>
-        const connectToWebSocket = () => {
+        const connectToWebSocket = function () {
             const errorElement = document.getElementById("errorBox");
             const ws = new WebSocket("ws://" + location.host + "/song/ws?status=true");
-            ws.onopen = () => {
+            ws.onopen = function () {
                 errorElement.style.display = "none";
             };
-            ws.onmessage = (ev) => {
+            ws.onmessage = function () {
                 location.reload(true);
             };
-            ws.onclose = ev => {
+            ws.onclose = function (ev) {
                 setTimeout(connectToWebSocket, 500);
                 console.error("ws closed" + ev.reason);
                 errorElement.style.display = "block";
