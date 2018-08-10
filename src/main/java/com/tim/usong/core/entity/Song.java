@@ -11,22 +11,32 @@ public class Song {
     private final int pageCount;
     private final int lang;
     private final int langCount;
+    private final boolean error;
 
     public Song(String title) {
-        this(null, title, new ArrayList<>(), 1, 1);
+        this(title, false);
+    }
+
+    public Song(String title, boolean error) {
+        this(null, title, new ArrayList<>(), 1, 1, error);
     }
 
     public Song(String fileName, String title, List<Section> sections, int lang, int langCount) {
+        this(fileName, title, sections, lang, langCount, false);
+    }
+
+    public Song(String fileName, String title, List<Section> sections, int lang, int langCount, boolean error) {
         this.fileName = fileName;
         this.title = title;
         this.sections = sections;
         this.pageCount = sections.stream().mapToInt(s -> s.getPages().size()).sum();
         this.lang = lang;
         this.langCount = langCount;
+        this.error = error;
     }
 
     public Song(String title, Exception e) {
-        this(null, title, new ArrayList<>(), 1, 1);
+        this(null, title, new ArrayList<>(), 1, 1, true);
         String errString = e.toString().replace("\n", "\n<br />");
         sections.add(new Section(e.getClass().getName(), new Page(errString)));
     }
@@ -53,6 +63,10 @@ public class Song {
 
     public int getLangCount() {
         return langCount;
+    }
+
+    public boolean isError() {
+        return error;
     }
 
     @Override

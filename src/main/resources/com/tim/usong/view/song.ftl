@@ -15,7 +15,9 @@
 
 <body onload="backend = main(); backend.connectToWebSocket()">
 <header>
-    <h1 id="title" data-songId="#{song.hashCode()}">${song.title}</h1>
+    <h1 id="title" data-songId="#{song.hashCode()}" <#if song.error> class="negative" </#if>>
+    ${song.title}
+    </h1>
 </header>
 
 <#list song.sections as section>

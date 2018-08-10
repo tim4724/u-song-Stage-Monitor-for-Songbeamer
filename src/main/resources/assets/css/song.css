@@ -99,6 +99,11 @@ section {
     height: 50px;
 }
 
+#title.negative {
+    color: #d80000;
+    font-size: 2em;
+}
+
 #errorBox {
     display: none;
     position: fixed;
