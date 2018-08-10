@@ -25,9 +25,10 @@
 </head>
 <body onload="connectToWebSocket()">
 
-<h1 id="title">${messages.getString("status")}</h1>
 
 <section>
+    <h1 id="title">${messages.getString("status")}</h1>
+
     <table>
         <tr>
             <th>${messages.getString("version")}</th>
@@ -126,6 +127,18 @@
                 <th>${messages.getString("currentLang")}</th>
                 <td>${status.lang} / ${status.langCount}</td>
             </tr>
+        <#else>
+           <tr style="visibility: hidden">
+               <th></th>
+               <td></td>
+           </tr>
+        </#if>
+        <#if status.currentSection?? >
+        <#else>
+                   <tr style="visibility: hidden">
+                       <th></th>
+                       <td></td>
+                   </tr>
         </#if>
     </table>
 </section>

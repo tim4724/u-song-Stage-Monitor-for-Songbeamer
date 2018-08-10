@@ -13,12 +13,13 @@ body {
 }
 
 section {
-    display: inline-block;
-    margin: 16px auto;
+    margin: 16px;
     border-radius: 4px;
     background: #181818;
     color: #eeeeee;
     border: 6px solid #181818;
+    min-height: calc(100vh - 32px);
+    box-sizing: border-box;
 }
 
 table {
