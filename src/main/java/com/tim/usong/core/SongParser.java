@@ -17,7 +17,7 @@ public class SongParser {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final String path;
-    private Map<String, Integer> langMap = new HashMap<>();
+    private final Map<String, Integer> langMap = new HashMap<>();
 
     public SongParser(String path) {
         this.path = path;

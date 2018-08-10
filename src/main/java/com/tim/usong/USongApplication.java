@@ -70,7 +70,7 @@ public class USongApplication extends Application<USongConfiguration> {
     }
 
     @Override
-    public void run(USongConfiguration config, Environment environment) throws Exception {
+    public void run(USongConfiguration config, Environment environment) {
         final USongConfiguration.AppConfigHolder appConfig = config.getAppConfig();
         SongBeamerSettings SBSettings = readSongBeamerSettings();
 

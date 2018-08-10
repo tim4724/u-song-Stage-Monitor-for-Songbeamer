@@ -60,17 +60,17 @@ let main = () => {
             }
             lastPageNumber = newPageNumber;
             currentPage.classList.add('currentPage');
-            currentPage.parentNode.classList.add('currentSection');
+            currentPage.parentElement.classList.add('currentSection');
 
             let offset = 10;
             let scrollTarget;
             if (newPageNumber === 0) {
                 scrollTarget = titleElement;
-            } else if (currentPage.parentNode.scrollHeight < (innerHeight * 0.8)) {
+            } else if (currentPage.parentElement.scrollHeight < (innerHeight * 0.8)) {
                 scrollTarget = currentPage.parentNode;
             } else {
                 scrollTarget = currentPage;
-                if (currentPage.parentNode.getElementsByClassName('page')[0] !== currentPage) {
+                if (currentPage.parentElement.getElementsByClassName('page')[0] !== currentPage) {
                     offset = innerHeight * 0.2;
                 }
             }
@@ -81,7 +81,7 @@ let main = () => {
     };
     return {
         setLang: setLang,
-        pageUp: () => setPage(lastPageNumber - 1) ,
+        pageUp: () => setPage(lastPageNumber - 1),
         pageDown: () => setPage(lastPageNumber + 1),
         connectToWebSocket: connectToWebSocket
     }

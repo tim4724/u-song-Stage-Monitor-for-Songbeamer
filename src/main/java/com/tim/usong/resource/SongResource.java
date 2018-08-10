@@ -17,12 +17,12 @@ import java.util.*;
 
 @Path("song")
 public class SongResource {
-    private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final SongParser songParser;
     private Song song;
 
     public SongResource(SongParser songParser) {
         this.songParser = songParser;
+        ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
         setSongAndPage(new Song(messages.getString("waitingForSongbeamer")), -1);
     }
 
@@ -110,10 +110,6 @@ public class SongResource {
             sessions.remove(session);
             logger.debug("session close ", closeReason);
             notifyDataChanged();
-        }
-
-        @OnMessage
-        public void onMessage(String s) {
         }
 
         @OnError

@@ -6,14 +6,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class Section {
-
     public enum Type {VERSE, PRE_CHORUS, CHORUS, PRE_BRIDGE, BRIDGE, ENDING, UNKNOWN}
 
-    private String name;
-    private Type type;
-    private List<Page> pages = new ArrayList<>();
+    private final String name;
+    private final Type type;
+    private final List<Page> pages = new ArrayList<>();
 
-    public Section(String name) {
+    public Section(String name, Page... pages) {
         this.name = name;
         if (name.matches("(?i)^(Vers|Verse|Strophe)($| .*)")) {
             type = Section.Type.VERSE;
@@ -30,10 +29,6 @@ public class Section {
         } else {
             type = Type.UNKNOWN;
         }
-    }
-
-    public Section(String name, Page... pages) {
-        this(name);
         this.pages.addAll(Arrays.asList(pages));
     }
 

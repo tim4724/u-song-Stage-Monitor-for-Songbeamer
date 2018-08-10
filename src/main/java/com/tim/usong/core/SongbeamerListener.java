@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
 
 public class SongbeamerListener implements Managed, Runnable {
@@ -91,7 +92,7 @@ public class SongbeamerListener implements Managed, Runnable {
         String in = "";
         int len;
         while ((len = inputStream.read(data)) != -1) {
-            in = in + new String(data, 0, len, "UTF-8");
+            in = in + new String(data, 0, len, StandardCharsets.UTF_8);
             logger.debug("Received data: \n" + in);
             while (in.contains(endTag)) {
                 try {
