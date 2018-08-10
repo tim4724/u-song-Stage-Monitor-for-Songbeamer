@@ -7,6 +7,7 @@ import com.tim.usong.core.SongbeamerListener;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
 import com.tim.usong.util.AutoStartUtil;
+import com.tim.usong.util.NetworkHostUtils;
 import com.tim.usong.view.StatusView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,12 +61,14 @@ public class StatusResource {
                       USongApplication.SongBeamerSettings songBeamerSettings) {
             ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle", locale);
             Song song = songResource.getSong();
+            String hostname = NetworkHostUtils.getHostname();
+            String ipAddress = NetworkHostUtils.getHostAddress();
 
-            this.version = USongApplication.APP_VERSION;
-            this.startWithWindows = AutoStartUtil.isAutostartEnabled();
-            this.clientCount = songResource.getClientCount();
-            this.hostname = getHostname(messages.getString("unknown"));
-            this.ipAddress = getHostAddress(messages.getString("unknown"));
+            version = USongApplication.APP_VERSION;
+            startWithWindows = AutoStartUtil.isAutostartEnabled();
+            clientCount = songResource.getClientCount();
+            this.hostname = hostname != null ? hostname : messages.getString("unknown");
+            this.ipAddress = ipAddress != null ? ipAddress : messages.getString("unknown");
             this.sbVersion = songBeamerSettings.version;
             this.connected = songbeamerListener.isConnected();
             this.songDir = songParser.getSongDir();
@@ -74,29 +77,7 @@ public class StatusResource {
             this.currentPage = songResource.getPage();
             this.currentSection = getSectionName(song, currentPage);
             this.lang = song.getLang();
-            this.langCount = song.getLang();
-        }
-
-
-        private String getHostname(String defaultValue) {
-            try {
-                return InetAddress.getLocalHost().getHostName();
-            } catch (UnknownHostException e) {
-                return defaultValue;
-            }
-        }
-
-        private String getHostAddress(String defaultValue) {
-            try {
-                try (DatagramSocket socket = new DatagramSocket()) {
-                    socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
-                    return socket.getLocalAddress().getHostAddress();
-                } catch (SocketException e) {
-                    return InetAddress.getLocalHost().getHostAddress();
-                }
-            } catch (UnknownHostException e) {
-                return defaultValue;
-            }
+            this.langCount = song.getLangCount();
         }
 
         private long countSongs(String songPath) {

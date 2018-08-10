@@ -197,12 +197,4 @@ public class SongParser {
     public String getSongDir() {
         return path;
     }
-
-    public int getLangForSong(String songTitle) {
-        Integer lang = langMap.get(songTitle);
-        if (lang == null) {
-            return 1;
-        }
-        return lang;
-    }
 }

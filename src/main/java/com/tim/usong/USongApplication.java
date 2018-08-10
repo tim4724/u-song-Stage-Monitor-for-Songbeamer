@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import com.tim.usong.core.ui.PreviewFrame;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
-import com.tim.usong.core.ui.StatusTray;
+import com.tim.usong.core.ui.UsongTray;
 import com.tim.usong.core.ui.SplashScreen;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
@@ -94,7 +94,7 @@ public class USongApplication extends Application<USongConfiguration> {
             SongParser songParser = new SongParser(songDir);
             SongResource songResource = new SongResource(songParser);
             SongbeamerListener sBListener = new SongbeamerListener(songResource);
-            StatusTray statusTray = new StatusTray(previewFrame);
+            UsongTray usongTray = new UsongTray(previewFrame);
             StatusResource statusResource = new StatusResource(
                     sBListener, songResource, songParser, SBSettings);
 
@@ -103,7 +103,7 @@ public class USongApplication extends Application<USongConfiguration> {
             environment.jersey().register(statusResource);
             environment.lifecycle().manage(sBListener);
             environment.lifecycle().manage(previewFrame);
-            environment.lifecycle().manage(statusTray);
+            environment.lifecycle().manage(usongTray);
             environment.lifecycle().addServerLifecycleListener(server -> {
                 SplashScreen.started();
             });

@@ -2,6 +2,7 @@ package com.tim.usong.core.ui;
 
 import com.tim.usong.USongApplication;
 import com.tim.usong.util.AutoStartUtil;
+import com.tim.usong.util.NetworkHostUtils;
 import io.dropwizard.lifecycle.Managed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +17,12 @@ import java.net.*;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
-public class StatusTray implements Managed {
-    private static final Logger logger = LoggerFactory.getLogger(StatusTray.class);
+public class UsongTray implements Managed {
+    private static final Logger logger = LoggerFactory.getLogger(UsongTray.class);
     private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private PreviewFrame previewFrame;
 
-    public StatusTray(PreviewFrame previewFrame) {
+    public UsongTray(PreviewFrame previewFrame) {
         this.previewFrame = previewFrame;
     }
 
@@ -36,35 +37,33 @@ public class StatusTray implements Managed {
         String autoStartMsg = messages.getString("autostart");
         String exitMsg = messages.getString("exit");
 
-        PopupMenu popupMenu = trayIcon.getPopupMenu();
-        popupMenu.add(statusMsg);
+        MenuItem statusItem = new MenuItem(statusMsg);
+        statusItem.addActionListener(e -> openStatusWindow());
+
         CheckboxMenuItem previewCheckBox = new CheckboxMenuItem(previewMsg, previewFrame.isVisible());
-        previewCheckBox.addItemListener(event -> previewFrame.setVisible(event.getStateChange() == ItemEvent.SELECTED));
-        popupMenu.add(previewCheckBox);
+        previewCheckBox.addItemListener(e -> previewFrame.setVisible(e.getStateChange() == ItemEvent.SELECTED));
 
         CheckboxMenuItem autoStartCheckbox = new CheckboxMenuItem(autoStartMsg, AutoStartUtil.isAutostartEnabled());
         autoStartCheckbox.addItemListener(event -> setAutoStartEnabled(event.getStateChange() == ItemEvent.SELECTED));
+
+        MenuItem hostItem = new MenuItem("http://" + getHostname());
+        hostItem.addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
+
+        MenuItem ipAddressItem = new MenuItem("http://" + getIpAdress());
+        ipAddressItem.addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
+
+        MenuItem exitItem = new MenuItem(exitMsg);
+        exitItem.addActionListener(e -> System.exit(0));
+
+        PopupMenu popupMenu = trayIcon.getPopupMenu();
+        popupMenu.add(statusItem);
+        popupMenu.add(previewCheckBox);
         popupMenu.add(autoStartCheckbox);
         popupMenu.addSeparator();
-        String hostname = getHostname();
-        popupMenu.add(hostname != null ? "http://" + hostname : "http://localhost");
+        popupMenu.add(hostItem);
+        popupMenu.add(ipAddressItem);
         popupMenu.addSeparator();
-        popupMenu.add(exitMsg);
-
-        popupMenu.addActionListener(e -> {
-            String actionComand = e.getActionCommand();
-            if (actionComand.equals(statusMsg)) {
-                openStatusWindow();
-            } else if (actionComand.startsWith("http://")) {
-                openBrowser(actionComand + "/song?admin=true");
-            } else if (actionComand.equals(exitMsg)) {
-                try {
-                    System.exit(0);
-                } catch (Exception e1) {
-                    System.exit(-1);
-                }
-            }
-        });
+        popupMenu.add(exitItem);
 
         trayIcon.addActionListener(new AbstractAction() {
             @Override
@@ -87,6 +86,10 @@ public class StatusTray implements Managed {
         }
     }
 
+    @Override
+    public void stop() {
+    }
+
     private void setAutoStartEnabled(boolean enable) {
         try {
             AutoStartUtil.setAutoStartEnabled(enable);
@@ -101,20 +104,7 @@ public class StatusTray implements Managed {
         String url = "http://localhost/status";
         Preferences prefs = Preferences.userNodeForPackage(WebFrame.class).node("status");
         WebFrame webFrame = new WebFrame(title, url, prefs, 800, 600, 0.6);
-        webFrame.setType(Window.Type.UTILITY);
         webFrame.setVisible(true);
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    private String getHostname() {
-        try {
-            return InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            return null;
-        }
     }
 
     private void openBrowser(String url) {
@@ -124,5 +114,21 @@ public class StatusTray implements Managed {
             logger.error("Failed to open browser", e);
             USongApplication.showErrorDialogAsync(messages.getString("browserOpenError"), e);
         }
+    }
+
+    private String getHostname() {
+        String hostname = NetworkHostUtils.getHostname();
+        if (hostname == null) {
+            hostname = "localhost";
+        }
+        return hostname;
+    }
+
+    private String getIpAdress() {
+        String ip = NetworkHostUtils.getHostAddress();
+        if (ip == null) {
+            ip = "127.0.0.1";
+        }
+        return ip;
     }
 }

@@ -70,9 +70,13 @@ public class SongbeamerListener implements Managed, Runnable {
             try (Socket socket = serverSocket.accept()) {
                 connected = true;
                 receive(socket);
+                connected = false;
+                logger.error("Conenction to SBRemoteSender lost");
+                songResource.setSongAndPage(new Song(messages.getString("lostConnectionToSB")), 0);
+                USongApplication.showErrorDialogAsync(messages.getString("lostConnectionToSB"), null);
             } catch (Exception e) {
+                connected = false;
                 if (!Thread.currentThread().isInterrupted()) {
-                    connected = false;
                     logger.error("Conenction to SBRemoteSender lost", e);
                     songResource.setSongAndPage(new Song(messages.getString("lostConnectionToSB"), e), 0);
                     USongApplication.showErrorDialogAsync(messages.getString("lostConnectionToSB"), e);

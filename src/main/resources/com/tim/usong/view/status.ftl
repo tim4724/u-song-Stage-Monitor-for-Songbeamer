@@ -31,7 +31,13 @@
     <table>
         <tr>
             <th>${messages.getString("version")}</th>
-            <td>${status.version}</td>
+            <td>
+                <#if status.version??>
+                    ${status.version}
+                <#else>
+                    ${messages.getString("unknown")}
+                </#if>
+            </td>
         </tr>
         <tr>
             <th>${messages.getString("autostart")}</th>
