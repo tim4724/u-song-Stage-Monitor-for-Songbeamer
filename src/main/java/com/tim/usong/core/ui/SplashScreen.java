@@ -18,11 +18,15 @@ public class SplashScreen extends JWindow {
     }
 
     public static void started() {
-        INSTANCE.started = true;
+        if (INSTANCE != null) {
+            INSTANCE.started = true;
+        }
     }
 
     public static void error() {
-        INSTANCE.error = true;
+        if (INSTANCE != null) {
+            INSTANCE.error = true;
+        }
     }
 
     private SplashScreen() {

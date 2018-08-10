@@ -63,7 +63,7 @@ public class SongbeamerListener implements Managed, Runnable {
             } catch (Exception e) {
                 logger.error("Starting SBRemoteSender failed", e);
                 songResource.setSongAndPage(new Song(messages.getString("startSBRemoteClientError"), e), 0);
-                USongApplication.showErrorDialog("startSBRemoteClientError", e, false);
+                USongApplication.showErrorDialogAsync(messages.getString("startSBRemoteClientError"), e);
             }
 
             try (Socket socket = serverSocket.accept()) {
@@ -74,7 +74,7 @@ public class SongbeamerListener implements Managed, Runnable {
                     connected = false;
                     logger.error("Conenction to SBRemoteSender lost", e);
                     songResource.setSongAndPage(new Song(messages.getString("lostConnectionToSB"), e), 0);
-                    USongApplication.showErrorDialog("lostConnectionToSB", e, false);
+                    USongApplication.showErrorDialogAsync(messages.getString("lostConnectionToSB"), e);
                 }
             }
         }
@@ -104,7 +104,7 @@ public class SongbeamerListener implements Managed, Runnable {
                     logger.error("Failed to parse data from SongBeamerSender", e);
                     Song errorSong = new Song(messages.getString("handlingSongbeamerActionError"), e);
                     songResource.setSongAndPage(errorSong, 0);
-                    USongApplication.showErrorDialog("handlingSongbeamerActionError", e, false);
+                    USongApplication.showErrorDialogAsync(messages.getString("handlingSongbeamerActionError"), e);
                 }
                 in = in.substring(in.indexOf(endTag) + endTag.length());
             }

@@ -39,12 +39,14 @@ public class SongParser {
             return parseSong(fileName);
         } catch (NoSuchFileException e) {
             logger.error("Failed to parse song", e);
-            USongApplication.showErrorDialog("fileNotFoundError", fileName + "\n" + e, false);
-            return new Song(messages.getString("fileNotFoundError") + fileName, e);
+            String errorMessage = messages.getString("fileNotFoundError");
+            USongApplication.showErrorDialogAsync(errorMessage, fileName + "\n" + e);
+            return new Song(errorMessage + "<br>\n" + fileName, e);
         } catch (Exception e) {
             logger.error("Failed to parse song", e);
-            USongApplication.showErrorDialog("fileParseError", fileName + "\n" + e, false);
-            return new Song(messages.getString("fileParseError") + fileName, e);
+            String errorMessage = messages.getString("fileParseError");
+            USongApplication.showErrorDialogAsync(errorMessage, fileName + "\n" + e);
+            return new Song(errorMessage + fileName, e);
         }
     }
 

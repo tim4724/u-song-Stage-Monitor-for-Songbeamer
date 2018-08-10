@@ -8,6 +8,7 @@ import java.awt.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ResourceBundle;
 
 class Setup {
 
@@ -19,9 +20,10 @@ class Setup {
      * - usong.yml is a config file i.e. for http and logging settings
      * - SBRemoteSender.exe is an application to receive actions from songbeamer about current song and current page
      **/
-    static void setUpEverything() {
+    static void setUpRequiredExternalFiles() {
         Logger logger = LoggerFactory.getLogger(Setup.class);
-        setUpUI();
+        ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+
         try {
             Files.createDirectories(Paths.get(USongApplication.LOCAL_DIR));
 
@@ -29,17 +31,18 @@ class Setup {
             if (!Files.exists(configYamlPath)) {
                 Files.copy(USongApplication.class.getResourceAsStream("/usong.yml"), configYamlPath);
             }
-
             Path sbRemoteSenderPath = Paths.get(USongApplication.LOCAL_DIR, "SBRemoteSender.exe");
             if (!Files.exists(sbRemoteSenderPath)) {
                 Files.copy(USongApplication.class.getResourceAsStream("/SBRemoteSender.exe"), sbRemoteSenderPath);
             }
         } catch (Exception e) {
+            // application may still work if SBRemoteSender is started manually or if yml is provided via parameter
             logger.error("Setup failed", e);
+            USongApplication.showErrorDialogAsync(messages.getString("createFilesError"), e);
         }
     }
 
-    private static void setUpUI() {
+    static void setUpUI() {
         Font font = new Font("Helvetica Neue", Font.PLAIN, 14);
         Color darkGrayBg = Color.decode("0x111111");
         Color accent = Color.decode("0x008cff");
@@ -61,5 +64,10 @@ class Setup {
         UIManager.put("Button.foreground", Color.WHITE);
         UIManager.put("ProgressBar.background", darkGrayBg);
         UIManager.put("ProgressBar.foreground", accent);
+
+        // Frame for all dialogs, where no frame is provided
+        Frame rootFrame = new Frame();
+        rootFrame.setAlwaysOnTop(true);
+        JOptionPane.setRootFrame(rootFrame);
     }
 }

@@ -24,7 +24,7 @@ public class StatusTray implements Managed {
     private static final String REG_RUN_KEY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
     private static final String VALUE = "uSongStageMonitor";
     private final Logger logger = LoggerFactory.getLogger(StatusTray.class);
-    private final ResourceBundle msg = ResourceBundle.getBundle("MessagesBundle");
+    private final ResourceBundle msgs = ResourceBundle.getBundle("MessagesBundle");
     private final USongApplication.SongBeamerSettings songBeamerSettings;
     private final SongbeamerListener songbeamerListener;
     private final SongParser songParser;
@@ -52,9 +52,9 @@ public class StatusTray implements Managed {
 
     @Override
     public void start() {
-        String statusMsg = msg.getString("status");
-        String previewMsg = msg.getString("preview");
-        String exitMsg = msg.getString("exit");
+        String statusMsg = msgs.getString("status");
+        String previewMsg = msgs.getString("preview");
+        String exitMsg = msgs.getString("exit");
 
         PopupMenu popupMenu = trayIcon.getPopupMenu();
         popupMenu.add(statusMsg);
@@ -62,7 +62,7 @@ public class StatusTray implements Managed {
         previewCheckBox.addItemListener(event -> preview.setVisible(event.getStateChange() == ItemEvent.SELECTED));
         popupMenu.add(previewCheckBox);
 
-        CheckboxMenuItem autoStartCheckbox = new CheckboxMenuItem(msg.getString("autostart"), isAutostartEnabled());
+        CheckboxMenuItem autoStartCheckbox = new CheckboxMenuItem(msgs.getString("autostart"), isAutostartEnabled());
         autoStartCheckbox.addItemListener(event -> setAutoStartEnabled(event.getStateChange() == ItemEvent.SELECTED));
         popupMenu.add(autoStartCheckbox);
         popupMenu.addSeparator();
@@ -108,8 +108,8 @@ public class StatusTray implements Managed {
 
     private void showStatusWindow() {
         try {
-            String unknown = msg.getString("unknown");
-            String connectedState = songbeamerListener.isConnected() ? msg.getString("connected") : msg.getString("notConnected");
+            String unknown = msgs.getString("unknown");
+            String connectedState = songbeamerListener.isConnected() ? msgs.getString("connected") : msgs.getString("notConnected");
             String songDir = Strings.nullToEmpty(songParser.getSongDir()) + "  ";
             Song song = songResource.getSong();
             String songTitle = song.getTitle();
@@ -122,24 +122,24 @@ public class StatusTray implements Managed {
             if (Strings.isNullOrEmpty(sbVersion)) sbVersion = unknown;
 
             StringBuilder messageBuilder = new StringBuilder()
-                    .append(msg.getString("hostname")).append("\t\t").append(getHostname(unknown)).append("\n")
-                    .append(msg.getString("ipAddress")).append(" \t\t").append(getHostAddress()).append("\n")
-                    .append(msg.getString("songbeamerSender")).append(" \t").append(connectedState).append("\n")
-                    .append(msg.getString("activeClientsCount")).append("\t\t").append(clientsCount)
+                    .append(msgs.getString("hostname")).append("\t\t").append(getHostname(unknown)).append("\n")
+                    .append(msgs.getString("ipAddress")).append(" \t\t").append(getHostAddress()).append("\n")
+                    .append(msgs.getString("songbeamerSender")).append(" \t").append(connectedState).append("\n")
+                    .append(msgs.getString("activeClientsCount")).append("\t\t").append(clientsCount)
                     .append("\n\n")
-                    .append(msg.getString("songDir")).append("\t").append(songDir).append("\n")
-                    .append(msg.getString("songCount")).append("\t\t").append(countSongs(songDir))
+                    .append(msgs.getString("songDir")).append("\t").append(songDir).append("\n")
+                    .append(msgs.getString("songCount")).append("\t\t").append(countSongs(songDir))
                     .append("\n\n")
-                    .append(msg.getString("currentSong")).append("\t\t").append(songTitle).append("\n")
-                    .append(msg.getString("currentPage")).append("\t\t").append(page == -1 ? "-" : page + 1);
+                    .append(msgs.getString("currentSong")).append("\t\t").append(songTitle).append("\n")
+                    .append(msgs.getString("currentPage")).append("\t\t").append(page == -1 ? "-" : page + 1);
             if (song.getLangCount() > 1) {
                 int currentLang = songParser.getLangForSong(song.getTitle());
-                messageBuilder.append("\n").append(msg.getString("currentLang")).append("\t").append(currentLang);
+                messageBuilder.append("\n").append(msgs.getString("currentLang")).append("\t").append(currentLang);
             }
             messageBuilder
                     .append("\n\n")
-                    .append(msg.getString("songbeamerVersion")).append("\t").append(sbVersion)
-                    .append("\n").append(msg.getString("version")).append("\t\t").append(USongApplication.APP_VERSION);
+                    .append(msgs.getString("songbeamerVersion")).append("\t").append(sbVersion)
+                    .append("\n").append(msgs.getString("version")).append("\t\t").append(USongApplication.APP_VERSION);
 
             JTextArea textArea = new JTextArea(messageBuilder.toString());
             textArea.setEditable(false);
@@ -148,7 +148,7 @@ public class StatusTray implements Managed {
                     JOptionPane.PLAIN_MESSAGE, logoIcon);
         } catch (Exception e) {
             logger.error("Failed to open status window", e);
-            USongApplication.showErrorDialog("statusWindowError", e, false);
+            USongApplication.showErrorDialogAsync(msgs.getString("statusWindowError"), e);
         }
     }
 
@@ -167,7 +167,7 @@ public class StatusTray implements Managed {
                 return InetAddress.getLocalHost().getHostAddress();
             }
         } catch (UnknownHostException e) {
-            return msg.getString("unknown");
+            return msgs.getString("unknown");
         }
     }
 
@@ -184,7 +184,7 @@ public class StatusTray implements Managed {
             Desktop.getDesktop().browse(new URL(url).toURI());
         } catch (Exception e) {
             logger.error("Failed to open browser", e);
-            USongApplication.showErrorDialog("browserOpenError", e, false);
+            USongApplication.showErrorDialogAsync(msgs.getString("browserOpenError"), e);
         }
     }
 
@@ -206,7 +206,7 @@ public class StatusTray implements Managed {
             Runtime.getRuntime().exec(cmd);
         } catch (Exception e) {
             logger.error("Failed to edit registry", e);
-            USongApplication.showErrorDialog("autostartChangeFailed", e, false);
+            USongApplication.showErrorDialogAsync(msgs.getString("autostartChangeFailed"), e);
         }
     }
 

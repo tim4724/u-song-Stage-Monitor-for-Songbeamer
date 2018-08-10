@@ -61,6 +61,7 @@ public class Preview implements Managed {
 
     private static class PreviewFrame extends JFrame {
         private final Logger logger = LoggerFactory.getLogger(PreviewFrame.class);
+        private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
         private final Preferences prefs = Preferences.userNodeForPackage(PreviewFrame.class);
         private final KeyCombination increaseZoom = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.CONTROL_DOWN);
         private final KeyCombination increaseZoom2 = new KeyCodeCombination(KeyCode.ADD, KeyCombination.CONTROL_DOWN);
@@ -155,7 +156,7 @@ public class Preview implements Managed {
                 Desktop.getDesktop().browse(new URL(url).toURI());
             } catch (Exception e) {
                 logger.error("Failed to open browser", e);
-                USongApplication.showErrorDialog("browserOpenError", e, false);
+                USongApplication.showErrorDialogAsync(messages.getString("browserOpenError"), e);
             }
         }
     }

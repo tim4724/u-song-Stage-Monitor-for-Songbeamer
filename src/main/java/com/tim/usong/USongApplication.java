@@ -16,7 +16,6 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import io.dropwizard.websockets.WebsocketBundle;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,23 +36,26 @@ public class USongApplication extends Application<USongConfiguration> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static void main(String[] args) throws Exception {
-        Setup.setUpEverything();
+        Setup.setUpRequiredExternalFiles();
+        Setup.setUpUI();
         SplashScreen.showSplash();
-        if (args.length == 0) args = new String[]{"server", LOCAL_DIR + "usong.yml"};
+        if (args.length == 0) {
+            args = new String[]{"server", LOCAL_DIR + "usong.yml"};
+        }
         new USongApplication().run(args);
     }
 
-    public static void showErrorDialog(String msg, Object extra, boolean terminateApplication) {
-        JFrame jf = new JFrame();
-        jf.setAlwaysOnTop(true);
-        String text = messages.getString(msg) + "\n" + (extra != null ? extra.toString() : "");
-        if (terminateApplication) {
-            SplashScreen.error();
-            JOptionPane.showMessageDialog(jf, text, APP_NAME, JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        } else {
-            new Thread(() -> JOptionPane.showMessageDialog(jf, text, APP_NAME, JOptionPane.ERROR_MESSAGE)).start();
-        }
+    public static void showErrorDialogAsync(String text, Object extra) {
+        new Thread(() -> showErrorDialog(text, extra)).start();
+    }
+
+    private static void showErrorDialog(String text, Object extra) {
+        showErrorDialog(extra != null ? text + "\n" + extra : text);
+    }
+
+    private static void showErrorDialog(String body) {
+        SplashScreen.error();
+        JOptionPane.showMessageDialog(null, body, APP_NAME, JOptionPane.ERROR_MESSAGE);
     }
 
     @Override
@@ -78,8 +80,8 @@ public class USongApplication extends Application<USongConfiguration> {
         }
         if (Strings.isNullOrEmpty(songDir)) {
             logger.error("No directory for songs found.");
-            showErrorDialog("songsDirNotFoundError", null, true);
-            return;
+            showErrorDialog(messages.getString("songsDirNotFoundError"));
+            System.exit(-1);
         }
         if (!songDir.endsWith("\\")) {
             songDir = songDir + "\\";
@@ -103,18 +105,20 @@ public class USongApplication extends Application<USongConfiguration> {
                 SplashScreen.started();
             });
         } catch (BindException e) {
-            logger.error("Server already running", e);
-            showErrorDialog("alreadyRunningError", null, true);
+            logger.error("Application already running", e);
+            showErrorDialog(messages.getString("alreadyRunningError"), e);
+            System.exit(-1);
         } catch (Exception e) {
             logger.error("Failed to start server", e);
-            throw e;
+            showErrorDialog(messages.getString("fatalError"), e);
+            System.exit(-1);
         }
     }
 
     @Override
     protected void onFatalError() {
         logger.error("Fatal error");
-        showErrorDialog("fatalError", null, true);
+        showErrorDialog(messages.getString("fatalError"));
         super.onFatalError();
     }
 
