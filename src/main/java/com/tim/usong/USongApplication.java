@@ -5,7 +5,7 @@ import com.tim.usong.core.ui.PreviewFrame;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
 import com.tim.usong.core.ui.UsongTray;
-import com.tim.usong.core.ui.SplashScreen;
+import com.tim.usong.core.ui.SplashWindow;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
@@ -39,7 +39,7 @@ public class USongApplication extends Application<USongConfiguration> {
     public static void main(String[] args) throws Exception {
         Setup.setUpRequiredExternalFiles();
         Setup.setUpUI();
-        SplashScreen.showSplash();
+        SplashWindow.showSplash();
         if (args.length == 0) {
             args = new String[]{"server", LOCAL_DIR + "usong.yml"};
         }
@@ -55,7 +55,7 @@ public class USongApplication extends Application<USongConfiguration> {
     }
 
     private static void showErrorDialog(String body) {
-        SplashScreen.error();
+        SplashWindow.error();
         JOptionPane.showMessageDialog(null, body, APP_NAME, JOptionPane.ERROR_MESSAGE);
     }
 
@@ -105,7 +105,7 @@ public class USongApplication extends Application<USongConfiguration> {
             environment.lifecycle().manage(previewFrame);
             environment.lifecycle().manage(usongTray);
             environment.lifecycle().addServerLifecycleListener(server -> {
-                SplashScreen.started();
+                SplashWindow.started();
             });
         } catch (BindException e) {
             logger.error("Application already running", e);

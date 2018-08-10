@@ -5,14 +5,14 @@ import com.tim.usong.USongApplication;
 import javax.swing.*;
 import java.awt.*;
 
-public class SplashScreen extends JWindow {
-    private static SplashScreen INSTANCE;
+public class SplashWindow extends JWindow {
+    private static SplashWindow INSTANCE;
     private boolean started = false;
     private boolean error = false;
 
     public static void showSplash() {
         if (INSTANCE == null) {
-            INSTANCE = new SplashScreen();
+            INSTANCE = new SplashWindow();
         }
         INSTANCE.setVisible(true);
     }
@@ -29,7 +29,7 @@ public class SplashScreen extends JWindow {
         }
     }
 
-    private SplashScreen() {
+    private SplashWindow() {
         String text = String.format("%s %s", USongApplication.APP_NAME, USongApplication.APP_VERSION);
         ImageIcon imageIcon = new ImageIcon(getClass().getResource("/icon-small.png"));
         JLabel label = new JLabel(text.toUpperCase(), imageIcon, SwingConstants.CENTER);
