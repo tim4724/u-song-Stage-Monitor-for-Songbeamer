@@ -85,6 +85,7 @@ public class SongResource {
     public static class SongWebSocket {
         private static final Logger logger = LoggerFactory.getLogger(SongWebSocket.class);
         private static final List<Session> sessions = Collections.synchronizedList(new ArrayList<>());
+        private static final List<Session> statusSessions = Collections.synchronizedList(new ArrayList<>());
         private static int songId;
         private static int page;
 
@@ -92,7 +93,10 @@ public class SongResource {
             int clientsCount = sessions.size();
             String data = String.format("{\"songId\": %d, \"page\": %d, \"clients\": %d}", songId, page, clientsCount);
             logger.debug("send data to clients");
-            for (javax.websocket.Session session : sessions) {
+            for (Session session : sessions) {
+                session.getAsyncRemote().sendText(data);
+            }
+            for (Session session : statusSessions) {
                 session.getAsyncRemote().sendText(data);
             }
         }
@@ -101,15 +105,22 @@ public class SongResource {
         public void onOpen(Session session) {
             logger.debug("session open ");
             session.setMaxIdleTimeout(Long.MAX_VALUE);
-            sessions.add(session);
-            notifyDataChanged();
+            String query = session.getQueryString();
+            if (query != null && query.replace(" ", "").contains("status=true")) {
+                statusSessions.add(session);
+            } else {
+                sessions.add(session);
+                notifyDataChanged(); // new song client -> update
+            }
         }
 
         @OnClose
         public void onClose(Session session, CloseReason closeReason) {
-            sessions.remove(session);
-            logger.debug("session close ", closeReason);
-            notifyDataChanged();
+            if (sessions.remove(session)) {
+                logger.debug("session close ", closeReason);
+                notifyDataChanged();
+            }
+            statusSessions.remove(session);
         }
 
         @OnError

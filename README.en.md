@@ -25,7 +25,7 @@ You need to enter the ip address or hostname of the server. I.e. "http://myhostn
 ![Alt text](/system-tray-status-icon-example.png?raw=true "System Tray Status Symbol")
 
 ## Preview window
-Click on "preview window" in the status tray icon context menu or access "http://&lt;hostname&gt;/song?admin=true": 
+Click on "previewFrame window" in the status tray icon context menu or access "http://&lt;hostname&gt;/song?admin=true": 
 * You can change the current language of a song
 * You can scroll up or down independent of songbeamer and of what is displayed on the beamer
 * You can see the number of active and up-to-date clients connected

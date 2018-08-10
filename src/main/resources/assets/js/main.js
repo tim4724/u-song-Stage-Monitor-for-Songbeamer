@@ -35,9 +35,9 @@ let main = () => {
             }
         };
         ws.onclose = ev => {
-            errorElement.style.display = "block";
-            console.error("ws closed" + ev.reason);
             setTimeout(connectToWebSocket, 500);
+            console.error("ws closed" + ev.reason);
+            errorElement.style.display = "block";
         };
     };
     let updatePageNumber = (newPageNumber) => {

@@ -1,13 +1,14 @@
 package com.tim.usong;
 
 import com.google.common.base.Strings;
-import com.tim.usong.core.ui.Preview;
+import com.tim.usong.core.ui.PreviewFrame;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
-import com.tim.usong.core.StatusTray;
+import com.tim.usong.core.ui.StatusTray;
 import com.tim.usong.core.ui.SplashScreen;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
+import com.tim.usong.resource.StatusResource;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -89,17 +90,19 @@ public class USongApplication extends Application<USongConfiguration> {
         logger.info("Using songs directory: " + songDir);
 
         try {
+            PreviewFrame previewFrame = new PreviewFrame();
             SongParser songParser = new SongParser(songDir);
             SongResource songResource = new SongResource(songParser);
+            SongbeamerListener sBListener = new SongbeamerListener(songResource);
+            StatusTray statusTray = new StatusTray(previewFrame);
+            StatusResource statusResource = new StatusResource(
+                    sBListener, songResource, songParser, SBSettings);
+
             environment.jersey().register(new RootResource());
             environment.jersey().register(songResource);
-
-            SongbeamerListener SBListener = new SongbeamerListener(songResource);
-            Preview preview = new Preview();
-            StatusTray statusTray = new StatusTray(SBSettings, SBListener, songParser, songResource, preview);
-
-            environment.lifecycle().manage(SBListener);
-            environment.lifecycle().manage(preview);
+            environment.jersey().register(statusResource);
+            environment.lifecycle().manage(sBListener);
+            environment.lifecycle().manage(previewFrame);
             environment.lifecycle().manage(statusTray);
             environment.lifecycle().addServerLifecycleListener(server -> {
                 SplashScreen.started();
