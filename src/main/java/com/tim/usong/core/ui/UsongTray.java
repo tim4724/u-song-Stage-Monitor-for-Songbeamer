@@ -32,38 +32,28 @@ public class UsongTray implements Managed {
         TrayIcon trayIcon = new TrayIcon(image, USongApplication.APP_NAME, new PopupMenu());
         trayIcon.setImageAutoSize(true);
 
-        String statusMsg = messages.getString("status");
         String previewMsg = messages.getString("preview");
         String autoStartMsg = messages.getString("autostart");
-        String exitMsg = messages.getString("exit");
 
-        MenuItem statusItem = new MenuItem(statusMsg);
-        statusItem.addActionListener(e -> openStatusWindow());
-
+        MenuItem statusItem = new MenuItem(messages.getString("status"));
         CheckboxMenuItem previewCheckBox = new CheckboxMenuItem(previewMsg, previewFrame.isVisible());
-        previewCheckBox.addItemListener(e -> previewFrame.setVisible(e.getStateChange() == ItemEvent.SELECTED));
-
         CheckboxMenuItem autoStartCheckbox = new CheckboxMenuItem(autoStartMsg, AutoStartUtil.isAutostartEnabled());
+        MenuItem hostItem = new MenuItem("http://" + getHostname());
+        MenuItem ipAddressItem = new MenuItem("http://" + getIpAdress());
+        MenuItem exitItem = new MenuItem(messages.getString("exit"));
+        previewCheckBox.addItemListener(e -> previewFrame.setVisible(e.getStateChange() == ItemEvent.SELECTED));
         autoStartCheckbox.addItemListener(event -> setAutoStartEnabled(event.getStateChange() == ItemEvent.SELECTED));
 
-        MenuItem hostItem = new MenuItem("http://" + getHostname());
-        hostItem.addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
-
-        MenuItem ipAddressItem = new MenuItem("http://" + getIpAdress());
-        ipAddressItem.addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
-
-        MenuItem exitItem = new MenuItem(exitMsg);
-        exitItem.addActionListener(e -> System.exit(0));
-
         PopupMenu popupMenu = trayIcon.getPopupMenu();
-        popupMenu.add(statusItem);
+        popupMenu.add(statusItem).addActionListener(e -> openStatusWindow());
         popupMenu.add(previewCheckBox);
+        previewCheckBox.addItemListener(e -> previewFrame.setVisible(e.getStateChange() == ItemEvent.SELECTED));
         popupMenu.add(autoStartCheckbox);
         popupMenu.addSeparator();
-        popupMenu.add(hostItem);
-        popupMenu.add(ipAddressItem);
+        popupMenu.add(hostItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
+        popupMenu.add(ipAddressItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
         popupMenu.addSeparator();
-        popupMenu.add(exitItem);
+        popupMenu.add(exitItem).addActionListener(e -> System.exit(0));
 
         trayIcon.addActionListener(new AbstractAction() {
             @Override
