@@ -7,23 +7,77 @@ body {
     font-size: 64px;
 }
 
+.bodyExit {
+    opacity: 0;
+    filter: grayscale(100%);
+    transition: filter 0.5s linear, opacity 0.5s linear 0.3s;
+}
+
 #title {
     color: #ff7c00;
     font-weight: normal;
-    font-size: 0.6em;
+    font-size: 0.7em;
     margin-top: 10px;
     margin-bottom: 1px;
+    animation-name: listItemEnter;
+    animation-duration: 0.7s;
+    animation-fill-mode: both;
+}
+
+@keyframes listItemEnter {
+    0% {
+        opacity: 0;
+        filter: grayscale(100%);
+        margin-top: 100px;
+    }
+    50% {
+        filter: grayscale(100%);
+    }
+    75% {
+        margin-top: 16px;
+    }
+    100% {
+        opacity: 1;
+        filter: grayscale(0%);
+    }
 }
 
 section {
-    margin: 16px auto;
+    margin: 16px auto 16px;
     border-radius: 4px;
     color: #909090;
     border: 6px solid #00ffa5;
+    animation-name: listItemEnter;
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
 }
 
-.currentSection {
-    color: #ffffff;
+body :nth-child(1) {
+    animation-delay: 0.25s;
+}
+
+body :nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+body :nth-child(3) {
+    animation-delay: 0.75s;
+}
+
+body :nth-child(4) {
+    animation-delay: 1s;
+}
+
+body :nth-child(5) {
+    animation-delay: 1.25s;
+}
+
+body :nth-child(6) {
+    animation-delay: 1.5s;
+}
+
+body :nth-child(7 + n) {
+    animation-delay: 1.75s;
 }
 
 .sectionName {
@@ -40,6 +94,10 @@ section {
     border-right: 4px solid transparent;
     padding-top: 25px;
     padding-bottom: 25px;
+}
+
+.currentSection {
+    color: #ffffff;
 }
 
 .currentPage {

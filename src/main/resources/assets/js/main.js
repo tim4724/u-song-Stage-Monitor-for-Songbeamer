@@ -1,9 +1,10 @@
 function main() {
     const titleElement = document.getElementById('title');
     const pages = document.getElementsByClassName('page');
-    const errorElement = document.getElementById("errorBox");
-    const clientsCountElement = document.getElementById("activeClients");
+    const errorElement = document.getElementById('errorBox');
+    const clientsCountElement = document.getElementById('activeClients');
     const songId = parseInt(titleElement.getAttribute('data-songId'));
+
     let currentPage = undefined; // element
     let lastPageNumber = -1; // number
 
@@ -20,14 +21,17 @@ function main() {
     }
 
     function connectToWebSocket() {
-        const ws = new WebSocket("ws://" + location.host + "/song/ws");
+        const ws = new WebSocket('ws://' + location.host + '/song/ws');
         ws.onopen = function () {
-            errorElement.style.display = "none";
+            errorElement.style.display = 'none';
         };
         ws.onmessage = function (ev) {
             let data = JSON.parse(ev.data);
             if (songId !== parseInt(data.songId)) {
-                location.reload(true);
+                setTimeout(function () {
+                    location.reload(true);
+                }, 800);
+                document.body.classList.add('bodyExit');
             }
             if (lastPageNumber !== data.page) {
                 updatePageNumber(data.page);
@@ -44,8 +48,8 @@ function main() {
         };
         ws.onclose = function (ev) {
             setTimeout(connectToWebSocket, 500);
-            console.error("ws closed" + ev.reason);
-            errorElement.style.display = "block";
+            console.error('ws closed' + ev.reason);
+            errorElement.style.display = 'block';
         };
     }
 
