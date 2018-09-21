@@ -8,6 +8,7 @@ import com.tim.usong.core.entity.Song;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
@@ -16,11 +17,15 @@ import java.util.*;
 public class SongParser {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-    private final String path;
+    private final String songDirPath;
     private final Map<String, Integer> langMap = new HashMap<>();
 
-    public SongParser(String path) {
-        this.path = path;
+    public SongParser(File songDir) {
+        String songDirPath = songDir.getAbsolutePath();
+        if (!songDirPath.endsWith("/")) {
+            songDirPath += "/";
+        }
+        this.songDirPath = songDirPath;
     }
 
     public void setLangForSong(String songTitle, int lang) {
@@ -33,7 +38,7 @@ public class SongParser {
             return new Song(title);
         }
         if (!fileName.contains(":")) {
-            fileName = path + fileName;
+            fileName = songDirPath + fileName;
         }
         try {
             return parseSong(fileName);
@@ -52,7 +57,7 @@ public class SongParser {
 
     private Song parseSong(String songFile) throws IOException {
         long startTime = System.currentTimeMillis();
-        String title = songFile.replace(path, "").replace(".sng", "");
+        String title = songFile.replace(songDirPath, "").replace(".sng", "");
         List<String> pages = new ArrayList<>();
 
         try (Scanner scanner = new Scanner(Paths.get(songFile), "ISO-8859-1")) {
@@ -195,6 +200,6 @@ public class SongParser {
     }
 
     public String getSongDir() {
-        return path;
+        return songDirPath;
     }
 }

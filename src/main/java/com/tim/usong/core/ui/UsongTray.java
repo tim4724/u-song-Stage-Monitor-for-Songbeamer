@@ -1,5 +1,6 @@
 package com.tim.usong.core.ui;
 
+import com.google.common.base.Strings;
 import com.tim.usong.USongApplication;
 import com.tim.usong.util.AutoStartUtil;
 import com.tim.usong.util.NetworkHostUtils;
@@ -13,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.net.*;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
@@ -38,6 +40,7 @@ public class UsongTray implements Managed {
         MenuItem statusItem = new MenuItem(messages.getString("status"));
         CheckboxMenuItem previewCheckBox = new CheckboxMenuItem(previewMsg, previewFrame.isVisible());
         CheckboxMenuItem autoStartCheckbox = new CheckboxMenuItem(autoStartMsg, AutoStartUtil.isAutostartEnabled());
+        MenuItem songDirItem = new MenuItem(messages.getString("songDirSelect"));
         MenuItem hostItem = new MenuItem("http://" + getHostname());
         MenuItem ipAddressItem = new MenuItem("http://" + getIpAdress());
         MenuItem exitItem = new MenuItem(messages.getString("exit"));
@@ -47,8 +50,8 @@ public class UsongTray implements Managed {
         PopupMenu popupMenu = trayIcon.getPopupMenu();
         popupMenu.add(statusItem).addActionListener(e -> openStatusWindow());
         popupMenu.add(previewCheckBox);
-        previewCheckBox.addItemListener(e -> previewFrame.setVisible(e.getStateChange() == ItemEvent.SELECTED));
         popupMenu.add(autoStartCheckbox);
+        popupMenu.add(songDirItem).addActionListener(e -> selectSongDirectory());
         popupMenu.addSeparator();
         popupMenu.add(hostItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
         popupMenu.add(ipAddressItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
@@ -86,6 +89,14 @@ public class UsongTray implements Managed {
         } catch (Exception e) {
             logger.error("Failed to edit registry", e);
             USongApplication.showErrorDialogAsync(messages.getString("autostartChangeFailed"), e);
+        }
+    }
+
+    private void selectSongDirectory() {
+        File songDir = new SelectSongDirectoryDialog().getDirectory();
+        if (songDir != null) {
+            USongApplication.saveSongDir(songDir);
+            //TODO: restart application
         }
     }
 

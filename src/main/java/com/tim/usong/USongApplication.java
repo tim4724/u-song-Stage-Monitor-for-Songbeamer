@@ -1,15 +1,16 @@
 package com.tim.usong;
 
-import com.google.common.base.Strings;
 import com.tim.usong.core.ui.PreviewFrame;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
+import com.tim.usong.core.ui.SelectSongDirectoryDialog;
 import com.tim.usong.core.ui.UsongTray;
 import com.tim.usong.core.ui.SplashWindow;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
 import io.dropwizard.Application;
+import io.dropwizard.Configuration;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
@@ -21,19 +22,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.io.File;
 import java.net.BindException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
-public class USongApplication extends Application<USongConfiguration> {
+public class USongApplication extends Application<Configuration> {
     public static final String APP_NAME = USongApplication.class.getPackage().getImplementationTitle();
     public static final String APP_VERSION = USongApplication.class.getPackage().getImplementationVersion();
     public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
     private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+    private static final Preferences prefs = Preferences.userNodeForPackage(USongApplication.class);
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static void main(String[] args) throws Exception {
@@ -44,6 +49,14 @@ public class USongApplication extends Application<USongConfiguration> {
             args = new String[]{"server", LOCAL_DIR + "usong.yml"};
         }
         new USongApplication().run(args);
+    }
+
+    public static void saveSongDir(File songDir) {
+        if (songDir != null) {
+            prefs.put("songDir", songDir.getAbsolutePath());
+        } else {
+            prefs.remove("songDir");
+        }
     }
 
     public static void showErrorDialogAsync(String text, Object extra) {
@@ -60,7 +73,7 @@ public class USongApplication extends Application<USongConfiguration> {
     }
 
     @Override
-    public void initialize(Bootstrap<USongConfiguration> bootstrap) {
+    public void initialize(Bootstrap<Configuration> bootstrap) {
         bootstrap.addBundle(new WebsocketBundle(SongResource.SongWebSocket.class));
         bootstrap.setConfigurationSourceProvider(
                 new SubstitutingSourceProvider(
@@ -71,32 +84,58 @@ public class USongApplication extends Application<USongConfiguration> {
     }
 
     @Override
-    public void run(USongConfiguration config, Environment environment) {
-        final USongConfiguration.AppConfigHolder appConfig = config.getAppConfig();
+    public void run(Configuration config, Environment environment) {
         SongBeamerSettings sBSettings = readSongBeamerSettings();
 
-        String songDir = appConfig.songDir;
-        if (Strings.isNullOrEmpty(songDir)) {
-            songDir = sBSettings.songDir; //no songDir in app yml config provided
+        String prefsSongDir = prefs.get("songDir", null);
+        File prefsSongDirFile = prefsSongDir != null ? new File(prefsSongDir) : null;
+        String sbSongDir = sBSettings.songDir;
+        File sbSongDirFile = sbSongDir != null ? new File(sbSongDir) : null;
+
+        if (prefsSongDirFile != null && sbSongDirFile != null
+                && prefsSongDirFile.exists() && sbSongDirFile.exists()) {
+
+            if (!prefsSongDirFile.equals(sbSongDirFile)) {
+                String body = messages.getString("whichSongDir");
+                body = MessageFormat.format(body, prefsSongDir, sbSongDir);
+                int result = JOptionPane.showConfirmDialog(null, body, APP_NAME,
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (result == JOptionPane.YES_OPTION) {
+                    prefsSongDir = null;
+                    prefsSongDirFile = null;
+                    saveSongDir(null);
+                }
+            }
         }
-        if (Strings.isNullOrEmpty(songDir)) {
-            logger.error("No directory for songs found.");
-            showErrorDialog(messages.getString("songsDirNotFoundError"));
-            System.exit(-1);
+
+        SongParser songParser;
+        if (prefsSongDirFile != null && prefsSongDirFile.exists()) {
+            songParser = new SongParser(prefsSongDirFile);
+            logger.info("Using songs directory: " + prefsSongDir);
+        } else if (sbSongDirFile != null && sbSongDirFile.exists()) {
+            songParser = new SongParser(sbSongDirFile);
+            logger.info("Using songs directory: " + sbSongDir);
+        } else {
+            prefsSongDirFile = new SelectSongDirectoryDialog().getDirectory();
+            if (prefsSongDirFile != null && prefsSongDirFile.exists()) {
+                saveSongDir(prefsSongDirFile);
+                prefsSongDir = prefsSongDirFile.getAbsolutePath();
+                songParser = new SongParser(prefsSongDirFile);
+            } else {
+                logger.error("No directory for songs found.");
+                showErrorDialog(messages.getString("songsDirNotFoundError"));
+                System.exit(-1);
+                return;
+            }
         }
-        if (!songDir.endsWith("\\")) {
-            songDir = songDir + "\\";
-        }
-        logger.info("Using songs directory: " + songDir);
 
         try {
             PreviewFrame previewFrame = new PreviewFrame();
-            SongParser songParser = new SongParser(songDir);
             SongResource songResource = new SongResource(songParser);
             SongbeamerListener sBListener = new SongbeamerListener(songResource);
             UsongTray usongTray = new UsongTray(previewFrame);
-            StatusResource statusResource = new StatusResource(
-                    sBListener, songResource, songParser, previewFrame, sBSettings);
+            StatusResource statusResource = new StatusResource(sBListener, songResource,
+                    songParser, previewFrame, sBSettings);
 
             environment.jersey().register(new RootResource());
             environment.jersey().register(songResource);

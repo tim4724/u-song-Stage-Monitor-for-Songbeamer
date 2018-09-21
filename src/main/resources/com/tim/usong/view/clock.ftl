@@ -6,7 +6,8 @@
                 animation-name: unset;
                 opacity: 0;
                 transition: opacity 1s linear'>
-    <span id="timeHoursMinutes">&nbsp;</span><span id='timeSeconds' style="font-size: 0.5em; color: #C1C1C1;"></span>
+    <span id="timeHoursMinutes">&nbsp;</span>
+    <span id='timeSeconds' style="font-size: 0.5em; color: #C1C1C1;"></span>
 </section>
 
 <script>
