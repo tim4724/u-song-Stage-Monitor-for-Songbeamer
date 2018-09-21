@@ -30,7 +30,7 @@ function main() {
             if (songId !== parseInt(data.songId)) {
                 setTimeout(function () {
                     location.reload(true);
-                }, 800);
+                }, 700);
                 document.body.classList.add('bodyExit');
             }
             if (lastPageNumber !== data.page) {
