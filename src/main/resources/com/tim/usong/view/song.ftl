@@ -34,7 +34,7 @@
 </#list>
 
 <#if (song.sections?size == 0) >
-    <#include "clock.ftl">
+    <#include "clock.ftl" >
 </#if>
 
 <div id="bottomSpacer"></div>
