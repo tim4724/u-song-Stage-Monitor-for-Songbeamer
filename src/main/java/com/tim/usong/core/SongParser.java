@@ -17,13 +17,13 @@ import java.util.*;
 public class SongParser {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-    private final String songDirPath;
     private final Map<String, Integer> langMap = new HashMap<>();
+    private final String songDirPath;
 
     public SongParser(File songDir) {
         String songDirPath = songDir.getAbsolutePath();
-        if (!songDirPath.endsWith("/")) {
-            songDirPath += "/";
+        if (!songDirPath.endsWith("\\")) {
+            songDirPath += "\\";
         }
         this.songDirPath = songDirPath;
     }
@@ -199,7 +199,7 @@ public class SongParser {
         return !list.isEmpty() ? list.get(list.size() - 1) : null;
     }
 
-    public String getSongDir() {
+    public String getSongDirPath() {
         return songDirPath;
     }
 }

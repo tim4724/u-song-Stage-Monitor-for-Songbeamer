@@ -91,7 +91,8 @@ public class SongResource {
 
         static void notifyDataChanged() {
             int clientsCount = sessions.size();
-            String data = String.format("{\"songId\": %d, \"page\": %d, \"clients\": %d}", songId, page, clientsCount);
+            String format = "{\"songId\": %d, \"page\": %d, \"clients\": %d}";
+            String data = String.format(format, songId, page, clientsCount);
             logger.debug("send data to clients");
             for (Session session : sessions) {
                 session.getAsyncRemote().sendText(data);
