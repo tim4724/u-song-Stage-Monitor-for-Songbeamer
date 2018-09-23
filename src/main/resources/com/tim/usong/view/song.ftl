@@ -57,5 +57,12 @@
     &#9888; ${messages.getString("connectionLost")}
 </div>
 
+<script>
+    window.onerror = function (e) {
+        document.getElementById("errorBox").style.display = 'block';
+        console.error(e);
+    };
+</script>
+
 </body>
 </html>
