@@ -63,9 +63,10 @@ public class UsongTray implements Managed {
         trayIcon.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                // update the checkbox states
+                // update the checkbox states, which could have changed
                 previewCheckBox.setState(previewFrame.isVisible());
                 autoStartCheckbox.setState(AutoStartUtil.isAutostartEnabled());
+                ipAddressItem.setLabel("http://" + getIpAdress());
             }
         });
         try {
