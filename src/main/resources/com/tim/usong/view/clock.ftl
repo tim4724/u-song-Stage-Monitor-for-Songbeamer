@@ -3,11 +3,12 @@
          style='font-size: 4em;
                 border-color: #00a39d;
                 margin-top: 64px;
-                animation-name: unset;
                 opacity: 0;
                 transition: opacity 1s linear'>
-    <span id="timeHoursMinutes">&nbsp;</span>
-    <span id='timeSeconds' style="font-size: 0.5em; color: #C1C1C1;"></span>
+    <span id="timeHoursMinutes"></span><span id='timeSeconds'
+                                             style="font-size: 0.7em;
+                                             margin-left: 0.1em;
+                                             color: #C1C1C1;"></span>
 </section>
 
 <script>
@@ -15,16 +16,22 @@
         document.getElementById('timeBox').style.opacity = '1';
     }, 2000);
 
-    const locale = '${.locale?replace("_", "-")}';
     const timeHoursMinutes = document.getElementById('timeHoursMinutes');
     const timeSeconds = document.getElementById('timeSeconds');
 
-    const updateTimeBox = function () {
-        const time = (new Date()).toLocaleTimeString(locale);
-        const secondsIndex = time.lastIndexOf(':');
-        timeHoursMinutes.innerHTML = time.substr(0, secondsIndex);
-        timeSeconds.innerHTML = ' ' + time.substr(secondsIndex + 1, secondsIndex + 3);
+    const updateTime = function () {
+        const date = new Date();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        if (minutes < 10) {
+            minutes = '0' + minutes;
+        }
+        if (seconds < 10) {
+            seconds = '0' + seconds;
+        }
+        timeHoursMinutes.innerText = hours + ':' + minutes;
+        timeSeconds.innerText = seconds;
     };
-    updateTimeBox();
-    setInterval(updateTimeBox, 1000);
+    setInterval(updateTime, 1000);
 </script>
