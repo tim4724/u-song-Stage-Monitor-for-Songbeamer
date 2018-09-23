@@ -21,15 +21,14 @@ public class PreviewFrame implements Managed {
         if (visible) {
             int x = prefs.getInt("x", -1);
             int y = prefs.getInt("y", -1);
-            int defaultWidth = 300;
-            int defaultHeight = 200;
+            int defaultWidth = prefs.getInt("width", 300);
+            int defaultHeight = prefs.getInt("height", 200);
 
-            if (x == -1 && y == -1) {
-                GraphicsConfiguration config = GraphicsEnvironment
-                        .getLocalGraphicsEnvironment()
-                        .getDefaultScreenDevice()
-                        .getDefaultConfiguration();
-                Rectangle screenBounds = config.getBounds();
+            GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                    .getDefaultScreenDevice().getDefaultConfiguration();
+            Rectangle screenBounds = config.getBounds();
+
+            if (x == -1 && y == -1 || x > screenBounds.width || y > screenBounds.height) {
                 Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(config);
                 prefs.putInt("x", 0);
                 prefs.putInt("y", screenBounds.height - defaultHeight - screenInsets.bottom);
