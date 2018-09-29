@@ -6,7 +6,6 @@ Der ganze Bildschirm wird benutzt um möglichst viel Text zu zeigen.
 
 *Prefer Readme in English? [Readme English](README.en.md)
 
-
 ## Wie funktioniert es?
 
 Die Anwendung wird auf dem selben Rechner auf dem auf Songbeamer läuft gestartet.
@@ -18,7 +17,7 @@ Es eignet sich zum Beispiel auch ein Raspberry Pi (~40€)
 Die Seite ist mit Songbeamer synchronisiert und es wird automatisch die aktuelle Folie hervorgehoben.
 
 ## Einrichten
-* Lade die neueste Version herunter [usong-server-2.0.0.jar](https://github.com/timbirdy/u-song-Stage-Monitor-for-Songbeamer/raw/master/build/usong-server-2.0.0.jar).
+* Lade die neueste Version herunter [Releases](https://github.com/tim4724/u-song-Stage-Monitor-for-Songbeamer/releases).
 * Netzwerkfunktion in Songbeamer aktivieren. 
 > Dazu müssen Sie unter Extras -> Anpassen -> Befehle -> Beta das Symbol "Netzwerk" auf die SongBeamer-Symbolleiste ziehen, und dann anklicken, bis dieses gedrückt erscheint.``` 
 > https://download.songbeamer.de/SongBeamer%20Remote.pdf (NUR SCHRITTE 6 - 9)
@@ -48,8 +47,6 @@ Aktuelle Lösung: Sprache auf der Admin Oberfläche wählen.
 
 ## Ideen / Verbesserung
 * Lied Sprache automatisch erkennen
-* Automatisch mit Windows starten als Option
-* Zoom Buttons / Zoom Funktionalität auf der Website für Tablets
 * ...
 
 ## Gebaut mit
