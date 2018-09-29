@@ -2,7 +2,7 @@
 <#-- @ftlvariable name="" type="com.tim.usong.view.SongView" -->
 <html>
 <head>
-    <meta name="viewport" content="width=device-width,initial-scale=0.15"/>
+    <meta name="viewport" content="width=device-width, initial-scale=0.15, maximum-scale=0.15, user-scalable=0"/>
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/song.css">
     <link rel="stylesheet" href="/assets2/css/song2.css">
@@ -13,7 +13,7 @@
     <script src="/assets/js/main.js"></script>
 </head>
 
-<body onload="backend = main(); backend.connectToWebSocket()">
+<body onload="backend = main(); backend.connectToWebSocket()" class="notranslate">
 <header>
     <h1 id="title" data-songId="#{song.hashCode()}" <#if song.error> class="negative" </#if>>
     ${song.title}
@@ -40,8 +40,8 @@
 <div id="bottomSpacer"></div>
 
 <#if admin>
+    <span id="activeClients" class="active">-</span>
     <footer id="controlsWrapper">
-        <span id="activeClients">-</span>
         <button type="button" id="upButton" onclick="backend.pageUp()">&#9650;</button>
         <button type="button" id="downButton" onclick="backend.pageDown()">&#9660;</button>
         <#if (song.langCount > 1)>

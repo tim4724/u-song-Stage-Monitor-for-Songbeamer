@@ -6,7 +6,7 @@ function main() {
     const songId = parseInt(titleElement.getAttribute('data-songId'));
 
     let currentPage = undefined; // element
-    let lastPageNumber = -1; // number
+    let lastPageNumber = -2; // number
 
     function setLang(newLang) {
         let xhr = new XMLHttpRequest();
@@ -32,8 +32,7 @@ function main() {
                     location.reload(true);
                 }, 700);
                 document.body.classList.add('bodyExit');
-            }
-            if (lastPageNumber !== data.page) {
+            } else if (lastPageNumber !== data.page) {
                 updatePageNumber(data.page);
             }
             if (clientsCountElement) {
@@ -43,8 +42,8 @@ function main() {
                     clientsCountElement.classList.remove('negative');
                 }
                 clientsCountElement.innerText = data.clients;
-
             }
+            errorElement.style.display = 'none';
         };
         ws.onclose = function (ev) {
             setTimeout(connectToWebSocket, 500);
@@ -106,21 +105,25 @@ function main() {
 }
 
 function scroll(e, offset, duration) {
-    zenscroll.setup(duration, offset);
+    if(zenscroll) {
+        zenscroll.setup(duration, offset);
 
-    zenscroll.to(e, duration);
-    setTimeout(function () {
-        if (!zenscroll.moving()) {
-            zenscroll.to(e, duration);
-        }
-    }, 100);//sometimes its buggy and doesnt scroll right away
+        zenscroll.to(e, duration);
+        setTimeout(function () {
+            if (!zenscroll.moving()) {
+                zenscroll.to(e, duration);
+            }
+        }, 100); // sometimes its buggy and doesn't scroll right away
 
-    //backup plan
-    setTimeout(function () {
-        if (!zenscroll.moving()) {
-            e.scrollIntoView(true);
-        }
-    }, 200);
+        // backup plan
+        setTimeout(function () {
+            if (!zenscroll.moving()) {
+                e.scrollIntoView(true);
+            }
+        }, 200);
+    } else {
+        e.scrollIntoView(true);
+    }
 }
 
 function isVisible(el) {
