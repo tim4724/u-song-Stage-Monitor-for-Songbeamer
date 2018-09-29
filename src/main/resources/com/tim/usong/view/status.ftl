@@ -25,7 +25,6 @@
 </head>
 <body onload="connectToWebSocket()">
 
-
 <section>
     <h1 id="title">${messages.getString("status")}</h1>
 

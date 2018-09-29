@@ -20,7 +20,8 @@ import java.util.prefs.Preferences;
 public class UsongTray implements Managed {
     private static final Logger logger = LoggerFactory.getLogger(UsongTray.class);
     private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-    private PreviewFrame previewFrame;
+    private static final String GITHUB_LINK = "https://github.com/tim4724/u-song-Stage-Monitor-for-Songbeamer";
+    private final PreviewFrame previewFrame;
 
     public UsongTray(PreviewFrame previewFrame) {
         this.previewFrame = previewFrame;
@@ -43,6 +44,7 @@ public class UsongTray implements Managed {
         MenuItem exitItem = new MenuItem(messages.getString("exit"));
         previewCheckBox.addItemListener(e -> previewFrame.setVisible(e.getStateChange() == ItemEvent.SELECTED));
         autoStartCheckbox.addItemListener(event -> setAutoStartEnabled(event.getStateChange() == ItemEvent.SELECTED));
+        MenuItem githubItem = new MenuItem(messages.getString("openGithub"));
 
         PopupMenu popupMenu = trayIcon.getPopupMenu();
         popupMenu.add(statusItem).addActionListener(e -> openStatusWindow());
@@ -52,6 +54,7 @@ public class UsongTray implements Managed {
         popupMenu.add(hostItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
         popupMenu.add(ipAddressItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
         popupMenu.addSeparator();
+        popupMenu.add(githubItem).addActionListener(e -> openBrowser(GITHUB_LINK));
         popupMenu.add(exitItem).addActionListener(e -> System.exit(0));
 
         trayIcon.addActionListener(new AbstractAction() {
