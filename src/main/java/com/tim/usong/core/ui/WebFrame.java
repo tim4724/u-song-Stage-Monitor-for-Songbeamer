@@ -1,7 +1,6 @@
 package com.tim.usong.core.ui;
 
 import com.tim.usong.USongApplication;
-import io.dropwizard.lifecycle.Managed;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -26,8 +25,8 @@ public class WebFrame extends JFrame {
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final KeyCombination increaseZoom = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.CONTROL_DOWN);
     private final KeyCombination increaseZoom2 = new KeyCodeCombination(KeyCode.ADD, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination decreseZoom2 = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination decreseZoom = new KeyCodeCombination(KeyCode.SUBTRACT, KeyCombination.CONTROL_DOWN);
+    private final KeyCombination decreaseZoom = new KeyCodeCombination(KeyCode.SUBTRACT, KeyCombination.CONTROL_DOWN);
+    private final KeyCombination decreaseZoom2 = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
     private final Preferences prefs;
     private final String url;
     private WebView webView;
@@ -84,7 +83,7 @@ public class WebFrame extends JFrame {
             webView.setOnKeyPressed(event -> {
                 if (increaseZoom.match(event) || increaseZoom2.match(event)) {
                     webView.setZoom(zoom += 0.05);
-                } else if (decreseZoom.match(event) || decreseZoom2.match(event)) {
+                } else if (decreaseZoom.match(event) || decreaseZoom2.match(event)) {
                     webView.setZoom(zoom -= 0.05);
                 } else if (event.getCode() == KeyCode.F5) {
                     webEngine.reload();

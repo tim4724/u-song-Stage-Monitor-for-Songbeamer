@@ -12,7 +12,7 @@ public class Song {
     private final int lang;
     private final int langCount;
     private final boolean error;
-
+    
     public Song(String title) {
         this(title, false);
     }
