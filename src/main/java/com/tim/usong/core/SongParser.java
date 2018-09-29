@@ -131,7 +131,8 @@ public class SongParser {
                     continue;
                 }
                 if (isBlockName(line)) {
-                    currentSectionName = line;
+                    // Vers 22x -> Vers 2, because the 2x means repeat 2 times.
+                    currentSectionName = line.replaceAll("[0-9]x$", "");
                     continue;
                 }
 
