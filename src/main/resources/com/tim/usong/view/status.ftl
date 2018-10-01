@@ -25,7 +25,7 @@
 </head>
 <body onload="connectToWebSocket()">
 
-<section>
+<main>
     <h1 id="title">${messages.getString("status")}</h1>
 
     <table>
@@ -140,7 +140,7 @@
                    </tr>
         </#if>
     </table>
-</section>
+</main>
 
 <div id="errorBox">
     &#9888; ${messages.getString("connectionLost")}
