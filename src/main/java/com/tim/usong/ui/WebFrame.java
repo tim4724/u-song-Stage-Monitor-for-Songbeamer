@@ -1,4 +1,4 @@
-package com.tim.usong.core.ui;
+package com.tim.usong.ui;
 
 import com.tim.usong.USongApplication;
 import javafx.application.Platform;

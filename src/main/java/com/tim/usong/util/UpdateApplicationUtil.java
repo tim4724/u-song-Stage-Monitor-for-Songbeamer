@@ -3,7 +3,7 @@ package com.tim.usong.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tim.usong.USongApplication;
-import com.tim.usong.core.ui.UsongTray;
+import com.tim.usong.ui.UsongTray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

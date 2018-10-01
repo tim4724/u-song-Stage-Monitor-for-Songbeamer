@@ -1,4 +1,4 @@
-package com.tim.usong.core.ui;
+package com.tim.usong.ui;
 
 import javax.swing.*;
 import java.io.File;

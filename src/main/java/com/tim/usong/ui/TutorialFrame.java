@@ -1,4 +1,4 @@
-package com.tim.usong.core.ui;
+package com.tim.usong.ui;
 
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;

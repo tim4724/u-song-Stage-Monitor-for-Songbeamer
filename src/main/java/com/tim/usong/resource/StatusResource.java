@@ -6,7 +6,7 @@ import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
-import com.tim.usong.core.ui.PreviewFrame;
+import com.tim.usong.ui.PreviewFrame;
 import com.tim.usong.util.AutoStartUtil;
 import com.tim.usong.util.NetworkHostUtils;
 import com.tim.usong.view.StatusView;

@@ -1,6 +1,6 @@
 package com.tim.usong.core;
 
-import com.tim.usong.core.ui.SelectSongDirectoryDialog;
+import com.tim.usong.ui.SelectSongDirectoryDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

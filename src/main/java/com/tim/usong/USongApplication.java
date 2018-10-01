@@ -1,15 +1,16 @@
 package com.tim.usong;
 
 import com.tim.usong.core.SongbeamerSettings;
-import com.tim.usong.core.ui.PreviewFrame;
+import com.tim.usong.ui.PreviewFrame;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
-import com.tim.usong.core.ui.TutorialFrame;
-import com.tim.usong.core.ui.UsongTray;
-import com.tim.usong.core.ui.SplashWindow;
+import com.tim.usong.ui.TutorialFrame;
+import com.tim.usong.ui.UsongTray;
+import com.tim.usong.ui.SplashWindow;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
+import com.tim.usong.util.SetupUtil;
 import com.tim.usong.util.UpdateApplicationUtil;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
@@ -39,8 +40,8 @@ public class USongApplication extends Application<Configuration> {
     private final Preferences prefs = Preferences.userNodeForPackage(USongApplication.class);
 
     public static void main(String[] args) throws Exception {
-        Setup.setUpRequiredExternalFiles();
-        Setup.setUpUI();
+        SetupUtil.setUpRequiredExternalFiles();
+        SetupUtil.setUpUI();
         SplashWindow.showSplash();
         if (args.length == 0) {
             args = new String[]{"server", LOCAL_DIR + "usong.yml"};

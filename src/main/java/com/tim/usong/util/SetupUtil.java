@@ -1,5 +1,6 @@
-package com.tim.usong;
+package com.tim.usong.util;
 
+import com.tim.usong.USongApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,9 +11,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
-class Setup {
+public class SetupUtil {
 
-    private Setup() {
+    private SetupUtil() {
     }
 
     /**
@@ -20,8 +21,8 @@ class Setup {
      * - usong.yml is a config file i.e. for http and logging settings
      * - SBRemoteSender.exe is an application to receive actions from songbeamer about current song and current page
      **/
-    static void setUpRequiredExternalFiles() {
-        Logger logger = LoggerFactory.getLogger(Setup.class);
+    public static void setUpRequiredExternalFiles() {
+        Logger logger = LoggerFactory.getLogger(SetupUtil.class);
         ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
 
         try {
@@ -37,12 +38,12 @@ class Setup {
             }
         } catch (Exception e) {
             // application may still work if SBRemoteSender is started manually or if yml is provided via parameter
-            logger.error("Setup failed", e);
+            logger.error("SetupUtil failed", e);
             USongApplication.showErrorDialogAsync(messages.getString("createFilesError"), e);
         }
     }
 
-    static void setUpUI() {
+    public static void setUpUI() {
         Font font = new Font("Helvetica Neue", Font.PLAIN, 14);
         Color darkGrayBg = Color.decode("0x111111");
         Color accent = Color.decode("0x008cff");
