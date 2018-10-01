@@ -22,6 +22,7 @@ public class UsongTray implements Managed {
     private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private static final String GITHUB_LINK = "https://github.com/tim4724/u-song-Stage-Monitor-for-Songbeamer";
     private final PreviewFrame previewFrame;
+    private TrayIcon trayIcon;
 
     public UsongTray(PreviewFrame previewFrame) {
         this.previewFrame = previewFrame;
@@ -30,7 +31,7 @@ public class UsongTray implements Managed {
     @Override
     public void start() {
         Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon-small2.png"));
-        TrayIcon trayIcon = new TrayIcon(image, USongApplication.APP_NAME, new PopupMenu());
+        trayIcon = new TrayIcon(image, USongApplication.APP_NAME, new PopupMenu());
         trayIcon.setImageAutoSize(true);
 
         String previewMsg = messages.getString("preview");
@@ -77,6 +78,10 @@ public class UsongTray implements Managed {
         } catch (AWTException e) {
             logger.error("Failed to add tray icon to system tray", e);
         }
+    }
+
+    public void showInfo(String body) {
+        trayIcon.displayMessage(USongApplication.APP_NAME, body, TrayIcon.MessageType.INFO);
     }
 
     @Override

@@ -91,7 +91,7 @@ public class USongApplication extends Application<Configuration> {
             environment.lifecycle().manage(usongTray);
             environment.lifecycle().addServerLifecycleListener(server -> {
                 SplashWindow.started();
-                new UpdateApplicationUtil().checkForUpdateAsync();
+                new UpdateApplicationUtil(usongTray).checkForUpdateAsync();
             });
         } catch (BindException e) {
             logger.error("Application already running", e);

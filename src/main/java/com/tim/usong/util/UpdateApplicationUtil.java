@@ -3,6 +3,7 @@ package com.tim.usong.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tim.usong.USongApplication;
+import com.tim.usong.core.ui.UsongTray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,13 +23,18 @@ public class UpdateApplicationUtil {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Preferences prefs = Preferences.userNodeForPackage(USongApplication.class).node("update");
+    private final UsongTray usongTray;
+
+    public UpdateApplicationUtil(UsongTray usongTray) {
+        this.usongTray = usongTray;
+    }
 
     public void checkForUpdateAsync() {
         new Thread(this::checkForUpdate).start();
     }
 
     private void checkForUpdate() {
-        if (USongApplication.APP_VERSION == null) {
+        if (USongApplication.APP_VERSION == null && false) {
             return; // this is a debug build
         }
 
@@ -64,6 +70,7 @@ public class UpdateApplicationUtil {
 
     private void handleGithubResponse(JsonNode json) {
         String currentVersion = USongApplication.APP_VERSION;
+        currentVersion = "1.1.1";
 
         String tagName = null;
         String downloadUrl = null;
@@ -123,6 +130,7 @@ public class UpdateApplicationUtil {
                 if (AutoStartUtil.isAutostartEnabled()) {
                     AutoStartUtil.enableAutoStart(dest.getAbsolutePath());
                 }
+                usongTray.showInfo(messages.getString("downloadSuccess"));
             }
         } catch (IOException e) {
             logger.error("Error downloading update", e);
