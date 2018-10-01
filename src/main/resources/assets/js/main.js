@@ -3,7 +3,6 @@ function main() {
     const pages = document.getElementsByClassName('page');
     const errorElement = document.getElementById('errorBox');
     const clientsCountElement = document.getElementById('activeClients');
-    const songId = parseInt(titleElement.getAttribute('data-songId'));
 
     let currentPage = undefined; // element
     let lastPageNumber = -2; // number
@@ -21,6 +20,7 @@ function main() {
     }
 
     function connectToWebSocket() {
+        const songId = parseInt(titleElement.getAttribute('data-songId'));
         const ws = new WebSocket('ws://' + location.host + '/song/ws');
         ws.onopen = function () {
             errorElement.style.display = 'none';
@@ -28,6 +28,7 @@ function main() {
         ws.onmessage = function (ev) {
             let data = JSON.parse(ev.data);
             if (songId !== parseInt(data.songId)) {
+                // reload page if new song is selected or beamer does show something that is not a song
                 setTimeout(function () {
                     location.reload(true);
                 }, 700);
@@ -49,12 +50,13 @@ function main() {
             setTimeout(connectToWebSocket, 500);
             console.error('ws closed' + ev.reason);
             errorElement.style.display = 'block';
+            document.body.innerText = ev;
         };
     }
 
     function updatePageNumber(newPageNumber) {
         const oldPage = currentPage;
-        currentPage = pages[newPageNumber];
+        const newPage = pages[newPageNumber];
 
         if (oldPage) {
             oldPage.parentNode.classList.remove('currentSection');
@@ -66,11 +68,12 @@ function main() {
             }
         }
 
-        if (currentPage) {
+        if (newPage) {
+            currentPage = newPage;
+            lastPageNumber = newPageNumber;
             if (oldPage) {
                 oldPage.classList.remove('currentPage');
             }
-            lastPageNumber = newPageNumber;
             currentPage.classList.add('currentPage');
             currentPage.parentElement.classList.add('currentSection');
 
@@ -105,7 +108,7 @@ function main() {
 }
 
 function scroll(e, offset, duration) {
-    if(zenscroll) {
+    if (zenscroll) {
         zenscroll.setup(duration, offset);
 
         zenscroll.to(e, duration);

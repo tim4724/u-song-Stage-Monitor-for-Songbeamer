@@ -17,27 +17,66 @@ import java.util.*;
 
 @Path("song")
 public class SongResource {
+    private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final SongParser songParser;
     private Song song;
+    private Song nextSong;
 
     public SongResource(SongParser songParser) {
         this.songParser = songParser;
-        ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-        setSongAndPage(new Song(messages.getString("waitingForSongbeamer")), -1);
-    }
-
-    public void setSongAndPage(String songFileName, int page) {
-        setSongAndPage(songParser.parse(songFileName), page);
+        song = new Song(messages.getString("waitingForSongbeamer"), Song.Type.INFO);
+        SongWebSocket.songId = song.hashCode();
+        SongWebSocket.songType = song.getType();
+        SongWebSocket.page = -1;
     }
 
     public void setSongAndPage(Song song, int page) {
-        this.song = song;
-        SongWebSocket.songId = song.hashCode();
-        SongWebSocket.page = page;
-        SongWebSocket.notifyDataChanged();
+        setSong(song);
+        setPage(page);
+    }
+
+    public void setSong(String songFilename) {
+        if (!songFilename.endsWith(".sng")) {
+            String title = messages.getString("noSongSelected") + "<br>\n" + songFilename;
+            setSong(new Song(title, Song.Type.INFO));
+        } else {
+            setSong(songParser.parse(songFilename));
+        }
+    }
+
+    public void setSong(Song newSong) {
+        boolean sameFileAsCurrent = newSong.getFileName() != null
+                && newSong.getFileName().equals(this.song.getFileName());
+
+        if (this.song == null
+                // Nothing is displayed on the beamer and new Song is of type "SNG"
+                || (SongWebSocket.page == -1 && newSong.getType() == Song.Type.SNG)
+                // Current song is not of Type "SNG", therefore not important and we can switch
+                || this.song.getType() != Song.Type.SNG
+                // Same file as current, i.e. the song-text could have been edit, therefore switch
+                || sameFileAsCurrent) {
+            this.nextSong = null;
+            this.song = newSong;
+            SongWebSocket.songId = newSong.hashCode();
+            SongWebSocket.songType = newSong.getType();
+            if (!sameFileAsCurrent) {
+                SongWebSocket.page = -1;
+            }
+            SongWebSocket.notifyDataChanged();
+        } else {
+            // Sometimes we want to show the current song longer
+            // Switch later to "nextSong"
+            this.nextSong = newSong;
+        }
     }
 
     public void setPage(int page) {
+        if (this.nextSong != null && (this.nextSong.getType() == Song.Type.SNG || page >= 0)) {
+            this.song = nextSong;
+            this.nextSong = null;
+            SongWebSocket.songId = this.song.hashCode();
+            SongWebSocket.songType = this.song.getType();
+        }
         SongWebSocket.page = page;
         SongWebSocket.notifyDataChanged();
     }
@@ -64,8 +103,8 @@ public class SongResource {
         if (newLang <= 0 || newLang > song.getLangCount()) {
             return Response.status(400).build();
         }
-        songParser.setLangForSong(song.getTitle(), newLang);
-        setSongAndPage(song.getFileName(), SongWebSocket.page);
+        songParser.setLangForSong(song.getFileName(), newLang);
+        setSong(song.getFileName());
         return Response.ok().build();
     }
 
@@ -87,12 +126,13 @@ public class SongResource {
         private static final List<Session> sessions = Collections.synchronizedList(new ArrayList<>());
         private static final List<Session> statusSessions = Collections.synchronizedList(new ArrayList<>());
         private static int songId;
+        private static Song.Type songType;
         private static int page;
 
         static void notifyDataChanged() {
             int clientsCount = sessions.size();
-            String format = "{\"songId\": %d, \"page\": %d, \"clients\": %d}";
-            String data = String.format(format, songId, page, clientsCount);
+            String format = "{\"songId\": %d, \"songType\": \"%s\", \"page\": %d, \"clients\": %d}";
+            String data = String.format(format, songId, songType, page, clientsCount);
             logger.debug("send data to clients");
             for (Session session : sessions) {
                 session.getAsyncRemote().sendText(data);

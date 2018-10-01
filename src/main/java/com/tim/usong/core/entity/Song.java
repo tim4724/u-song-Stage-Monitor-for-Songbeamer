@@ -11,32 +11,24 @@ public class Song {
     private final int pageCount;
     private final int lang;
     private final int langCount;
-    private final boolean error;
-    
-    public Song(String title) {
-        this(title, false);
+    private final Type type;
+
+    public Song(String title, Type type) {
+        this(null, title, new ArrayList<>(), 1, 1, type);
     }
 
-    public Song(String title, boolean error) {
-        this(null, title, new ArrayList<>(), 1, 1, error);
-    }
-
-    public Song(String fileName, String title, List<Section> sections, int lang, int langCount) {
-        this(fileName, title, sections, lang, langCount, false);
-    }
-
-    public Song(String fileName, String title, List<Section> sections, int lang, int langCount, boolean error) {
+    public Song(String fileName, String title, List<Section> sections, int lang, int langCount, Type type) {
         this.fileName = fileName;
         this.title = title;
         this.sections = sections;
         this.pageCount = sections.stream().mapToInt(s -> s.getPages().size()).sum();
         this.lang = lang;
         this.langCount = langCount;
-        this.error = error;
+        this.type = type;
     }
 
     public Song(String title, Exception e) {
-        this(null, title, new ArrayList<>(), 1, 1, true);
+        this(null, title, new ArrayList<>(), 1, 1, Type.ERROR);
         String errString = e.toString().replace("\n", "\n<br />");
         sections.add(new Section(e.getClass().getName(), new Page(errString)));
     }
@@ -65,8 +57,8 @@ public class Song {
         return langCount;
     }
 
-    public boolean isError() {
-        return error;
+    public Type getType() {
+        return type;
     }
 
     @Override
@@ -81,5 +73,11 @@ public class Song {
     @Override
     public int hashCode() {
         return Objects.hash(title, sections, langCount);
+    }
+
+    public enum Type {
+        SNG, // Real .sng song from file
+        ERROR, // Error message
+        INFO // Information, like "no song selected"
     }
 }

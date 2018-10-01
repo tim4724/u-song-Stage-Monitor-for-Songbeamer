@@ -28,15 +28,11 @@ public class SongParser {
         this.songDirPath = songDirPath;
     }
 
-    public void setLangForSong(String songTitle, int lang) {
-        langMap.put(songTitle, lang);
+    public void setLangForSong(String fileName, int lang) {
+        langMap.put(fileName, lang);
     }
 
     public Song parse(String fileName) {
-        if (!fileName.endsWith(".sng")) {
-            String title = messages.getString("noSongSelected") + "<br>\n" + fileName;
-            return new Song(title);
-        }
         if (!fileName.contains(":")) {
             fileName = songDirPath + fileName;
         }
@@ -72,11 +68,11 @@ public class SongParser {
             title = header.title;
         }
         int desiredLang = 1;
-        if (langMap.containsKey(title)) {
+        if (langMap.containsKey(songFile)) {
             desiredLang = langMap.get(title);
         }
 
-        List<Section> sections = parseSongtext(pages, header.langCount, desiredLang);
+        List<Section> sections = parseSongText(pages, header.langCount, desiredLang);
         List<Section> finalSectionList = new ArrayList<>();
 
         if (header.verseOrder != null) {
@@ -109,7 +105,7 @@ public class SongParser {
 
         long duration = System.currentTimeMillis() - startTime;
         logger.info(String.format("Parsed song \"%s (Language %d)\" in %dms", title, desiredLang, duration));
-        return new Song(songFile, title, finalSectionList, desiredLang, header.langCount);
+        return new Song(songFile, title, finalSectionList, desiredLang, header.langCount, Song.Type.SNG);
     }
 
     /**
@@ -117,7 +113,7 @@ public class SongParser {
      *
      * @return List of sections. Every section holds one or many pages
      */
-    private List<Section> parseSongtext(List<String> pages, int langCount, int desiredLang) {
+    private List<Section> parseSongText(List<String> pages, int langCount, int desiredLang) {
         List<Section> allSections = new ArrayList<>();
         String currentSectionName = "";
 
@@ -131,13 +127,14 @@ public class SongParser {
                     continue;
                 }
                 if (isBlockName(line)) {
-                    // Vers 22x -> Vers 2, because the 2x means repeat 2 times.
+                    // Vers 22x -> Vers 2, because the "2x" means repeat 2 times.
                     currentSectionName = line.replaceAll("[0-9]x$", "");
                     continue;
                 }
 
                 int lang = (lineCounter % langCount) + 1;
-                if (line.length() >= 4 && line.substring(0, 4).matches("^#?#[0-9] (.)*")) { //substring(0, 4) because of bug with special characters
+                if (line.length() >= 4 && line.substring(0, 4).matches("^#?#[0-9] (.)*")) {
+                    //substring(0, 4) because of bug with special characters
                     lang = Integer.parseInt(line.substring(0, line.indexOf(" ")).replaceAll("#", ""));
                     line = line.substring(line.indexOf(" "));
                 }

@@ -24,18 +24,17 @@ import java.util.ResourceBundle;
 public class SongbeamerListener implements Managed, Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+    private final Song noSongSelected;
     private final SongResource songResource;
     private final ServerSocket serverSocket;
     private final DocumentBuilder builder;
     private final Thread currentThread;
     private Process songBeamerProcess;
-    private String nextSongFilename = null;
-    private String currentSongDisplayedFilename = null;
-    private int currentPage = -1;
     private boolean connected = false;
 
     public SongbeamerListener(SongResource songResource) throws ParserConfigurationException, IOException {
         this.songResource = songResource;
+        noSongSelected = new Song(messages.getString("noSongSelected"), Song.Type.INFO);
         builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         serverSocket = new ServerSocket(19150);
         currentThread = new Thread(this);
@@ -72,7 +71,7 @@ public class SongbeamerListener implements Managed, Runnable {
                 receive(socket);
                 connected = false;
                 logger.error("Conenction to SBRemoteSender lost");
-                songResource.setSongAndPage(new Song(messages.getString("lostConnectionToSB"), true), 0);
+                songResource.setSongAndPage(new Song(messages.getString("lostConnectionToSB"), Song.Type.ERROR), 0);
                 USongApplication.showErrorDialogAsync(messages.getString("lostConnectionToSB"), null);
             } catch (Exception e) {
                 connected = false;
@@ -86,7 +85,7 @@ public class SongbeamerListener implements Managed, Runnable {
     }
 
     private void receive(Socket socket) throws IOException {
-        songResource.setSongAndPage(new Song(messages.getString("noSongSelected")), 0);
+        songResource.setSongAndPage(noSongSelected, -1);
 
         final String startTag = "<SongBeamerIPC>";
         final String endTag = "</SongBeamerIPC>";
@@ -123,36 +122,18 @@ public class SongbeamerListener implements Managed, Runnable {
 
         switch (action) {
             case "SBAction_LoadItem":
-                nextSongFilename = value;
-                if (currentPage == -1 || currentSongDisplayedFilename == null
-                        || nextSongFilename.endsWith(currentSongDisplayedFilename)) {
-                    // Switch song if page is -1 or
-                    // When a song was modified, nextSongFilename will be the absolute path (maybe a bug in SB).
-                    // Reload song if nextSongFilename ends with currentSongDisplayedFilename
-                    songResource.setSongAndPage(nextSongFilename, currentPage);
-                }
+                songResource.setSong(value);
                 break;
             case "SBAction_Presenter_Black":
             case "SBAction_Presenter_BGOnly":
-                // Currently no text on projector
-                currentPage = -1;
-                notifySongResource();
+                // Currently no text on projector -> -1
+                songResource.setPage(-1);
                 break;
             case "SBAction_Presenter_SetPage":
-                currentPage = Integer.parseInt(value) - 1;
-                notifySongResource();
+                // index starts at 0
+                int page = Integer.parseInt(value) - 1;
+                songResource.setPage(page);
                 break;
-        }
-    }
-
-    private void notifySongResource() {
-        if (nextSongFilename == null) {
-            songResource.setSongAndPage(new Song(messages.getString("noSongSelected")), currentPage);
-        } else if (!nextSongFilename.equals(currentSongDisplayedFilename)) {
-            currentSongDisplayedFilename = nextSongFilename;
-            songResource.setSongAndPage(nextSongFilename, currentPage);
-        } else {
-            songResource.setPage(currentPage);
         }
     }
 
