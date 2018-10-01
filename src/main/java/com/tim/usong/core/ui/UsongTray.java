@@ -85,7 +85,11 @@ public class UsongTray implements Managed {
 
     private void setAutoStartEnabled(boolean enable) {
         try {
-            AutoStartUtil.setAutoStartEnabled(enable);
+            if (enable) {
+                AutoStartUtil.enableAutoStart(USongApplication.getCurrentJarPath());
+            } else {
+                AutoStartUtil.disableAutoStart();
+            }
         } catch (Exception e) {
             logger.error("Failed to edit registry", e);
             USongApplication.showErrorDialogAsync(messages.getString("autostartChangeFailed"), e);

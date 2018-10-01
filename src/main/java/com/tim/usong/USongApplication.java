@@ -9,6 +9,8 @@ import com.tim.usong.core.ui.SplashWindow;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
+import com.tim.usong.util.AutoStartUtil;
+import com.tim.usong.util.UpdateApplicationUtil;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.assets.AssetsBundle;
@@ -22,7 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.io.UnsupportedEncodingException;
 import java.net.BindException;
+import java.net.URLDecoder;
 import java.util.ResourceBundle;
 
 public class USongApplication extends Application<Configuration> {
@@ -87,6 +91,7 @@ public class USongApplication extends Application<Configuration> {
             environment.lifecycle().manage(usongTray);
             environment.lifecycle().addServerLifecycleListener(server -> {
                 SplashWindow.started();
+                new UpdateApplicationUtil().checkForUpdateAsync();
             });
         } catch (BindException e) {
             logger.error("Application already running", e);
@@ -108,5 +113,17 @@ public class USongApplication extends Application<Configuration> {
         logger.error("Fatal error");
         showErrorDialog(messages.getString("fatalError"));
         super.onFatalError();
+    }
+
+    public static String getCurrentJarPath() {
+        String path = USongApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        try {
+            path = URLDecoder.decode(path, "UTF-8");
+        } catch (UnsupportedEncodingException ignore) {
+        }
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
+        return path.replace("/", "\\");
     }
 }
