@@ -121,12 +121,6 @@ section {
     font-size: 2em;
 }
 
-#activeClients.negative {
-    color: #ffffff;
-    background: #d80000;
-    font-weight: 500;
-}
-
 #errorBox {
     display: none;
     position: fixed;

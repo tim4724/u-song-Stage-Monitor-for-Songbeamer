@@ -42,7 +42,7 @@ function main() {
                 } else {
                     clientsCountElement.classList.remove('negative');
                 }
-                clientsCountElement.innerText = data.clients;
+                clientsCountElement.innerHTML = data.clients;
             }
             errorElement.style.display = 'none';
         };
@@ -64,6 +64,7 @@ function main() {
             //no page is set yet
             if (newPageNumber === -1) {
                 scrollTo(0, 0);//scroll to the top of the page
+                lastPageNumber = -1;
                 return;
             }
         }

@@ -9,11 +9,11 @@ body {
 #controlsWrapper {
     width: 100%;
     z-index: 50;
+    box-sizing: border-box;
     position: fixed;
     bottom: 0;
     left: 0;
     background-color: #eeeeee;
-    padding: 8px;
 }
 
 .active {
@@ -23,9 +23,9 @@ body {
 button {
     margin: 8px;
     color: #ffffff;
-    font-size: 1em;
     background-color: #555555;
     transition: all 0.5s ease-in-out;
+    font-size: 1em;
     padding: 10px 20px 10px 20px;
     border: 2px solid transparent;
 }
@@ -33,7 +33,7 @@ button {
 button:hover:enabled {
     background-color: #212121;
     cursor: pointer;
-    border-color: #00cc00;
+    border-color: #49bc49;
 }
 
 #upButton, #downButton {
@@ -41,18 +41,19 @@ button:hover:enabled {
 }
 
 #activeClients {
-    margin: 16px;
-    padding: 12px;
-    width: 1em;
-    height: 1em;
-    top: 0;
-    right: 0;
-    line-height: 1em;
     font-size: 1em;
-    color: white;
+    float: left;
+    margin: 16px;
+    background: #49bc49;
+    width: calc(1em - 10px);
+    padding: 10px 20px 10px 20px;
     border-radius: 50%;
-    position: fixed;
+    color: white;
+}
 
+#activeClients.negative {
+    background: #C1C1C1;
+    color: #d80000;
 }
 
 #errorBox {

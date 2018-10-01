@@ -69,7 +69,7 @@ public class SongParser {
         }
         int desiredLang = 1;
         if (langMap.containsKey(songFile)) {
-            desiredLang = langMap.get(title);
+            desiredLang = langMap.get(songFile);
         }
 
         List<Section> sections = parseSongText(pages, header.langCount, desiredLang);

@@ -40,8 +40,8 @@
 <div id="bottomSpacer"></div>
 
 <#if admin>
-    <span id="activeClients" class="active">-</span>
     <footer id="controlsWrapper">
+        <span id="activeClients">-</span>
         <button type="button" id="upButton" onclick="backend.pageUp()">&#9650;</button>
         <button type="button" id="downButton" onclick="backend.pageDown()">&#9660;</button>
         <#if (song.langCount > 1)>
