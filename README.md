@@ -19,8 +19,9 @@ Die Seite ist mit Songbeamer synchronisiert und es wird automatisch die aktuelle
 ## Einrichten
 * Lade die neueste Version herunter [Releases](https://github.com/tim4724/u-song-Stage-Monitor-for-Songbeamer/releases).
 * Netzwerkfunktion in Songbeamer aktivieren. 
-> Dazu müssen Sie unter Extras -> Anpassen -> Befehle -> Beta das Symbol "Netzwerk" auf die SongBeamer-Symbolleiste ziehen, und dann anklicken, bis dieses gedrückt erscheint.``` 
-> https://download.songbeamer.de/SongBeamer%20Remote.pdf (NUR SCHRITTE 6 - 9)
+![Alt text](/src/main/resources/assets/img/tutorial.png?raw=true "Netzwerk funktion aktivieren")
+Unter Extras -> Anpassen -> Befehle -> Beta das Symbol "Netzwerk" auf die SongBeamer-Symbolleiste ziehen, und dann anklicken, sodass dieses ausgewählt erscheint.
+
 
 ## Ausführen
 * Doppelklick auf die "usong-server-x.y.jar" führt zum start des Servers. (Man sieht ein kurzen Splash Screen)

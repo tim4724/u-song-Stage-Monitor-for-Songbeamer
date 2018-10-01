@@ -45,6 +45,7 @@ public class UsongTray implements Managed {
         MenuItem exitItem = new MenuItem(messages.getString("exit"));
         previewCheckBox.addItemListener(e -> previewFrame.setVisible(e.getStateChange() == ItemEvent.SELECTED));
         autoStartCheckbox.addItemListener(event -> setAutoStartEnabled(event.getStateChange() == ItemEvent.SELECTED));
+        MenuItem tutorialItem = new MenuItem(messages.getString("tutorial"));
         MenuItem githubItem = new MenuItem(messages.getString("openGithub"));
 
         PopupMenu popupMenu = trayIcon.getPopupMenu();
@@ -55,6 +56,7 @@ public class UsongTray implements Managed {
         popupMenu.add(hostItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
         popupMenu.add(ipAddressItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
         popupMenu.addSeparator();
+        popupMenu.add(tutorialItem).addActionListener(e -> new TutorialFrame().setVisible(true));
         popupMenu.add(githubItem).addActionListener(e -> openBrowser(GITHUB_LINK));
         popupMenu.add(exitItem).addActionListener(e -> System.exit(0));
 

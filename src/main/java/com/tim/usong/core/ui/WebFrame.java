@@ -40,6 +40,11 @@ public class WebFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon-small2.png")));
 
+        width = prefs.getInt("width", width);
+        height = prefs.getInt("height", height);
+        setSize(width, height);
+
+        // set position after settings size!
         int x = prefs.getInt("x", -1);
         int y = prefs.getInt("y", -1);
         if (x != -1 || y != -1) {
@@ -47,15 +52,13 @@ public class WebFrame extends JFrame {
         } else {
             setLocationRelativeTo(null);
         }
-        width = prefs.getInt("width", width);
-        height = prefs.getInt("height", height);
-        setSize(width, height);
 
         final JFXPanel jfxPanel = new JFXPanel();
         add(jfxPanel);
 
         // avoid that some kinda important jfx thread dies or something if preview window is closed
         Platform.setImplicitExit(false);
+
         Platform.runLater(() -> {
             webView = new WebView();
             webView.setZoom(zoom = prefs.getDouble("zoom", zoom));

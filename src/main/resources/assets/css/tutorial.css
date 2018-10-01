@@ -1,0 +1,43 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
+    background: #000;
+    font-size: 16px;
+    color: white;
+}
+
+#title {
+    color: #ff7c00;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+
+main {
+    margin: 16px;
+    display: inline-block;
+    padding: 0 24px 24px 24px;
+    background: #181818;
+    border-radius: 4px;
+    border: 6px solid #181818;
+}
+
+#urls {
+    font-size: 2em;
+}
+
+a {
+    color: #008cff;
+}
+
+.tutorialHeadline {
+    text-align: left;
+    font-weight: normal;
+    font-size: 1.5em;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 2px solid white;
+}

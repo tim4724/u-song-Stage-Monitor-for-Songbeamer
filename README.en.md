@@ -15,9 +15,9 @@ Scrolling, highlighting and refreshing is handled automatically and is synced to
 
 ## Setup
 * Download latest version [Releases](https://github.com/tim4724/u-song-Stage-Monitor-for-Songbeamer/releases).
-* Enable "network" in Songbeamer: 
-    > Dazu müssen Sie unter Extras -> Anpassen -> Befehle -> Beta das Symbol "Netzwerk" auf die SongBeamer-Symbolleiste ziehen, und dann anklicken, bis dieses gedrückt erscheint.
-    > https://download.songbeamer.de/SongBeamer%20Remote.pdf (steps 6 - 9 only!);
+* Enable network functionality in Songbeamer
+![Alt text](/src/main/resources/assets/img/tutorial.png?raw=true "Enable network function")
+Open Extras -> Customize -> Commands -> Beta and drag the icon "Network" to the tile bar, then click the network icon, to make it appear selected.
 
 ## Running
 * Simply double click the jar file (or set it to autorun with your system)

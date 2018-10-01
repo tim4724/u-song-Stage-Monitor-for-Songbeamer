@@ -4,12 +4,12 @@ import com.tim.usong.core.SongbeamerSettings;
 import com.tim.usong.core.ui.PreviewFrame;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerListener;
+import com.tim.usong.core.ui.TutorialFrame;
 import com.tim.usong.core.ui.UsongTray;
 import com.tim.usong.core.ui.SplashWindow;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
-import com.tim.usong.util.AutoStartUtil;
 import com.tim.usong.util.UpdateApplicationUtil;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.BindException;
 import java.net.URLDecoder;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 public class USongApplication extends Application<Configuration> {
     public static final String APP_NAME = USongApplication.class.getPackage().getImplementationTitle();
@@ -35,6 +36,7 @@ public class USongApplication extends Application<Configuration> {
     public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
     private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Preferences prefs = Preferences.userNodeForPackage(USongApplication.class);
 
     public static void main(String[] args) throws Exception {
         Setup.setUpRequiredExternalFiles();
@@ -91,6 +93,10 @@ public class USongApplication extends Application<Configuration> {
             environment.lifecycle().manage(usongTray);
             environment.lifecycle().addServerLifecycleListener(server -> {
                 SplashWindow.started();
+                if (prefs.getBoolean("firstRun", true)) {
+                    new TutorialFrame().setVisible(true);
+                    prefs.putBoolean("firstRun", false);
+                }
                 new UpdateApplicationUtil(usongTray).checkForUpdateAsync();
             });
         } catch (BindException e) {
