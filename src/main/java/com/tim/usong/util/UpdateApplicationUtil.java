@@ -120,7 +120,9 @@ public class UpdateApplicationUtil {
             if (responseCode >= 200 && responseCode < 300) {
                 InputStream in = conn.getInputStream();
                 Files.copy(in, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                AutoStartUtil.enableAutoStart(dest.getAbsolutePath());
+                if (AutoStartUtil.isAutostartEnabled()) {
+                    AutoStartUtil.enableAutoStart(dest.getAbsolutePath());
+                }
             }
         } catch (IOException e) {
             logger.error("Error downloading update", e);
