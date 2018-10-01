@@ -34,7 +34,7 @@ public class UpdateApplicationUtil {
     }
 
     private void checkForUpdate() {
-        if (USongApplication.APP_VERSION == null && false) {
+        if (USongApplication.APP_VERSION == null) {
             return; // this is a debug build
         }
 
