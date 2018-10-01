@@ -61,7 +61,6 @@
     window.onerror = function (e) {
         document.getElementById("errorBox").style.display = 'block';
         console.error(e);
-        document.body.innerText = ev;
     };
 </script>
 

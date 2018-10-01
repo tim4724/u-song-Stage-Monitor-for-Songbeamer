@@ -50,7 +50,6 @@ function main() {
             setTimeout(connectToWebSocket, 500);
             console.error('ws closed' + ev.reason);
             errorElement.style.display = 'block';
-            document.body.innerText = ev;
         };
     }
 
