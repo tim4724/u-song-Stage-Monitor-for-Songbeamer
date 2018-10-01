@@ -70,7 +70,6 @@ public class UpdateApplicationUtil {
 
     private void handleGithubResponse(JsonNode json) {
         String currentVersion = USongApplication.APP_VERSION;
-        currentVersion = "1.1.1";
 
         String tagName = null;
         String downloadUrl = null;
