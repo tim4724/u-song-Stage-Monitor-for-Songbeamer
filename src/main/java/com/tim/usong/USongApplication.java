@@ -10,6 +10,7 @@ import com.tim.usong.ui.SplashWindow;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
+import com.tim.usong.util.AutoStartUtil;
 import com.tim.usong.util.SetupUtil;
 import com.tim.usong.util.UpdateApplicationUtil;
 import io.dropwizard.Application;
@@ -43,6 +44,7 @@ public class USongApplication extends Application<Configuration> {
         SetupUtil.setUpRequiredExternalFiles();
         SetupUtil.setUpUI();
         SplashWindow.showSplash();
+
         if (args.length == 0) {
             args = new String[]{"server", LOCAL_DIR + "usong.yml"};
         }
@@ -75,6 +77,16 @@ public class USongApplication extends Application<Configuration> {
 
     @Override
     public void run(Configuration config, Environment environment) {
+        // Assume that the current executed application is the latest version
+        // Update Autostart registry entry
+        try {
+            if (AutoStartUtil.isAutostartEnabled()) {
+                AutoStartUtil.enableAutoStart(getCurrentJarPath());
+            }
+        } catch (Exception e) {
+            logger.error("Failed to ensure autostart jar path is correct", e);
+        }
+
         try {
             SongbeamerSettings sbSettings = new SongbeamerSettings();
             SongParser songParser = new SongParser(sbSettings.songDir);
@@ -102,7 +114,7 @@ public class USongApplication extends Application<Configuration> {
                     tutorialFrame.setAlwaysOnTop(false);
                     prefs.putBoolean("firstRun", false);
                 }
-                new UpdateApplicationUtil(usongTray).checkForUpdateAsync();
+                new UpdateApplicationUtil().checkForUpdateAsync();
             });
         } catch (BindException e) {
             logger.error("Application already running", e);
