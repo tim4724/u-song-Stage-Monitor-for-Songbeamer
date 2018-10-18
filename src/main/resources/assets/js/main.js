@@ -3,19 +3,14 @@ function main() {
     const pages = document.getElementsByClassName('page');
     const errorElement = document.getElementById('errorBox');
     const clientsCountElement = document.getElementById('activeClients');
+    const clockButton = document.getElementById('clock');
 
     let currentPage = undefined; // element
     let lastPageNumber = -2; // number
 
-    function setLang(newLang) {
+    function simplePostRequest(path) {
         let xhr = new XMLHttpRequest();
-        xhr.open('POST', 'song/lang/' + newLang, true);
-        xhr.send();
-    }
-
-    function setPage(newPage) {
-        let xhr = new XMLHttpRequest();
-        xhr.open('POST', 'song/page/' + newPage, true);
+        xhr.open('POST', path, true);
         xhr.send();
     }
 
@@ -34,6 +29,12 @@ function main() {
                 }, 700);
                 document.body.classList.add('bodyExit');
             } else {
+                if (clockButton) {
+                    const visible = data.page === -1 && data.songType === "SNG";
+                    clockButton.style.opacity = visible ? "1" : "0";
+                    clockButton.style.cursor = visible ? "pointer" : "default";
+                    clockButton.onclick = visible ? backend.clock : "";
+                }
                 updatePageNumber(data.page);
             }
             if (clientsCountElement) {
@@ -97,14 +98,19 @@ function main() {
     }
 
     return {
-        setLang: setLang,
+        setLang: function (newLang) {
+            simplePostRequest('song/lang/' + newLang);
+        },
         pageUp: function () {
-            return setPage(lastPageNumber - 1);
+            simplePostRequest('song/page/' + (lastPageNumber - 1));
         },
         pageDown: function () {
-            return setPage(lastPageNumber + 1);
+            simplePostRequest('song/page/' + (lastPageNumber + 1));
         },
-        connectToWebSocket: connectToWebSocket
+        connectToWebSocket: connectToWebSocket,
+        clock: function () {
+            simplePostRequest('song/clock');
+        }
     }
 }
 

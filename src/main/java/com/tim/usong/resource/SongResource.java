@@ -98,6 +98,22 @@ public class SongResource {
     }
 
     @POST
+    @Path("clock")
+    public Response setPageForCurrentSong() {
+        if (!"clock".equals(song.getTitle())) {
+            if (nextSong == null) {
+                nextSong = song;
+            }
+            song = new Song(messages.getString("clock"), Song.Type.CLOCK);
+            SongWebSocket.songId = song.hashCode();
+            SongWebSocket.songType = song.getType();
+            SongWebSocket.page = -1;
+            SongWebSocket.notifyDataChanged();
+        }
+        return Response.ok().build();
+    }
+
+    @POST
     @Path("lang/{newLang}")
     public Response setLangForCurrentSong(@PathParam("newLang") int newLang) {
         if (newLang <= 0 || newLang > song.getLangCount()) {

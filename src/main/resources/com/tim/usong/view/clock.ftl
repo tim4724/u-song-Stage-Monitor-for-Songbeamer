@@ -4,7 +4,7 @@
                 border-color: #00a39d;
                 margin-top: 64px;
                 opacity: 0;
-                transition: opacity 1s linear'>
+                transition: opacity 2s linear'>
     <span id="timeHoursMinutes"></span><span id='timeSeconds'
                                              style="font-size: 0.7em;
                                              margin-left: 0.1em;
@@ -12,13 +12,12 @@
 </section>
 
 <script>
-    setTimeout(function () {
-        document.getElementById('timeBox').style.opacity = '1';
-    }, 2000);
-
     const timeHoursMinutes = document.getElementById('timeHoursMinutes');
     const timeSeconds = document.getElementById('timeSeconds');
 
+    setTimeout(function () {
+        document.getElementById('timeBox').style.opacity = "1";
+    }, 500);
     const updateTime = function () {
         const date = new Date();
         var hours = date.getHours();
@@ -33,5 +32,9 @@
         timeHoursMinutes.innerText = hours + ':' + minutes;
         timeSeconds.innerText = seconds;
     };
-    setInterval(updateTime, 1000);
+    updateTime();
+    const updateClockInterval = setInterval(updateTime, 1000);
+    const clockStopUpdating = function () {
+        clearInterval(updateClockInterval);
+    }
 </script>

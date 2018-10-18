@@ -50,6 +50,7 @@
                         onclick="backend.setLang(${i});">Sprache ${i}</button>
             </#list>
         </#if>
+        <button type="button" id="clock">&#128340;</button>
     </footer>
 </#if>
 

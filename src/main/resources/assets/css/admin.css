@@ -41,7 +41,6 @@ button:hover:enabled {
 }
 
 #activeClients {
-    font-size: 1em;
     float: left;
     margin: 16px;
     background: #49bc49;
@@ -49,6 +48,17 @@ button:hover:enabled {
     padding: 10px 20px 10px 20px;
     border-radius: 50%;
     color: white;
+}
+
+#clock {
+    float: right;
+    margin: 8px 16px 8px 8px;
+    color: white;
+    border-radius: 50%;
+    padding: 0 4px 6px;
+    opacity: 0;
+    width: calc(1em + 34px);
+    height: calc(1em + 34px);
 }
 
 #activeClients.negative {
