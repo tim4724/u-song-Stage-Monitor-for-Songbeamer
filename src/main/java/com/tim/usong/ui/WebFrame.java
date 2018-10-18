@@ -72,8 +72,8 @@ public class WebFrame extends JFrame {
             MenuItem minus = new MenuItem(messages.getString("zoomDecrease"));
             MenuItem reload = new MenuItem(messages.getString("reload"));
             MenuItem openInBrowser = new MenuItem(messages.getString("openInBrowser"));
-            plus.setOnAction(e -> webView.setZoom(zoom += 0.05));
-            minus.setOnAction(e -> webView.setZoom(zoom -= 0.05));
+            plus.setOnAction(e -> webView.setZoom(zoom += 0.02));
+            minus.setOnAction(e -> webView.setZoom(zoom -= 0.02));
             reload.setOnAction(e -> webEngine.reload());
             openInBrowser.setOnAction(e -> openBrowser());
 
@@ -87,9 +87,9 @@ public class WebFrame extends JFrame {
             });
             webView.setOnKeyPressed(event -> {
                 if (increaseZoom.match(event) || increaseZoom2.match(event)) {
-                    webView.setZoom(zoom += 0.05);
+                    webView.setZoom(zoom += 0.02);
                 } else if (decreaseZoom.match(event) || decreaseZoom2.match(event)) {
-                    webView.setZoom(zoom -= 0.05);
+                    webView.setZoom(zoom -= 0.02);
                 } else if (event.getCode() == KeyCode.F5) {
                     webEngine.reload();
                 }
