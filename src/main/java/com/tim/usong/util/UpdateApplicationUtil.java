@@ -63,7 +63,7 @@ public class UpdateApplicationUtil {
         String tagName = latestRelease.get("tag_name").asText();
         String branch = latestRelease.get("target_commitish").asText();
         if (!"master".equals(branch) || tagName.compareTo(currentVersion) <= 0
-                || tagName.equals(prefs.get("DoNotAskUpdate", null))) {
+                || tagName.equals(prefs.get("do_not_ask_update", null))) {
             return;
         }
 
@@ -97,7 +97,7 @@ public class UpdateApplicationUtil {
                     USongApplication.showErrorDialogAsync(messages.getString("browserOpenError"), e);
                 }
             } else if (result == 2) {
-                prefs.put("DoNotAskUpdate", tagName);
+                prefs.put("do_not_ask_update", tagName);
             }
         }
     }

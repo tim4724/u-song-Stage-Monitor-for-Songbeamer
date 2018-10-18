@@ -42,6 +42,7 @@ public class WebFrame extends JFrame {
 
         width = prefs.getInt("width", width);
         height = prefs.getInt("height", height);
+        setBackground(Color.BLACK);
         setSize(width, height);
 
         // set position after settings size!
@@ -54,6 +55,7 @@ public class WebFrame extends JFrame {
         }
 
         final JFXPanel jfxPanel = new JFXPanel();
+        jfxPanel.setBackground(Color.BLACK);
         add(jfxPanel);
 
         // avoid that some kinda important jfx thread dies or something if preview window is closed

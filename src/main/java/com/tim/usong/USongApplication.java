@@ -106,13 +106,13 @@ public class USongApplication extends Application<Configuration> {
             environment.lifecycle().manage(usongTray);
             environment.lifecycle().addServerLifecycleListener(server -> {
                 SplashWindow.started();
-                if (prefs.getBoolean("firstRun", true)) {
+                if (prefs.getBoolean("first_run", true)) {
                     JFrame tutorialFrame = new TutorialFrame();
                     // bring to front, because of any reason the window is not
                     tutorialFrame.setAlwaysOnTop(true);
                     tutorialFrame.setVisible(true);
                     tutorialFrame.setAlwaysOnTop(false);
-                    prefs.putBoolean("firstRun", false);
+                    prefs.putBoolean("first_run", false);
                 }
                 new UpdateApplicationUtil().checkForUpdateAsync();
             });

@@ -15,7 +15,7 @@ public class AutoStartUtil {
         File f = new File(path);
         if (f.exists() && f.getName().endsWith(".jar")) {
             String cmd = "reg add %s /v \"%s\" /d \"%s\" /t REG_SZ /f";
-            String startApplicationCmd = "cmd /c START javaw -jar \"" + path + "\"";
+            String startApplicationCmd = "cmd /c START javaw -jar \\\"" + path + "\\\"";
             cmd = String.format(cmd, REG_RUN_KEY, VALUE, startApplicationCmd);
             Runtime.getRuntime().exec(cmd);
         } else {
