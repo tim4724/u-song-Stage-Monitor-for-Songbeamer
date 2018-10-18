@@ -33,7 +33,7 @@ function main() {
                     location.reload(true);
                 }, 700);
                 document.body.classList.add('bodyExit');
-            } else if (lastPageNumber !== data.page) {
+            } else {
                 updatePageNumber(data.page);
             }
             if (clientsCountElement) {
@@ -60,9 +60,10 @@ function main() {
         if (oldPage) {
             oldPage.parentNode.classList.remove('currentSection');
         } else {
-            //no page is set yet
+            // no page is set yet
+            // song was loaded, but no page selected
             if (newPageNumber === -1) {
-                scrollTo(0, 0);//scroll to the top of the page
+                scrollTo(0, 0); // scroll to the top of the page
                 lastPageNumber = -1;
                 return;
             }
