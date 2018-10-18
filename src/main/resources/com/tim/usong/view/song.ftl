@@ -58,7 +58,7 @@
 </div>
 
 <script>
-    window.onerror = function (e) {
+    window.onerror = function (e, a, line) {
         document.getElementById("errorBox").style.display = 'block';
         console.error(e);
     };

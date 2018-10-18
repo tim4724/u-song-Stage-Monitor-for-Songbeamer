@@ -108,16 +108,14 @@ function main() {
 }
 
 function scroll(e, offset, duration) {
-    if (zenscroll) {
+    if (typeof zenscroll !== "undefined") {
         zenscroll.setup(duration, offset);
-
         zenscroll.to(e, duration);
         setTimeout(function () {
             if (!zenscroll.moving()) {
                 zenscroll.to(e, duration);
             }
         }, 100); // sometimes its buggy and doesn't scroll right away
-
         // backup plan
         setTimeout(function () {
             if (!zenscroll.moving()) {
