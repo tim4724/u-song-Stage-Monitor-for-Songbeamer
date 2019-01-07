@@ -18,11 +18,11 @@
     <h2 class="tutorialHeadline">${messages.getString("tutorial2")}</h2>
 
     <div id="urls">
-        <a href="http://${hostname}">http://${hostname}</a>
+        <a href="http://${hostname}" target="_blank">http://${hostname}</a>
 
         <#if ipAddress != "0.0.0.0" && ipAddress != "127.0.0.1">
             <span> ${messages.getString("or")} </span>
-            <a href="http://${ipAddress}">http://${ipAddress}</a>
+            <a href="http://${ipAddress}" target="_blank">http://${ipAddress}</a>
         </#if>
     </div>
 </main>

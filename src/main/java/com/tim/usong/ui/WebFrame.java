@@ -66,6 +66,17 @@ public class WebFrame extends JFrame {
             webView.setZoom(zoom = prefs.getDouble("zoom", zoom));
             WebEngine webEngine = webView.getEngine();
             webEngine.load(url);
+            webEngine.setCreatePopupHandler(config -> {
+                // grab the last hyperlink that has :hover pseudoclass
+                Object o = webEngine.executeScript("var list = document.querySelectorAll( ':hover' );"
+                        + "for (i=list.length-1; i>-1; i--) "
+                        + "{ if ( list.item(i).getAttribute('href') ) "
+                        + "{ list.item(i).getAttribute('href'); break; } }");
+                if (o != null) {
+                    openBrowser(o.toString());
+                }
+                return null; // prevent from opening in webView
+            });
             jfxPanel.setScene(new Scene(webView));
 
             MenuItem plus = new MenuItem(messages.getString("zoomIncrease"));
@@ -123,6 +134,10 @@ public class WebFrame extends JFrame {
     }
 
     private void openBrowser() {
+        openBrowser(this.url);
+    }
+
+    private void openBrowser(String url) {
         try {
             Desktop.getDesktop().browse(new URL(url).toURI());
         } catch (Exception e) {
