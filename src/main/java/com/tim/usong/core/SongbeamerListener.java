@@ -86,7 +86,6 @@ public class SongbeamerListener implements Managed, Runnable {
 
     private void receive(Socket socket) throws IOException {
         songResource.setSongAndPage(noSongSelected, -1);
-
         final String startTag = "<SongBeamerIPC>";
         final String endTag = "</SongBeamerIPC>";
 

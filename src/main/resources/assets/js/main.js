@@ -35,7 +35,7 @@ function main() {
                     clockButton.style.cursor = visible ? "pointer" : "default";
                     clockButton.onclick = visible ? backend.clock : "";
                 }
-                updatePageNumber(data.page);
+                updatePageNumber(Math.min(data.page, pages.length - 1));
             }
             if (clientsCountElement) {
                 if (data.clients === 1) {

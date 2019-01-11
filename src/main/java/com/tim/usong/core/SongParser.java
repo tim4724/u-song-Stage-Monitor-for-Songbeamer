@@ -5,6 +5,7 @@ import com.tim.usong.USongApplication;
 import com.tim.usong.core.entity.Page;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
+import com.tim.usong.ui.SelectSongDirectoryDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,12 +14,20 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.prefs.Preferences;
 
 public class SongParser {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+    private final Preferences preferences = Preferences.userNodeForPackage(SongParser.class).node("songparser");
     private final Map<String, Integer> langMap = new HashMap<>();
     private final String songDirPath;
+
+    // TODO: Allow user to select the value, or extract it from songbeamer settings
+    // UNtil then: reg add HKEY_CURRENT_USER\Software\JavaSoft\Prefs\com\tim\usong\core\songparser /v max_lines_per_page /t REG_SZ /d 3 /f
+    // Text will be on a new page, if it has more than "n" lines
+    // This can be selected in songbeamer: "Extras" -> "Options" -> "Song" -> "Maximum text lines"
+    private final int maxLinesPerPage;
 
     public SongParser(File songDir) {
         String songDirPath = songDir.getAbsolutePath();
@@ -26,6 +35,7 @@ public class SongParser {
             songDirPath += "\\";
         }
         this.songDirPath = songDirPath;
+        maxLinesPerPage = Math.max(0, preferences.getInt("max_lines_per_page", 0));
     }
 
     public void setLangForSong(String fileName, int lang) {
@@ -117,38 +127,70 @@ public class SongParser {
         List<Section> allSections = new ArrayList<>();
         String currentSectionName = "";
 
-        for (String page : pages) {
-            Page newPage = new Page();
+        for (int i = 0; i < pages.size(); i++) {
+            String page = pages.get(i);
+            // Because of a feature "Maximale Zeilenanzahl" (maximum line count)
+            // One page may actuality be split into multiple pages, when presented
+            List<Page> newPages = new ArrayList<>();
 
+            // counts all textlines inclusive empty ones. Do not include section names
             int lineCounter = 0;
-            for (String line : page.split("\\r?\\n")) {
+            // counts only not empty text lines. Do not include section names
+            int lineCounterNotEmpty = 0;
+
+            // limit "-1" -> do not discard any empty strings at the end
+            String[] lines = page.split("\\r?\\n", -1);
+            // iterate over all
+            for (int j = 0; j < lines.length - 1; j++) {
+                String line = lines[j];
                 line = line.trim();
-                if (line.isEmpty()) {
-                    continue;
-                }
                 if (isBlockName(line)) {
                     // Vers 22x -> Vers 2, because the "2x" means repeat 2 times.
                     currentSectionName = line.replaceAll("[0-9]x$", "");
                     continue;
                 }
-
-                int lang = (lineCounter % langCount) + 1;
-                if (line.length() >= 4 && line.substring(0, 4).matches("^#?#[0-9] (.)*")) {
-                    //substring(0, 4) because of bug with special characters
-                    lang = Integer.parseInt(line.substring(0, line.indexOf(" ")).replaceAll("#", ""));
-                    line = line.substring(line.indexOf(" "));
+                if (lineCounter == 0 || (maxLinesPerPage > 0 && lineCounter % maxLinesPerPage == 0)) {
+                    // if something should be a new page, according to the maxLinesPerPage setting
+                    // is determined by counting lines, inclusibvely empty ones.
+                    // the upcoming text is part of a new page
+                    newPages.add(new Page());
+                }
+                int lang = ((lineCounterNotEmpty) % langCount) + 1;
+                if (!line.isEmpty()) {
+                    // lang is determined by counting not empty lines
+                    if (line.length() >= 4 && line.substring(0, 4).matches("^#?#[0-9] (.)*")) {
+                        //substring(0, 4) because of bug with special characters
+                        lang = Integer.parseInt(line.substring(0, line.indexOf(" ")).replaceAll("#", ""));
+                        line = line.substring(line.indexOf(" "));
+                    }
+                    lineCounterNotEmpty++;
                 }
                 if (lang == desiredLang) {
-                    newPage.addLine(line.trim());
+                    lastOf(newPages).addLine(line.trim());
                 }
-                lineCounter++;//TODO: May need to be modified if lang is given explicitly (##1, ##2...)
+                lineCounter++;
+            }
+
+            // Somehow there is an exception if the last page in the song contains only 1 line.
+            // Then this line is added to the previous page
+            // But only if the last page is a result of "maxLinesPerPage"
+            boolean lastPageOfSong = (i == (pages.size() - 1));
+            if (lastPageOfSong && newPages.size() > 1) {
+                //TODO: Different compared to songbeamer in some rare cases with empty lines
+                Page lastPage = lastOf(newPages);
+                String lastPageText = lastPage.getContent();
+                if (!lastPageText.contains("\\r?\\n") && lines.length > 1) {
+                    newPages.remove(newPages.size() - 1);
+                    lastOf(newPages).addLine(lastPage.getContent());
+                }
             }
 
             Section lastSection = lastOf(allSections);
             if (lastSection == null || !lastSection.getName().equals(currentSectionName)) {
-                allSections.add(new Section(currentSectionName, newPage));
+                lastSection = new Section(currentSectionName, newPages.toArray(new Page[0]));
+                allSections.add(lastSection);
             } else {
-                lastSection.addPage(newPage);
+                lastSection.addPages(newPages.toArray(new Page[0]));
             }
         }
         return allSections;
