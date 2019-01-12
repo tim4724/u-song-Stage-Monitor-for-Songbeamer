@@ -183,7 +183,7 @@ public class SongParser {
                 //TODO: Different compared to songbeamer in some rare cases with empty lines
                 Page lastPage = lastOf(newPages);
                 String lastPageText = lastPage.getContent();
-                if (!lastPageText.contains("\\r?\\n") && lines.length > 1) {
+                if (!lastPageText.contains("\n") && lines.length > 1) {
                     newPages.remove(newPages.size() - 1);
                     lastOf(newPages).addLine(lastPage.getContent());
                 }
