@@ -24,10 +24,13 @@ public class SongParser {
     private final String songDirPath;
 
     // TODO: Allow user to select the value, or extract it from songbeamer settings
-    // UNtil then: reg add HKEY_CURRENT_USER\Software\JavaSoft\Prefs\com\tim\usong\core\songparser /v max_lines_per_page /t REG_SZ /d 3 /f
+
     // Text will be on a new page, if it has more than "n" lines
     // This can be selected in songbeamer: "Extras" -> "Options" -> "Song" -> "Maximum text lines"
     private final int maxLinesPerPage;
+    // The title can be on the first page
+    // This can be selected in songbeamer: "Extras" -> "Options" -> "Song" -> "Title: " -> "on the first page"
+    private final boolean titleHasOwnPage;
 
     public SongParser(File songDir) {
         String songDirPath = songDir.getAbsolutePath();
@@ -36,6 +39,7 @@ public class SongParser {
         }
         this.songDirPath = songDirPath;
         maxLinesPerPage = Math.max(0, preferences.getInt("max_lines_per_page", 0));
+        titleHasOwnPage = preferences.getBoolean("title_has_own_page", false);
     }
 
     public void setLangForSong(String fileName, int lang) {
@@ -111,6 +115,10 @@ public class SongParser {
             for (Page p : onlySection.getPages()) {
                 finalSectionList.add(new Section("", p));
             }
+        }
+
+        if (titleHasOwnPage) {
+            finalSectionList.get(0).addPage(0, new Page());
         }
 
         long duration = System.currentTimeMillis() - startTime;

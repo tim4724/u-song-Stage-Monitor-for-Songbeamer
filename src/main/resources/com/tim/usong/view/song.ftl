@@ -26,9 +26,15 @@
             <div class="sectionName">${section.name}</div>
         </#if>
         <#list section.pages as page>
+            <#if page.content??>
             <div class="page">
-                ${page.content}
+                <#if page.content?has_content >
+                    <div class="pageContent">
+                        ${page.content}
+                    </div>
+                </#if>
             </div>
+            </#if>
         </#list>
     </section>
 </#list>

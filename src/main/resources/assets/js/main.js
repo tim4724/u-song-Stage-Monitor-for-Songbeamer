@@ -81,7 +81,7 @@ function main() {
 
             let offset = 10;
             let scrollTarget;
-            if (newPageNumber === 0) {
+            if (newPageNumber === 0 || (newPageNumber === 1 && pages[0].children.length === 0)) {
                 scrollTarget = titleElement;
             } else if (currentPage.parentElement.scrollHeight < (innerHeight * 0.8)) {
                 scrollTarget = currentPage.parentNode;

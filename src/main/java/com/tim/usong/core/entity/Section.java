@@ -32,6 +32,10 @@ public class Section {
         this.pages.addAll(Arrays.asList(pages));
     }
 
+    public void addPage(int index, Page page) {
+        pages.add(index, page);
+    }
+
     public void addPages(Page... pages) {
         this.pages.addAll(Arrays.asList(pages));
     }

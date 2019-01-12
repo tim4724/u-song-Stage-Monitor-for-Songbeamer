@@ -51,6 +51,9 @@ section {
 .page {
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
+}
+
+.pageContent {
     padding-top: 25px;
     padding-bottom: 25px;
 }
