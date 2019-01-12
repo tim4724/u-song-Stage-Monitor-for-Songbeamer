@@ -102,10 +102,18 @@ function main() {
             simplePostRequest('song/lang/' + newLang);
         },
         pageUp: function () {
-            simplePostRequest('song/page/' + (lastPageNumber - 1));
+            let newPageNumber = lastPageNumber - 1;
+            while (newPageNumber > 0 && pages[newPageNumber].children.length === 0) {
+                --newPageNumber; // skip empty pages
+            }
+            simplePostRequest('song/page/' + newPageNumber);
         },
         pageDown: function () {
-            simplePostRequest('song/page/' + (lastPageNumber + 1));
+            let newPageNumber = lastPageNumber + 1;
+            while (newPageNumber < pages.length - 1 && pages[newPageNumber].children.length === 0) {
+                ++newPageNumber; // skip empty pages
+            }
+            simplePostRequest('song/page/' + newPageNumber);
         },
         connectToWebSocket: connectToWebSocket,
         clock: function () {

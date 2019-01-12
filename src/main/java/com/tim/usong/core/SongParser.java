@@ -19,7 +19,6 @@ import java.util.prefs.Preferences;
 public class SongParser {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-    private final Preferences preferences = Preferences.userNodeForPackage(SongParser.class).node("songparser");
     private final Map<String, Integer> langMap = new HashMap<>();
     private final String songDirPath;
 
@@ -38,6 +37,7 @@ public class SongParser {
             songDirPath += "\\";
         }
         this.songDirPath = songDirPath;
+        Preferences preferences = Preferences.userNodeForPackage(SongParser.class).node("songparser");
         maxLinesPerPage = Math.max(0, preferences.getInt("max_lines_per_page", 0));
         titleHasOwnPage = preferences.getBoolean("title_has_own_page", false);
     }
@@ -52,14 +52,10 @@ public class SongParser {
         }
         try {
             return parseSong(fileName);
-        } catch (NoSuchFileException e) {
-            logger.error("Failed to parse song", e);
-            String errorMessage = messages.getString("fileNotFoundError");
-            USongApplication.showErrorDialogAsync(errorMessage, fileName + "\n" + e);
-            return new Song(errorMessage + "<br>\n" + fileName, e);
         } catch (Exception e) {
             logger.error("Failed to parse song", e);
-            String errorMessage = messages.getString("fileParseError");
+            String msgKey = e instanceof NoSuchFileException ? "fileNotFoundError" : "fileParseError";
+            String errorMessage = messages.getString(msgKey);
             USongApplication.showErrorDialogAsync(errorMessage, fileName + "\n" + e);
             return new Song(errorMessage + fileName, e);
         }

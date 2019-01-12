@@ -22,9 +22,6 @@ public class SetupUtil {
      * - SBRemoteSender.exe is an application to receive actions from songbeamer about current song and current page
      **/
     public static void setUpRequiredExternalFiles() {
-        Logger logger = LoggerFactory.getLogger(SetupUtil.class);
-        ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-
         try {
             Files.createDirectories(Paths.get(USongApplication.LOCAL_DIR));
 
@@ -38,7 +35,8 @@ public class SetupUtil {
             }
         } catch (Exception e) {
             // application may still work if SBRemoteSender is started manually or if yml is provided via parameter
-            logger.error("SetupUtil failed", e);
+            LoggerFactory.getLogger(SetupUtil.class).error("SetupUtil failed", e);
+            ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
             USongApplication.showErrorDialogAsync(messages.getString("createFilesError"), e);
         }
     }

@@ -22,7 +22,6 @@ public class UsongTray implements Managed {
     private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private static final String GITHUB_LINK = "https://github.com/tim4724/u-song-Stage-Monitor-for-Songbeamer";
     private final PreviewFrame previewFrame;
-    private TrayIcon trayIcon;
 
     public UsongTray(PreviewFrame previewFrame) {
         this.previewFrame = previewFrame;
@@ -31,7 +30,7 @@ public class UsongTray implements Managed {
     @Override
     public void start() {
         Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon-small2.png"));
-        trayIcon = new TrayIcon(image, USongApplication.APP_NAME, new PopupMenu());
+        TrayIcon trayIcon = new TrayIcon(image, USongApplication.APP_NAME, new PopupMenu());
         trayIcon.setImageAutoSize(true);
 
         String previewMsg = messages.getString("preview");
@@ -82,10 +81,6 @@ public class UsongTray implements Managed {
         }
     }
 
-    public void showInfo(String body) {
-        trayIcon.displayMessage(USongApplication.APP_NAME, body, TrayIcon.MessageType.INFO);
-    }
-
     @Override
     public void stop() {
     }
@@ -122,17 +117,11 @@ public class UsongTray implements Managed {
 
     private String getHostname() {
         String hostname = NetworkHostUtils.getHostname();
-        if (hostname == null) {
-            hostname = "localhost";
-        }
-        return hostname;
+        return hostname != null ? hostname : "localhost";
     }
 
     private String getIpAdress() {
         String ip = NetworkHostUtils.getHostAddress();
-        if (ip == null) {
-            ip = "127.0.0.1";
-        }
-        return ip;
+        return ip != null ? ip : "127.0.0.1";
     }
 }

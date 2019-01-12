@@ -99,7 +99,7 @@ public class SongResource {
 
     @POST
     @Path("clock")
-    public Response setPageForCurrentSong() {
+    public Response setClockAsCurrentSong() {
         if (!"clock".equals(song.getTitle())) {
             if (nextSong == null) {
                 nextSong = song;

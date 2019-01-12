@@ -48,12 +48,9 @@ section {
     margin-left: 10px;
 }
 
-.page {
+.pageContent {
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-}
-
-.pageContent {
     padding-top: 25px;
     padding-bottom: 25px;
 }
@@ -62,7 +59,7 @@ section {
     color: #ffffff;
 }
 
-.currentPage {
+.currentPage .pageContent {
     border-color: #ffffff;
     background: #111111;
 }
