@@ -102,18 +102,22 @@ function main() {
             simplePostRequest('song/lang/' + newLang);
         },
         pageUp: function () {
-            let newPageNumber = lastPageNumber - 1;
-            while (newPageNumber > 0 && pages[newPageNumber].children.length === 0) {
-                --newPageNumber; // skip empty pages
+            for (let i = lastPageNumber - 1; i >= 0; i--) {
+                // skip emtpy pages
+                if (pages[i].children.length !== 0) {
+                    simplePostRequest('song/page/' + i);
+                    break;
+                }
             }
-            simplePostRequest('song/page/' + newPageNumber);
         },
         pageDown: function () {
-            let newPageNumber = lastPageNumber + 1;
-            while (newPageNumber < pages.length - 1 && pages[newPageNumber].children.length === 0) {
-                ++newPageNumber; // skip empty pages
+            for (let i = lastPageNumber + 1; i < pages.length; i++) {
+                // skipt empty pages
+                if (pages[i].children.length !== 0) {
+                    simplePostRequest('song/page/' + i);
+                    break;
+                }
             }
-            simplePostRequest('song/page/' + newPageNumber);
         },
         connectToWebSocket: connectToWebSocket,
         clock: function () {
