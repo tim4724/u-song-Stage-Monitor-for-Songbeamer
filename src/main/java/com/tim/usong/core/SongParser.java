@@ -5,7 +5,6 @@ import com.tim.usong.USongApplication;
 import com.tim.usong.core.entity.Page;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
-import com.tim.usong.ui.SelectSongDirectoryDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,9 +62,9 @@ public class SongParser {
 
     private Song parseSong(String songFile) throws IOException {
         long startTime = System.currentTimeMillis();
-        String title = songFile.replace(songDirPath, "").replace(".sng", "");
-        List<String> pages = new ArrayList<>();
 
+        List<String> pages = new ArrayList<>();
+        // Read from file and seperate into pages
         try (Scanner scanner = new Scanner(Paths.get(songFile), "ISO-8859-1")) {
             scanner.useDelimiter("-(-)+\\r?\\n");
             while (scanner.hasNext()) {
@@ -74,17 +73,14 @@ public class SongParser {
         }
 
         Header header = new Header(pages.remove(0));
-        if (header.title != null && !header.title.isEmpty()) {
-            title = header.title;
-        }
-        int desiredLang = 1;
-        if (langMap.containsKey(songFile)) {
-            desiredLang = langMap.get(songFile);
-        }
+        String title = Strings.isNullOrEmpty(header.title)
+                ? songFile.replaceAll("songDirPath|.sng$", "")
+                : header.title;
+        int desiredLang = langMap.getOrDefault(songFile, 1);
 
         List<Section> sections = parseSongText(pages, header.langCount, desiredLang);
-        List<Section> finalSectionList = new ArrayList<>();
 
+        List<Section> finalSectionList = new ArrayList<>();
         if (header.verseOrder != null) {
             for (String sectionName : header.verseOrder) {
                 Section section = findSectionByName(sections, sectionName);
@@ -95,25 +91,19 @@ public class SongParser {
         }
 
         for (Section s : sections) {
-            boolean alreadyAdded = false;
-            for (Section s2 : finalSectionList) {
-                if (s == s2) {
-                    alreadyAdded = true;
-                }
-            }
-            if (!alreadyAdded) {
+            if (finalSectionList.stream().noneMatch(s2 -> s == s2)) {
                 finalSectionList.add(s);
             }
         }
 
         if (finalSectionList.size() == 1 && Strings.isNullOrEmpty(finalSectionList.get(0).getName())) {
             Section onlySection = finalSectionList.remove(0);
-            for (Page p : onlySection.getPages()) {
-                finalSectionList.add(new Section("", p));
-            }
+            onlySection.getPages().forEach(p -> finalSectionList.add(new Section("", p)));
         }
 
         if (titleHasOwnPage) {
+            // the first page is the title page.
+            // Therefore we add an empty page to our song, to keep in sync with songbeamer
             finalSectionList.get(0).addPage(0, new Page());
         }
 
@@ -144,33 +134,39 @@ public class SongParser {
 
             // limit "-1" -> do not discard any empty strings at the end
             String[] lines = page.split("\\r?\\n", -1);
-            // iterate over all
+
+            // iterate, but ignore last element, because its empty always
             for (int j = 0; j < lines.length - 1; j++) {
-                String line = lines[j];
-                line = line.trim();
+                String line = lines[j].trim();
                 if (isBlockName(line)) {
                     // Vers 22x -> Vers 2, because the "2x" means repeat 2 times.
                     currentSectionName = line.replaceAll("[0-9]x$", "");
                     continue;
                 }
+
                 if (lineCounter == 0 || (maxLinesPerPage > 0 && lineCounter % maxLinesPerPage == 0)) {
                     // if something should be a new page, according to the maxLinesPerPage setting
-                    // is determined by counting lines, inclusibvely empty ones.
+                    // is determined by counting lines, inclusively empty ones.
                     // the upcoming text is part of a new page
                     newPages.add(new Page());
                 }
+
+                // lang is determined by counting not empty lines
                 int lang = ((lineCounterNotEmpty) % langCount) + 1;
-                if (!line.isEmpty()) {
-                    // lang is determined by counting not empty lines
-                    if (line.length() >= 4 && line.substring(0, 4).matches("^#?#[0-9] (.)*")) {
-                        //substring(0, 4) because of bug with special characters
-                        lang = Integer.parseInt(line.substring(0, line.indexOf(" ")).replaceAll("#", ""));
-                        line = line.substring(line.indexOf(" "));
-                    }
-                    lineCounterNotEmpty++;
+
+                // substring(0, 4) because of bug with special characters
+                if (line.length() >= 4 && line.substring(0, 4).matches("^#?#[0-9] (.)*")) {
+                    // language is set explicitly with "#1" or "##1"
+                    lang = Integer.parseInt(line.substring(0, line.indexOf(" ")).replaceAll("#", ""));
+                    line = line.substring(line.indexOf(" ")).trim();
                 }
+
                 if (lang == desiredLang) {
-                    lastOf(newPages).addLine(line.trim());
+                    lastOf(newPages).addLine(line);
+                }
+
+                if (!line.isEmpty()) {
+                    lineCounterNotEmpty++;
                 }
                 lineCounter++;
             }
@@ -185,16 +181,16 @@ public class SongParser {
                 String lastPageText = lastPage.getContent();
                 if (!lastPageText.contains("\n") && lines.length > 1) {
                     newPages.remove(newPages.size() - 1);
-                    lastOf(newPages).addLine(lastPage.getContent());
+                    lastOf(newPages).addLine(lastPageText);
                 }
             }
 
             Section lastSection = lastOf(allSections);
-            if (lastSection == null || !lastSection.getName().equals(currentSectionName)) {
-                lastSection = new Section(currentSectionName, newPages.toArray(new Page[0]));
+            if (lastSection == null || !currentSectionName.equals(lastSection.getName())) {
+                lastSection = new Section(currentSectionName, newPages);
                 allSections.add(lastSection);
             } else {
-                lastSection.addPages(newPages.toArray(new Page[0]));
+                lastSection.addPages(newPages);
             }
         }
         return allSections;

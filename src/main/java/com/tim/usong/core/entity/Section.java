@@ -13,6 +13,10 @@ public class Section {
     private final List<Page> pages = new ArrayList<>();
 
     public Section(String name, Page... pages) {
+        this(name, Arrays.asList(pages));
+    }
+
+    public Section(String name, List<Page> pages) {
         this.name = name;
         if (name.matches("(?i)^(Vers|Verse|Strophe)($| .*)")) {
             type = Section.Type.VERSE;
@@ -29,15 +33,15 @@ public class Section {
         } else {
             type = Type.UNKNOWN;
         }
-        this.pages.addAll(Arrays.asList(pages));
+        this.pages.addAll(pages);
     }
 
     public void addPage(int index, Page page) {
         pages.add(index, page);
     }
 
-    public void addPages(Page... pages) {
-        this.pages.addAll(Arrays.asList(pages));
+    public void addPages(List<Page> pages) {
+        this.pages.addAll(pages);
     }
 
     public Type getType() {
