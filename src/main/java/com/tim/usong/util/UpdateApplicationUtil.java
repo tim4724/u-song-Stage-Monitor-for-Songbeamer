@@ -18,17 +18,15 @@ import java.util.prefs.Preferences;
 public class UpdateApplicationUtil {
     private static final String releasesUrl =
             "https://api.github.com/repos/tim4724/u-song-Stage-Monitor-for-Songbeamer/releases";
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-    private final Preferences prefs = Preferences
-            .userNodeForPackage(USongApplication.class)
-            .node("update");
 
-    public void checkForUpdateAsync() {
-        new Thread(this::checkForUpdate).start();
+    private UpdateApplicationUtil() {
     }
 
-    private void checkForUpdate() {
+    public static void checkForUpdateAsync() {
+        new Thread(UpdateApplicationUtil::checkForUpdate).start();
+    }
+
+    private static void checkForUpdate() {
         if (USongApplication.APP_VERSION == null) {
             return; // this is a debug build
         }
@@ -42,11 +40,12 @@ public class UpdateApplicationUtil {
                 handleGithubResponse(json);
             }
         } catch (Exception e) {
+            Logger logger = LoggerFactory.getLogger(UpdateApplicationUtil.class);
             logger.error("Failed to check on github for updates", e);
         }
     }
 
-    private String readResponseBody(HttpURLConnection connection) throws IOException {
+    private static String readResponseBody(HttpURLConnection connection) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuilder response = new StringBuilder();
@@ -57,13 +56,14 @@ public class UpdateApplicationUtil {
         return response.toString();
     }
 
-    private void handleGithubResponse(JsonNode json) {
+    private static void handleGithubResponse(JsonNode json) {
+        Preferences prefs = Preferences.userNodeForPackage(USongApplication.class).node("update");
         String currentVersion = USongApplication.APP_VERSION;
         JsonNode latestRelease = json.get(0);
         String tagName = latestRelease.get("tag_name").asText();
         String branch = latestRelease.get("target_commitish").asText();
-        if (!"master".equals(branch) || tagName.compareTo(currentVersion) <= 0
-                || tagName.equals(prefs.get("do_not_ask_update", null))) {
+        if (!"master".equals(branch) || tagName.compareTo(currentVersion) <= 0 ||
+                tagName.equals(prefs.get("do_not_ask_update", null))) {
             return;
         }
 
@@ -76,23 +76,23 @@ public class UpdateApplicationUtil {
             }
         }
 
+        ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
         if (downloadUrl != null) {
             String title = USongApplication.APP_NAME;
             String body = messages.getString("updateAvailable");
             body = String.format(body, tagName, currentVersion);
 
-            Object[] options = {messages.getString("yes"),
-                    messages.getString("notNow"),
+            Object[] options = {messages.getString("yes"), messages.getString("notNow"),
                     messages.getString("never"),};
 
-            int result = JOptionPane.showOptionDialog(
-                    null, body, title, JOptionPane.DEFAULT_OPTION,
+            int result = JOptionPane.showOptionDialog(null, body, title, JOptionPane.DEFAULT_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
             if (result == 0) {
                 try {
                     Desktop.getDesktop().browse(new URL(downloadUrl).toURI());
                 } catch (Exception e) {
+                    Logger logger = LoggerFactory.getLogger(UpdateApplicationUtil.class);
                     logger.error("Failed to open browser", e);
                     USongApplication.showErrorDialogAsync(messages.getString("browserOpenError"), e);
                 }

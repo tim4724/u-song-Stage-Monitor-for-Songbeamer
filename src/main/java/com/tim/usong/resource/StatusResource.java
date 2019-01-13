@@ -3,7 +3,7 @@ package com.tim.usong.resource;
 import com.google.common.base.Strings;
 import com.tim.usong.USongApplication;
 import com.tim.usong.core.SongParser;
-import com.tim.usong.core.SongbeamerListener;
+import com.tim.usong.core.SongbeamerActionListener;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
 import com.tim.usong.ui.PreviewFrame;
@@ -24,13 +24,13 @@ import java.util.ResourceBundle;
 
 @Path("status")
 public class StatusResource {
-    private final SongbeamerListener songbeamerListener;
+    private final SongbeamerActionListener songbeamerListener;
     private final SongResource songResource;
     private final SongParser songParser;
     private final PreviewFrame previewFrame;
     private final String songbeamerVersion;
 
-    public StatusResource(SongbeamerListener songbeamerListener,
+    public StatusResource(SongbeamerActionListener songbeamerListener,
                           SongResource songResource,
                           SongParser songParser,
                           PreviewFrame previewFrame,

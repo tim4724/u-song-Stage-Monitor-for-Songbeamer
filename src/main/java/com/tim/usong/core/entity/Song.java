@@ -66,8 +66,7 @@ public class Song {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Song song = (Song) o;
-        return Objects.equals(title, song.title) &&
-                Objects.equals(sections, song.sections);
+        return Objects.equals(title, song.title) && Objects.equals(sections, song.sections);
     }
 
     @Override

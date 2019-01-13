@@ -21,7 +21,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
 
-public class SongbeamerListener implements Managed, Runnable {
+public class SongbeamerActionListener implements Managed, Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Song noSongSelected;
@@ -32,7 +32,7 @@ public class SongbeamerListener implements Managed, Runnable {
     private Process songBeamerProcess;
     private boolean connected = false;
 
-    public SongbeamerListener(SongResource songResource) throws ParserConfigurationException, IOException {
+    public SongbeamerActionListener(SongResource songResource) throws ParserConfigurationException, IOException {
         this.songResource = songResource;
         noSongSelected = new Song(messages.getString("noSongSelected"), Song.Type.INFO);
         builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

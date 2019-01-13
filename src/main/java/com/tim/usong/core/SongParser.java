@@ -30,7 +30,7 @@ public class SongParser {
     // This can be selected in songbeamer: "Extras" -> "Options" -> "Song" -> "Title: " -> "on the first page"
     private final boolean titleHasOwnPage;
 
-    public SongParser(File songDir) {
+    public SongParser(File songDir, Boolean titleHasOwnPage) {
         String songDirPath = songDir.getAbsolutePath();
         if (!songDirPath.endsWith("\\")) {
             songDirPath += "\\";
@@ -38,7 +38,11 @@ public class SongParser {
         this.songDirPath = songDirPath;
         Preferences preferences = Preferences.userNodeForPackage(SongParser.class).node("songparser");
         maxLinesPerPage = Math.max(0, preferences.getInt("max_lines_per_page", 0));
-        titleHasOwnPage = preferences.getBoolean("title_has_own_page", false);
+        if (titleHasOwnPage == null) {
+            this.titleHasOwnPage = preferences.getBoolean("title_has_own_page", false);
+        } else {
+            this.titleHasOwnPage = titleHasOwnPage;
+        }
     }
 
     public void setLangForSong(String fileName, int lang) {

@@ -1,15 +1,12 @@
 package com.tim.usong;
 
-import com.tim.usong.core.SongbeamerSettings;
-import com.tim.usong.ui.PreviewFrame;
 import com.tim.usong.core.SongParser;
-import com.tim.usong.core.SongbeamerListener;
-import com.tim.usong.ui.TutorialFrame;
-import com.tim.usong.ui.UsongTray;
-import com.tim.usong.ui.SplashWindow;
+import com.tim.usong.core.SongbeamerActionListener;
+import com.tim.usong.core.SongbeamerSettings;
 import com.tim.usong.resource.RootResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
+import com.tim.usong.ui.*;
 import com.tim.usong.util.AutoStartUtil;
 import com.tim.usong.util.SetupUtil;
 import com.tim.usong.util.UpdateApplicationUtil;
@@ -18,10 +15,12 @@ import io.dropwizard.Configuration;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.lifecycle.ServerLifecycleListener;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import io.dropwizard.websockets.WebsocketBundle;
+import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,19 +31,17 @@ import java.net.URLDecoder;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
-public class USongApplication extends Application<Configuration> {
+public class USongApplication extends Application<Configuration> implements ServerLifecycleListener {
     public static final String APP_NAME = USongApplication.class.getPackage().getImplementationTitle();
     public static final String APP_VERSION = USongApplication.class.getPackage().getImplementationVersion();
     public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
-    private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+    private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final Preferences prefs = Preferences.userNodeForPackage(USongApplication.class);
 
     public static void main(String[] args) throws Exception {
-        SetupUtil.setUpRequiredExternalFiles();
         SetupUtil.setUpUI();
         SplashWindow.showSplash();
-
+        SetupUtil.setUpRequiredExternalFiles();
         if (args.length == 0) {
             args = new String[]{"server", LOCAL_DIR + "usong.yml"};
         }
@@ -67,16 +64,15 @@ public class USongApplication extends Application<Configuration> {
     @Override
     public void initialize(Bootstrap<Configuration> bootstrap) {
         bootstrap.addBundle(new WebsocketBundle(SongResource.SongWebSocket.class));
-        bootstrap.setConfigurationSourceProvider(
-                new SubstitutingSourceProvider(
-                        bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor())
+        bootstrap.setConfigurationSourceProvider(new SubstitutingSourceProvider(
+                bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor())
         );
         bootstrap.addBundle(new AssetsBundle());
         bootstrap.addBundle(new ViewBundle<>());
     }
 
     @Override
-    public void run(Configuration config, Environment environment) {
+    public void run(Configuration config, Environment environment) throws Exception {
         // Assume that the current executed application is the latest version
         // Update Autostart registry entry
         try {
@@ -87,48 +83,53 @@ public class USongApplication extends Application<Configuration> {
             logger.error("Failed to ensure autostart jar path is correct", e);
         }
 
+        SongbeamerSettings sbSettings = SongbeamerSettings.readSongbeamerIniFile();
+        if (sbSettings.songDir == null) {
+            sbSettings.songDir = new SelectSongDirectoryDialog().getDirectory();
+            if (sbSettings.songDir == null) {
+                logger.error("Could not find Songs directory");
+                showErrorDialog(messages.getString("songsDirNotFoundError"));
+                System.exit(-1);
+                return;
+            }
+        }
+
+        SongParser songParser = new SongParser(sbSettings.songDir, sbSettings.titleHasOwnPage);
+        SongResource songResource = new SongResource(songParser);
+        SongbeamerActionListener songbeamerActionListener;
         try {
-            SongbeamerSettings sbSettings = new SongbeamerSettings();
-            SongParser songParser = new SongParser(sbSettings.songDir);
-
-            PreviewFrame previewFrame = new PreviewFrame();
-            SongResource songResource = new SongResource(songParser);
-            SongbeamerListener sBListener = new SongbeamerListener(songResource);
-            UsongTray usongTray = new UsongTray(previewFrame);
-            StatusResource statusResource = new StatusResource(sBListener, songResource,
-                    songParser, previewFrame, sbSettings.version);
-
-            environment.jersey().register(new RootResource());
-            environment.jersey().register(songResource);
-            environment.jersey().register(statusResource);
-            environment.lifecycle().manage(sBListener);
-            environment.lifecycle().manage(previewFrame);
-            environment.lifecycle().manage(usongTray);
-            environment.lifecycle().addServerLifecycleListener(server -> {
-                SplashWindow.started();
-                if (prefs.getBoolean("first_run", true)) {
-                    JFrame tutorialFrame = new TutorialFrame();
-                    // bring to front, because of any reason the window is not
-                    tutorialFrame.setAlwaysOnTop(true);
-                    tutorialFrame.setVisible(true);
-                    tutorialFrame.setAlwaysOnTop(false);
-                    prefs.putBoolean("first_run", false);
-                }
-                new UpdateApplicationUtil().checkForUpdateAsync();
-            });
+            songbeamerActionListener = new SongbeamerActionListener(songResource);
         } catch (BindException e) {
             logger.error("Application already running", e);
             showErrorDialog(messages.getString("alreadyRunningError"), e);
             System.exit(-1);
-        } catch (SongbeamerSettings.NoSongDirFoundException e) {
-            logger.error("Could not find Songs directory", e);
-            showErrorDialog(messages.getString("songsDirNotFoundError"), e);
-            System.exit(-1);
-        } catch (Exception e) {
-            logger.error("Failed to start server", e);
-            showErrorDialog(messages.getString("fatalError"), e);
-            System.exit(-1);
+            return;
         }
+        PreviewFrame previewFrame = new PreviewFrame();
+
+        environment.jersey().register(new RootResource());
+        environment.jersey().register(songResource);
+        environment.jersey().register(new StatusResource(songbeamerActionListener, songResource, songParser,
+                previewFrame, sbSettings.version));
+        environment.lifecycle().manage(songbeamerActionListener);
+        environment.lifecycle().manage(previewFrame);
+        environment.lifecycle().manage(new UsongTray(previewFrame));
+        environment.lifecycle().addServerLifecycleListener(this);
+    }
+
+    @Override
+    public void serverStarted(Server server) {
+        SplashWindow.started();
+        Preferences prefs = Preferences.userNodeForPackage(USongApplication.class);
+        if (prefs.getBoolean("first_run", true)) {
+            JFrame tutorialFrame = new TutorialFrame();
+            // bring to front, because of any reason the window is not
+            tutorialFrame.setAlwaysOnTop(true);
+            tutorialFrame.setVisible(true);
+            tutorialFrame.setAlwaysOnTop(false);
+            prefs.putBoolean("first_run", false);
+        }
+        UpdateApplicationUtil.checkForUpdateAsync();
     }
 
     @Override
