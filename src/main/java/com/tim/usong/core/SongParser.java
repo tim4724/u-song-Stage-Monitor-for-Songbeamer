@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.*;
@@ -30,18 +31,23 @@ public class SongParser {
     // This can be selected in songbeamer: "Extras" -> "Options" -> "Song" -> "Title: " -> "on the first page"
     private final boolean titleHasOwnPage;
 
-    public SongParser(File songDir, Boolean titleHasOwnPage) {
+    public SongParser(File songDir, Boolean titleHasOwnPage, Integer maxLinesPerPage) {
         String songDirPath = songDir.getAbsolutePath();
         if (!songDirPath.endsWith("\\")) {
             songDirPath += "\\";
         }
         this.songDirPath = songDirPath;
         Preferences preferences = Preferences.userNodeForPackage(SongParser.class).node("songparser");
-        maxLinesPerPage = Math.max(0, preferences.getInt("max_lines_per_page", 0));
-        if (titleHasOwnPage == null) {
-            this.titleHasOwnPage = preferences.getBoolean("title_has_own_page", false);
-        } else {
+
+        if (titleHasOwnPage != null) {
             this.titleHasOwnPage = titleHasOwnPage;
+        } else {
+            this.titleHasOwnPage = preferences.getBoolean("title_has_own_page", false);
+        }
+        if (maxLinesPerPage != null) {
+            this.maxLinesPerPage = maxLinesPerPage;
+        } else {
+            this.maxLinesPerPage = preferences.getInt("max_lines_per_page", 0);
         }
     }
 
@@ -69,7 +75,7 @@ public class SongParser {
 
         List<String> pages = new ArrayList<>();
         // Read from file and seperate into pages
-        try (Scanner scanner = new Scanner(Paths.get(songFile), "ISO-8859-1")) {
+        try (Scanner scanner = new Scanner(Paths.get(songFile), StandardCharsets.ISO_8859_1.name())) {
             scanner.useDelimiter("-(-)+\\r?\\n");
             while (scanner.hasNext()) {
                 pages.add(scanner.next());

@@ -83,7 +83,7 @@ public class USongApplication extends Application<Configuration> implements Serv
             logger.error("Failed to ensure autostart jar path is correct", e);
         }
 
-        SongbeamerSettings sbSettings = SongbeamerSettings.readSongbeamerIniFile();
+        SongbeamerSettings sbSettings = SongbeamerSettings.readSongbeamerSettings();
         if (sbSettings.songDir == null) {
             sbSettings.songDir = new SelectSongDirectoryDialog().getDirectory();
             if (sbSettings.songDir == null) {
@@ -94,7 +94,7 @@ public class USongApplication extends Application<Configuration> implements Serv
             }
         }
 
-        SongParser songParser = new SongParser(sbSettings.songDir, sbSettings.titleHasOwnPage);
+        SongParser songParser = new SongParser(sbSettings.songDir, sbSettings.titleHasOwnPage, sbSettings.maxLinesPerPage);
         SongResource songResource = new SongResource(songParser);
         SongbeamerActionListener songbeamerActionListener;
         try {
