@@ -102,7 +102,7 @@ public class UsongTray implements Managed {
         String title = USongApplication.APP_NAME;
         String url = "http://localhost/status";
         Preferences prefs = Preferences.userNodeForPackage(WebFrame.class).node("status");
-        WebFrame webFrame = new WebFrame(title, url, prefs, 800, 600, 0.6);
+        WebFrame webFrame = new WebFrame(title, url, prefs, 1000, 700, 0.6);
         webFrame.setVisible(true);
     }
 

@@ -71,6 +71,10 @@
 
     <table>
         <tr>
+            <th>${messages.getString("songbeamerVersion")}</th>
+            <td>${status.sbVersion}</td>
+        </tr>
+        <tr>
             <th>${messages.getString("songbeamerSender")}</th>
             <td>
                 <#if !status.connected>
@@ -81,16 +85,12 @@
             </td>
         </tr>
         <tr>
-            <th>${messages.getString("songbeamerVersion")}</th>
-            <td>${status.sbVersion}</td>
-        </tr>
-        <tr>
             <th>${messages.getString("songDir")}</th>
             <td>
                 <#if status.songCount == 0>
                     <span class="negative"> ${status.songDir} </span>
                 <#else>
-                    <span> ${status.songDir} </span>
+                    ${status.songDir}
                 </#if>
             </td>
         </tr>
@@ -100,12 +100,32 @@
                 <#if status.songCount == 0>
                     <span class="negative"> ${status.songCount} </span>
                 <#else>
-                    <span> ${status.songCount} </span>
+                    ${status.songCount}
                 </#if>
             </td>
         </tr>
+        <tr>
+            <th>${messages.getString("titleHasOwnPage")}</th>
+            <td>
+                <#if status.titelHasOwnPage>
+                    ${messages.getString("yes")}
+                <#else>
+                    ${messages.getString("no")}
+                </#if>
+            </td>
+        </tr>
+        <tr>
+            <th>${messages.getString("maxLinesPerPage")}</th>
+            <#if (status.maxLinesPerPage > 0) >
+                <td>${status.maxLinesPerPage}</td>
+            <#else>
+                ${messages.getString("unlimited")}
+            </#if>
+        </tr>
+        <tr>
+            <td colspan="2" class="warning">${messages.getString("restartSongbeamerWarning")}</td>
+        </tr>
     </table>
-
     <table>
         <tr>
             <th>${messages.getString("currentSong")}</th>
@@ -126,18 +146,6 @@
                 <th>${messages.getString("currentLang")}</th>
                 <td>${status.lang} / ${status.langCount}</td>
             </tr>
-        <#else>
-           <tr style="visibility: hidden">
-               <th></th>
-               <td></td>
-           </tr>
-        </#if>
-        <#if status.currentSection?? >
-        <#else>
-                   <tr style="visibility: hidden">
-                       <th></th>
-                       <td></td>
-                   </tr>
         </#if>
     </table>
 </main>

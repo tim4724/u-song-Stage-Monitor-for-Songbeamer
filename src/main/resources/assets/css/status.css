@@ -56,6 +56,10 @@ td {
     color: #00d800;
 }
 
+.warning {
+    color: #b98b00;
+}
+
 #errorBox {
     display: none;
     position: fixed;

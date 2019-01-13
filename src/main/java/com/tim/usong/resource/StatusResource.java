@@ -52,15 +52,14 @@ public class StatusResource {
 
     public class Status {
         private final String version, hostname, ipAddress, sbVersion, songDir, songTitle, currentSection;
-        private final boolean startWithWindows, connected, preview;
-        private final int clientCount, songCount, currentPage, lang, langCount;
+        private final boolean startWithWindows, connected, preview, titelHasOwnPage;
+        private final int clientCount, songCount, currentPage, lang, langCount, maxLinesPerPage;
 
         public Status(Locale locale) {
             ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle", locale);
             Song song = songResource.getSong();
             String hostname = NetworkHostUtils.getHostname();
             String ipAddress = NetworkHostUtils.getHostAddress();
-
             this.version = USongApplication.APP_VERSION;
             this.startWithWindows = AutoStartUtil.isAutostartEnabled();
             this.clientCount = songResource.getClientCount();
@@ -76,6 +75,8 @@ public class StatusResource {
             this.currentSection = getSectionName(song, currentPage);
             this.lang = song.getLang();
             this.langCount = song.getLangCount();
+            this.titelHasOwnPage = songParser.isTitleHasOwnPage();
+            this.maxLinesPerPage = songParser.getMaxLinesPerPage();
         }
 
         private long countSongs(String songPath) {
@@ -154,6 +155,14 @@ public class StatusResource {
 
         public boolean isPreview() {
             return preview;
+        }
+
+        public boolean isTitelHasOwnPage() {
+            return titelHasOwnPage;
+        }
+
+        public int getMaxLinesPerPage() {
+            return maxLinesPerPage;
         }
     }
 }

@@ -252,4 +252,12 @@ public class SongParser {
     public String getSongDirPath() {
         return songDirPath;
     }
+
+    public int getMaxLinesPerPage() {
+        return maxLinesPerPage;
+    }
+
+    public boolean isTitleHasOwnPage() {
+        return titleHasOwnPage;
+    }
 }
