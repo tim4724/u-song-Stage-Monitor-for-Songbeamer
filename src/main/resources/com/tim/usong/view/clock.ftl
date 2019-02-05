@@ -9,6 +9,8 @@
                                              style="font-size: 0.7em;
                                              margin-left: 0.1em;
                                              color: #C1C1C1;"></span>
+
+    <title>${messages.getString("clock")}</title>
 </section>
 
 <script>

@@ -6,35 +6,34 @@
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/settings.css">
     <title>${messages.getString("settings")}</title>
+    <script>
+        function simplePutRequest(path, forceReload = false) {
+            let xhr = new XMLHttpRequest();
+            xhr.open('PUT', path, true);
+            xhr.onloadend = function () {
+                if (xhr.status !== 200) {
+                    alert(xhr.statusText);
+                    location.reload(true);
+                } else if (forceReload) {
+                    location.reload(true);
+                }
+            };
+            xhr.send()
+        }
+
+        function onCheckedChanged(id) {
+            const cb = document.getElementById(id);
+            simplePutRequest("settings?" + id + "=" + cb.checked);
+        }
+
+        function onInputChanged(id, forceReload = false) {
+            const input = document.getElementById(id);
+            simplePutRequest("settings?" + id + "=" + input.value, forceReload);
+        }
+    </script>
 </head>
 
 <body>
-<script>
-    function simplePutRequest(path, forceReload = false) {
-        let xhr = new XMLHttpRequest();
-        xhr.open('PUT', path, true);
-        xhr.onloadend = function () {
-            if (xhr.status !== 200) {
-                alert(xhr.statusText);
-                location.reload(true);
-            } else if (forceReload) {
-                location.reload(true);
-            }
-        };
-        xhr.send()
-    }
-
-    function onCheckedChanged(id) {
-        const cb = document.getElementById(id);
-        simplePutRequest("settings?" + id + "=" + cb.checked);
-    }
-
-    function onInputChanged(id, forceReload = false) {
-        const input = document.getElementById(id);
-        simplePutRequest("settings?" + id + "=" + input.value, forceReload);
-    }
-</script>
-
 <main>
     <h1 id="title">${messages.getString("settings")}</h1>
 

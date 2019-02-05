@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=0.15"/>
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/status.css">
+    <title>${messages.getString("status")}</title>
     <script>
         const connectToWebSocket = function () {
             const errorElement = document.getElementById("errorBox");

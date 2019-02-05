@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=0.15, maximum-scale=0.15, user-scalable=0"/>
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/tutorial.css">
+    <title>${messages.getString("tutorial")}</title>
 </head>
 
 <body>

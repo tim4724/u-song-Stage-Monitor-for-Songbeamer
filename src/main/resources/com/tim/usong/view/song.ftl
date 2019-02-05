@@ -11,6 +11,7 @@
     </#if>
     <script src="/assets/js/zenscroll.js"></script>
     <script src="/assets/js/main.js"></script>
+    <title>${song.getTitle()}</title>
 </head>
 
 <body onload="backend = main(); backend.connectToWebSocket()" class="notranslate">
