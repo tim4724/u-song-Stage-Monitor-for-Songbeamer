@@ -1,7 +1,6 @@
 package com.tim.usong.ui;
 
 import com.tim.usong.USongApplication;
-import com.tim.usong.util.AutoStartUtil;
 import com.tim.usong.util.NetworkHostUtils;
 import io.dropwizard.lifecycle.Managed;
 import org.slf4j.Logger;
@@ -13,7 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.*;
+import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
@@ -34,35 +33,32 @@ public class UsongTray implements Managed {
         trayIcon.setImageAutoSize(true);
 
         String previewMsg = messages.getString("preview");
-        String autoStartMsg = messages.getString("autostart");
 
         MenuItem statusItem = new MenuItem(messages.getString("status"));
         CheckboxMenuItem previewCheckBox = new CheckboxMenuItem(previewMsg, previewFrame.isVisible());
-        CheckboxMenuItem autoStartCheckbox = new CheckboxMenuItem(autoStartMsg, AutoStartUtil.isAutostartEnabled());
         MenuItem hostItem = new MenuItem("http://" + getHostname());
         MenuItem ipAddressItem = new MenuItem("http://" + getIpAdress());
         MenuItem exitItem = new MenuItem(messages.getString("exit"));
         previewCheckBox.addItemListener(e -> previewFrame.setVisible(e.getStateChange() == ItemEvent.SELECTED));
-        autoStartCheckbox.addItemListener(event -> setAutoStartEnabled(event.getStateChange() == ItemEvent.SELECTED));
         MenuItem tutorialItem = new MenuItem(messages.getString("tutorial"));
+        MenuItem settingsItem = new MenuItem(messages.getString("settings"));
         MenuItem githubItem = new MenuItem(messages.getString("openGithub"));
 
         PopupMenu popupMenu = trayIcon.getPopupMenu();
-        popupMenu.add(statusItem).addActionListener(e -> openStatusWindow());
+        popupMenu.add(statusItem).addActionListener(e -> openWebView("status"));
         popupMenu.add(previewCheckBox);
-        popupMenu.add(autoStartCheckbox);
-        popupMenu.addSeparator();
         popupMenu.add(hostItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
         popupMenu.add(ipAddressItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
         popupMenu.addSeparator();
         popupMenu.add(tutorialItem).addActionListener(e -> new TutorialFrame().setVisible(true));
         popupMenu.add(githubItem).addActionListener(e -> openBrowser(GITHUB_LINK));
+        popupMenu.add(settingsItem).addActionListener(e -> openWebView("settings"));
         popupMenu.add(exitItem).addActionListener(e -> System.exit(0));
 
         trayIcon.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                openStatusWindow();
+                openWebView("settings");
             }
         });
         trayIcon.addMouseListener(new MouseAdapter() {
@@ -70,7 +66,6 @@ public class UsongTray implements Managed {
             public void mouseReleased(MouseEvent e) {
                 // update the checkbox states, which could have changed
                 previewCheckBox.setState(previewFrame.isVisible());
-                autoStartCheckbox.setState(AutoStartUtil.isAutostartEnabled());
                 ipAddressItem.setLabel("http://" + getIpAdress());
             }
         });
@@ -85,24 +80,11 @@ public class UsongTray implements Managed {
     public void stop() {
     }
 
-    private void setAutoStartEnabled(boolean enable) {
-        try {
-            if (enable) {
-                AutoStartUtil.enableAutoStart(USongApplication.getCurrentJarPath());
-            } else {
-                AutoStartUtil.disableAutoStart();
-            }
-        } catch (Exception e) {
-            logger.error("Failed to edit registry", e);
-            USongApplication.showErrorDialogAsync(messages.getString("autostartChangeFailed"), e);
-        }
-    }
-
-    private void openStatusWindow() {
+    private void openWebView(String path) {
         String title = USongApplication.APP_NAME;
-        String url = "http://localhost/status";
-        Preferences prefs = Preferences.userNodeForPackage(WebFrame.class).node("status");
-        WebFrame webFrame = new WebFrame(title, url, prefs, 1000, 700, 0.6);
+        String url = "http://localhost/" + path;
+        Preferences prefs = Preferences.userNodeForPackage(WebFrame.class).node(path + "2");
+        WebFrame webFrame = new WebFrame(title, url, prefs, 1000, 700, 0.8);
         webFrame.setVisible(true);
     }
 

@@ -4,6 +4,7 @@ import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerActionListener;
 import com.tim.usong.core.SongbeamerSettings;
 import com.tim.usong.resource.RootResource;
+import com.tim.usong.resource.SettingsResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
 import com.tim.usong.ui.*;
@@ -15,7 +16,9 @@ import io.dropwizard.Configuration;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.lifecycle.ServerLifecycleListener;
+import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
@@ -25,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.BindException;
 import java.net.URLDecoder;
@@ -40,7 +44,9 @@ public class USongApplication extends Application<Configuration> implements Serv
 
     public static void main(String[] args) throws Exception {
         SetupUtil.setUpUI();
-        SplashWindow.showSplash();
+        if (GlobalPreferences.isShowSplashScreen()) {
+            SplashWindow.showSplash();
+        }
         SetupUtil.setUpRequiredExternalFiles();
         if (args.length == 0) {
             args = new String[]{"server", LOCAL_DIR + "usong.yml"};
@@ -73,6 +79,9 @@ public class USongApplication extends Application<Configuration> implements Serv
 
     @Override
     public void run(Configuration config, Environment environment) throws Exception {
+        JerseyEnvironment jersey = environment.jersey();
+        LifecycleEnvironment lifecycle = environment.lifecycle();
+
         // Assume that the current executed application is the latest version
         // Update Autostart registry entry
         try {
@@ -84,17 +93,35 @@ public class USongApplication extends Application<Configuration> implements Serv
         }
 
         SongbeamerSettings sbSettings = SongbeamerSettings.readSongbeamerSettings();
-        if (sbSettings.songDir == null) {
-            sbSettings.songDir = new SelectSongDirectoryDialog().getDirectory();
-            if (sbSettings.songDir == null) {
+        File songDir = sbSettings.songDir;
+        Boolean titleHasOwnPage = sbSettings.titleHasOwnPage;
+        Integer maxLinesPerPage = sbSettings.maxLinesPerPage;
+
+        if (songDir == null) {
+            String songDirString = GlobalPreferences.getSongDir();
+            if (songDirString == null || !(songDir = new File(songDirString)).exists()) {
+                songDir = new SelectSongDirectoryDialog().getDirectory();
+            }
+            if (songDir == null) {
                 logger.error("Could not find Songs directory");
                 showErrorDialog(messages.getString("songsDirNotFoundError"));
                 System.exit(-1);
                 return;
             }
         }
+        GlobalPreferences.setSongDir(songDir.getAbsolutePath());
+        if (titleHasOwnPage == null) {
+            titleHasOwnPage = GlobalPreferences.hasTitlePage();
+        } else {
+            GlobalPreferences.setTitleHasPage(titleHasOwnPage);
+        }
+        if (maxLinesPerPage == null) {
+            maxLinesPerPage = GlobalPreferences.getMaxLinesPage();
+        } else {
+            GlobalPreferences.setMaxLinesPage(maxLinesPerPage);
+        }
 
-        SongParser songParser = new SongParser(sbSettings.songDir, sbSettings.titleHasOwnPage, sbSettings.maxLinesPerPage);
+        SongParser songParser = new SongParser(songDir, titleHasOwnPage, maxLinesPerPage);
         SongResource songResource = new SongResource(songParser);
         SongbeamerActionListener songbeamerActionListener;
         try {
@@ -107,14 +134,15 @@ public class USongApplication extends Application<Configuration> implements Serv
         }
         PreviewFrame previewFrame = new PreviewFrame();
 
-        environment.jersey().register(new RootResource());
-        environment.jersey().register(songResource);
-        environment.jersey().register(new StatusResource(songbeamerActionListener, songResource, songParser,
-                previewFrame, sbSettings.version));
-        environment.lifecycle().manage(songbeamerActionListener);
-        environment.lifecycle().manage(previewFrame);
-        environment.lifecycle().manage(new UsongTray(previewFrame));
-        environment.lifecycle().addServerLifecycleListener(this);
+        jersey.register(new RootResource());
+        jersey.register(songResource);
+        jersey.register(new SettingsResource(sbSettings, songParser, songResource));
+        jersey.register(new StatusResource(songbeamerActionListener, songResource, songParser, previewFrame,
+                sbSettings.version));
+        lifecycle.manage(songbeamerActionListener);
+        lifecycle.manage(previewFrame);
+        lifecycle.manage(new UsongTray(previewFrame));
+        lifecycle.addServerLifecycleListener(this);
     }
 
     @Override
@@ -129,7 +157,9 @@ public class USongApplication extends Application<Configuration> implements Serv
             tutorialFrame.setAlwaysOnTop(false);
             prefs.putBoolean("first_run", false);
         }
-        UpdateApplicationUtil.checkForUpdateAsync();
+        if (GlobalPreferences.isNotifyUpdates()) {
+            UpdateApplicationUtil.checkForUpdateAsync();
+        }
     }
 
     @Override

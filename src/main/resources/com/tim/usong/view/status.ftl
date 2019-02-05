@@ -119,13 +119,11 @@
             <#if (status.maxLinesPerPage > 0) >
                 <td>${status.maxLinesPerPage}</td>
             <#else>
-                ${messages.getString("unlimited")}
+                <td>${messages.getString("unlimited")}</td>
             </#if>
         </tr>
-        <tr>
-            <td colspan="2" class="warning">${messages.getString("restartSongbeamerWarning")}</td>
-        </tr>
     </table>
+
     <table>
         <tr>
             <th>${messages.getString("currentSong")}</th>

@@ -27,10 +27,14 @@ public class Song {
         this.type = type;
     }
 
-    public Song(String title, Exception e) {
-        this(null, title, new ArrayList<>(), 1, 1, Type.ERROR);
+    public Song(String fileName, String title, Exception e) {
+        this(fileName, title, new ArrayList<>(), 1, 1, Type.ERROR);
         String errString = e.toString().replace("\n", "\n<br />");
         sections.add(new Section(e.getClass().getName(), new Page(errString)));
+    }
+
+    public Song(String title, Exception e) {
+        this(null, title, e);
     }
 
     public String getTitle() {

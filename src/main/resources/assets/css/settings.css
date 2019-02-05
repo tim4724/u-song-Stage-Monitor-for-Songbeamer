@@ -1,0 +1,126 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
+    background: #000;
+    font-size: 20px;
+    color: white;
+}
+
+#title {
+    color: #ff7c00;
+    font-weight: normal;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.settingGroupTitle{
+    margin-bottom: 16px;
+    font-size: 0.7em;
+}
+
+main {
+    margin: 16px;
+    width: 100%;
+    max-width: 1024px;
+    display: inline-block;
+    padding: 0 24px 24px 24px;
+    background: #181818;
+    border-radius: 4px;
+    text-align: left;
+    border: 6px solid #181818;
+}
+
+.settingGroup {
+    margin-top: 32px;
+    margin-bottom: 32px;
+    background: #111111;
+    padding: 12px 24px;
+}
+
+.setting {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    min-height: 34px;
+}
+
+.settingText {
+    min-width: 300px;
+    display: inline-block;
+}
+
+#maxLinesPage {
+    width: 40px;
+    border-width: 0;
+    border-radius: 4px;
+}
+
+#saveSongDir {
+    font-size: 1.0em;
+}
+
+.right {
+    float: right;
+}
+
+.warning {
+    color: #b98b00;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    zoom: 0.7;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.disabled {
+    opacity: 0.5;
+}
+
+.disabled .slider{
+    cursor: default;
+}
+
+input:checked + .slider {
+    background-color: #008cff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+input[type="text"], input[type="number"] {
+    padding: 6px 12px;
+}

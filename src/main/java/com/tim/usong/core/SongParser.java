@@ -20,35 +20,19 @@ public class SongParser {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Map<String, Integer> langMap = new HashMap<>();
-    private final String songDirPath;
-
-    // TODO: Allow user to select the value, or extract it from songbeamer settings
+    private File songDir;
 
     // Text will be on a new page, if it has more than "n" lines
     // This can be selected in songbeamer: "Extras" -> "Options" -> "Song" -> "Maximum text lines"
-    private final int maxLinesPerPage;
+    private int maxLinesPerPage;
     // The title can be on the first page
     // This can be selected in songbeamer: "Extras" -> "Options" -> "Song" -> "Title: " -> "on the first page"
-    private final boolean titleHasOwnPage;
+    private boolean titleHasOwnPage;
 
-    public SongParser(File songDir, Boolean titleHasOwnPage, Integer maxLinesPerPage) {
-        String songDirPath = songDir.getAbsolutePath();
-        if (!songDirPath.endsWith("\\")) {
-            songDirPath += "\\";
-        }
-        this.songDirPath = songDirPath;
-        Preferences preferences = Preferences.userNodeForPackage(SongParser.class).node("songparser");
-
-        if (titleHasOwnPage != null) {
-            this.titleHasOwnPage = titleHasOwnPage;
-        } else {
-            this.titleHasOwnPage = preferences.getBoolean("title_has_own_page", false);
-        }
-        if (maxLinesPerPage != null) {
-            this.maxLinesPerPage = maxLinesPerPage;
-        } else {
-            this.maxLinesPerPage = preferences.getInt("max_lines_per_page", 0);
-        }
+    public SongParser(File songDir, boolean titleHasOwnPage, int maxLinesPerPage) {
+        this.songDir = songDir;
+        this.titleHasOwnPage = titleHasOwnPage;
+        this.maxLinesPerPage = maxLinesPerPage;
     }
 
     public void setLangForSong(String fileName, int lang) {
@@ -56,26 +40,30 @@ public class SongParser {
     }
 
     public Song parse(String fileName) {
+        File songFile;
         if (!fileName.contains(":")) {
-            fileName = songDirPath + fileName;
+            songFile = new File(songDir, fileName);
+        } else {
+            songFile = new File(fileName);
         }
         try {
-            return parseSong(fileName);
+            return parseSong(songFile);
         } catch (Exception e) {
             logger.error("Failed to parse song", e);
             String msgKey = e instanceof NoSuchFileException ? "fileNotFoundError" : "fileParseError";
             String errorMessage = messages.getString(msgKey);
             USongApplication.showErrorDialogAsync(errorMessage, fileName + "\n" + e);
-            return new Song(errorMessage + fileName, e);
+            return new Song(fileName, errorMessage + fileName, e);
         }
     }
 
-    private Song parseSong(String songFile) throws IOException {
+    private Song parseSong(File songFile) throws IOException {
         long startTime = System.currentTimeMillis();
 
         List<String> pages = new ArrayList<>();
         // Read from file and seperate into pages
-        try (Scanner scanner = new Scanner(Paths.get(songFile), StandardCharsets.ISO_8859_1.name())) {
+        try (Scanner scanner = new Scanner(Paths.get(songFile.getAbsolutePath()),
+                StandardCharsets.ISO_8859_1.name())) {
             scanner.useDelimiter("-(-)+\\r?\\n");
             while (scanner.hasNext()) {
                 pages.add(scanner.next());
@@ -84,9 +72,9 @@ public class SongParser {
 
         Header header = new Header(pages.remove(0));
         String title = Strings.isNullOrEmpty(header.title)
-                ? songFile.replaceAll("songDirPath|.sng$", "")
+                ? songFile.getName().replaceAll(".sng$", "")
                 : header.title;
-        int desiredLang = langMap.getOrDefault(songFile, 1);
+        int desiredLang = langMap.getOrDefault(songFile.getName(), 1);
 
         List<Section> sections = parseSongText(pages, header.langCount, desiredLang);
 
@@ -119,7 +107,7 @@ public class SongParser {
 
         long duration = System.currentTimeMillis() - startTime;
         logger.info(String.format("Parsed song \"%s (Language %d)\" in %dms", title, desiredLang, duration));
-        return new Song(songFile, title, finalSectionList, desiredLang, header.langCount, Song.Type.SNG);
+        return new Song(songFile.getName(), title, finalSectionList, desiredLang, header.langCount, Song.Type.SNG);
     }
 
     /**
@@ -249,8 +237,20 @@ public class SongParser {
         return !list.isEmpty() ? list.get(list.size() - 1) : null;
     }
 
+    public void setSongDir(File songDir) {
+        this.songDir = songDir;
+    }
+
+    public void setMaxLinesPerPage(int maxLinesPerPage) {
+        this.maxLinesPerPage = maxLinesPerPage;
+    }
+
+    public void setTitleHasOwnPage(boolean titleHasOwnPage) {
+        this.titleHasOwnPage = titleHasOwnPage;
+    }
+
     public String getSongDirPath() {
-        return songDirPath;
+        return songDir.getAbsolutePath();
     }
 
     public int getMaxLinesPerPage() {

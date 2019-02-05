@@ -1,5 +1,7 @@
 package com.tim.usong.ui;
 
+import com.tim.usong.GlobalPreferences;
+
 import javax.swing.*;
 import java.io.File;
 import java.util.ResourceBundle;
@@ -7,12 +9,14 @@ import java.util.prefs.Preferences;
 
 public class SelectSongDirectoryDialog extends JFileChooser {
     private static final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-    private final Preferences prefs = Preferences.userNodeForPackage(SelectSongDirectoryDialog.class).node("songdir");
 
     public SelectSongDirectoryDialog() {
         setDialogTitle(messages.getString("songDirSelect"));
         setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        String path = prefs.get("manual_song_dir_select", null);
+        String path = GlobalPreferences.getSongDir();
+        if(path == null) {
+            path = System.getProperty("user.home");
+        }
         File defaultFile;
         if (path != null && (defaultFile = new File(path)).exists()) {
             setSelectedFile(defaultFile);
@@ -22,11 +26,7 @@ public class SelectSongDirectoryDialog extends JFileChooser {
     public File getDirectory() {
         int returnVal = showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File f = getSelectedFile();
-            if (f != null) {
-                prefs.put("manualSongDirSelect", f.getAbsolutePath());
-            }
-            return f;
+            return getSelectedFile();
         }
         return null;
     }

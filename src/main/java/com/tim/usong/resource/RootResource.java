@@ -1,6 +1,7 @@
 package com.tim.usong.resource;
 
 import com.tim.usong.view.TutorialView;
+import io.dropwizard.views.View;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -12,7 +13,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.net.URI;
-import java.util.Locale;
 
 @Path("")
 public class RootResource {
@@ -36,8 +36,7 @@ public class RootResource {
     @GET
     @Path("tutorial")
     @Produces(MediaType.TEXT_HTML)
-    public TutorialView getTutorial(@Context HttpServletRequest request) {
-        Locale locale = request.getLocale();
-        return new TutorialView(locale);
+    public View getTutorial(@Context HttpServletRequest request) {
+        return new TutorialView(request.getLocale());
     }
 }

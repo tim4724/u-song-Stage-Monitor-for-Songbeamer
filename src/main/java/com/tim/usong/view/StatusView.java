@@ -22,5 +22,4 @@ public class StatusView extends View {
     public ResourceBundle getMessages() {
         return messages;
     }
-
 }
