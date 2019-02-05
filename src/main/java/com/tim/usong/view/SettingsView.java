@@ -50,7 +50,7 @@ public class SettingsView extends View {
     }
 
     public boolean isAllowSetSongDir() {
-        return sbSettings.songDir == null || true;
+        return sbSettings.songDir == null;
     }
 
     public boolean isAllowSetTitleHasOwnPage() {
