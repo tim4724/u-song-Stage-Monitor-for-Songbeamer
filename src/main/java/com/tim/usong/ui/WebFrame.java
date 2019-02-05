@@ -17,10 +17,13 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class WebFrame extends JFrame {
+    private static final Map<String, WebFrame> activeFrames = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(WebFrame.class);
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final KeyCombination increaseZoom = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.CONTROL_DOWN);
@@ -113,6 +116,11 @@ public class WebFrame extends JFrame {
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {
+            WebFrame oldWebFrame = activeFrames.get(url);
+            if (oldWebFrame != null && oldWebFrame.isVisible()) {
+                oldWebFrame.dispose();
+            }
+            activeFrames.put(url, this);
             Platform.runLater(() -> webView.getEngine().load(url));
         }
     }
