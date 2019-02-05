@@ -13,7 +13,7 @@ body {
 }
 
 main {
-    margin: 16px;
+    margin: 16px 16px 0;
     display: inline-block;
     padding: 0 24px 24px 24px;
     background: #181818;
