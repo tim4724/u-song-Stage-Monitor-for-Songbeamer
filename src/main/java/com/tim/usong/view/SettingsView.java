@@ -3,7 +3,7 @@ package com.tim.usong.view;
 import com.tim.usong.GlobalPreferences;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerSettings;
-import com.tim.usong.util.AutoStartUtil;
+import com.tim.usong.util.AutoStart;
 import io.dropwizard.views.View;
 
 import java.util.Locale;
@@ -22,7 +22,7 @@ public class SettingsView extends View {
     }
 
     public boolean isAutostartEnabled() {
-        return AutoStartUtil.isAutostartEnabled();
+        return AutoStart.isAutostartEnabled();
     }
 
     public boolean isShowSplash() {
@@ -31,6 +31,10 @@ public class SettingsView extends View {
 
     public boolean isNotifyUpdates() {
         return GlobalPreferences.isNotifyUpdates();
+    }
+
+    public boolean isNotifySongbeamerUpdates() {
+        return GlobalPreferences.isNotifySongbeamerUpdates();
     }
 
     public String getSongDir() {
@@ -47,6 +51,10 @@ public class SettingsView extends View {
 
     public ResourceBundle getMessages() {
         return messages;
+    }
+
+    public boolean showNotifyUpdatesSongbeamer() {
+        return sbSettings.version != null;
     }
 
     public boolean isAllowSetSongDir() {

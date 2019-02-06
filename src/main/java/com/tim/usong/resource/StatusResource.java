@@ -7,8 +7,8 @@ import com.tim.usong.core.SongbeamerActionListener;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
 import com.tim.usong.ui.PreviewFrame;
-import com.tim.usong.util.AutoStartUtil;
-import com.tim.usong.util.NetworkHostUtils;
+import com.tim.usong.util.AutoStart;
+import com.tim.usong.util.NetworkHost;
 import com.tim.usong.view.StatusView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,10 +58,10 @@ public class StatusResource {
         public Status(Locale locale) {
             ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle", locale);
             Song song = songResource.getSong();
-            String hostname = NetworkHostUtils.getHostname();
-            String ipAddress = NetworkHostUtils.getHostAddress();
+            String hostname = NetworkHost.getHostname();
+            String ipAddress = NetworkHost.getHostAddress();
             this.version = USongApplication.APP_VERSION;
-            this.startWithWindows = AutoStartUtil.isAutostartEnabled();
+            this.startWithWindows = AutoStart.isAutostartEnabled();
             this.clientCount = songResource.getClientCount();
             this.preview = previewFrame.isVisible();
             this.hostname = hostname != null ? hostname : messages.getString("unknown");

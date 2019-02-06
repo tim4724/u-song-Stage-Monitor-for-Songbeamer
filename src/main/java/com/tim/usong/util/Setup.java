@@ -1,7 +1,6 @@
 package com.tim.usong.util;
 
 import com.tim.usong.USongApplication;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
@@ -11,9 +10,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
-public class SetupUtil {
+public class Setup {
 
-    private SetupUtil() {
+    private Setup() {
     }
 
     /**
@@ -35,7 +34,7 @@ public class SetupUtil {
             }
         } catch (Exception e) {
             // application may still work if SBRemoteSender is started manually or if yml is provided via parameter
-            LoggerFactory.getLogger(SetupUtil.class).error("SetupUtil failed", e);
+            LoggerFactory.getLogger(Setup.class).error("Setup failed", e);
             ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
             USongApplication.showErrorDialogAsync(messages.getString("createFilesError"), e);
         }

@@ -8,22 +8,21 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
-public class UpdateApplicationUtil {
+public class UpdateChecker {
     private static final String releasesUrl =
             "https://api.github.com/repos/tim4724/u-song-Stage-Monitor-for-Songbeamer/releases";
 
-    private UpdateApplicationUtil() {
+    private UpdateChecker() {
     }
 
     public static void checkForUpdateAsync() {
-        new Thread(UpdateApplicationUtil::checkForUpdate).start();
+        new Thread(UpdateChecker::checkForUpdate).start();
     }
 
     private static void checkForUpdate() {
@@ -40,7 +39,7 @@ public class UpdateApplicationUtil {
                 handleGithubResponse(json);
             }
         } catch (Exception e) {
-            Logger logger = LoggerFactory.getLogger(UpdateApplicationUtil.class);
+            Logger logger = LoggerFactory.getLogger(UpdateChecker.class);
             logger.error("Failed to check on github for updates", e);
         }
     }
@@ -89,13 +88,7 @@ public class UpdateApplicationUtil {
                     JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
             if (result == 0) {
-                try {
-                    Desktop.getDesktop().browse(new URL(downloadUrl).toURI());
-                } catch (Exception e) {
-                    Logger logger = LoggerFactory.getLogger(UpdateApplicationUtil.class);
-                    logger.error("Failed to open browser", e);
-                    USongApplication.showErrorDialogAsync(messages.getString("browserOpenError"), e);
-                }
+                Browser.open(downloadUrl);
             } else if (result == 2) {
                 prefs.put("do_not_ask_update", tagName);
             }

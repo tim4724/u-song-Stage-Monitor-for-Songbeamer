@@ -12,7 +12,7 @@
             xhr.open('PUT', path, true);
             xhr.onloadend = function () {
                 if (xhr.status !== 200) {
-                    alert(xhr.statusText);
+                    alert(xhr.responseText);
                     location.reload(true);
                 } else if (forceReload) {
                     location.reload(true);
@@ -38,7 +38,7 @@
     <h1 id="title">${messages.getString("settings")}</h1>
 
     <section class="settingGroup">
-        <div class="settingGroupTitle">${messages.getString("settings")}</div>
+        <div class="settingGroupTitle">${messages.getString("general")}</div>
         <div class="setting">
             <span class="settingText">${messages.getString("autostart")}</span>
             <label class="switch right">
@@ -65,6 +65,18 @@
                 <span class="slider"></span>
             </label>
         </div>
+
+        <#if showNotifyUpdatesSongbeamer()>
+            <div class="setting">
+                <span class="settingText">${messages.getString("checkUpdatesSongbeamer")}</span>
+                <label class="switch right">
+                    <input id="checkSongbeamerUpdates"
+                           type="checkbox"  ${isNotifySongbeamerUpdates()?then("checked", "")}
+                           onchange="new function() {onCheckedChanged('checkSongbeamerUpdates')};">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </#if>
     </section>
 
     <section class="settingGroup">

@@ -1,6 +1,6 @@
 package com.tim.usong.view;
 
-import com.tim.usong.util.NetworkHostUtils;
+import com.tim.usong.util.NetworkHost;
 import io.dropwizard.views.View;
 
 import java.util.Locale;
@@ -15,8 +15,8 @@ public class TutorialView extends View {
         super("tutorial.ftl");
         this.messages = ResourceBundle.getBundle("MessagesBundle", locale);
 
-        hostname = NetworkHostUtils.getHostname();
-        ipAddress = NetworkHostUtils.getHostAddress();
+        hostname = NetworkHost.getHostname();
+        ipAddress = NetworkHost.getHostAddress();
     }
 
     public ResourceBundle getMessages() {

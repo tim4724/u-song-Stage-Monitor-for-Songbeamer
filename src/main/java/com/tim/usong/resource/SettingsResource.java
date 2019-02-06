@@ -6,7 +6,9 @@ import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerSettings;
 import com.tim.usong.core.entity.Song;
 import com.tim.usong.ui.SelectSongDirectoryDialog;
-import com.tim.usong.util.AutoStartUtil;
+import com.tim.usong.util.AutoStart;
+import com.tim.usong.util.SongbeamerUpdateChecker;
+import com.tim.usong.util.UpdateChecker;
 import com.tim.usong.view.SettingsView;
 import io.dropwizard.views.View;
 
@@ -18,6 +20,7 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 @Path("settings")
 public class SettingsResource {
@@ -42,19 +45,25 @@ public class SettingsResource {
     public Response editSettings(@QueryParam("autoStart") Boolean autoStart,
                                  @QueryParam("splashScreen") Boolean showSplashScreen,
                                  @QueryParam("checkUpdates") Boolean notifyUpdates,
+                                 @QueryParam("checkSongbeamerUpdates") Boolean notifySongbeamerUpdates,
                                  @QueryParam("songDir") Boolean songDir,
                                  @QueryParam("titleHasPage") Boolean titleHasPage,
                                  @QueryParam("maxLinesPage") Integer maxLinesPage) throws IOException {
         if (autoStart == null && showSplashScreen == null && notifyUpdates == null && songDir == null
-                && titleHasPage == null && maxLinesPage == null) {
+                && titleHasPage == null && maxLinesPage == null && notifySongbeamerUpdates == null) {
             return Response.status(400).build();
         }
 
         if (autoStart != null) {
-            if (autoStart) {
-                AutoStartUtil.enableAutoStart(USongApplication.getCurrentJarPath());
-            } else {
-                AutoStartUtil.disableAutoStart();
+            try {
+                if (autoStart) {
+                    AutoStart.enableAutoStart(USongApplication.getCurrentJarPath());
+                } else {
+                    AutoStart.disableAutoStart();
+                }
+            } catch (Exception e) {
+                ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+                return Response.status(500).entity(messages.getString("autostartChangeFailed")).build();
             }
         }
         if (showSplashScreen != null) {
@@ -62,8 +71,16 @@ public class SettingsResource {
         }
         if (notifyUpdates != null) {
             GlobalPreferences.setNotifyUpdates(notifyUpdates);
+            if (notifyUpdates) {
+                UpdateChecker.checkForUpdateAsync();
+            }
         }
-
+        if (notifySongbeamerUpdates != null) {
+            GlobalPreferences.setNotifySongbamerUpdates(notifySongbeamerUpdates);
+            if (notifySongbeamerUpdates && sbSettings.version != null) {
+                SongbeamerUpdateChecker.checkForUpdateAsync(sbSettings.version);
+            }
+        }
         if (songDir != null) {
             File newSongDir = new SelectSongDirectoryDialog().getDirectory();
             if (newSongDir != null) {

@@ -1,7 +1,8 @@
 package com.tim.usong.ui;
 
 import com.tim.usong.USongApplication;
-import com.tim.usong.util.NetworkHostUtils;
+import com.tim.usong.util.NetworkHost;
+import com.tim.usong.util.Browser;
 import io.dropwizard.lifecycle.Managed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
@@ -47,11 +47,11 @@ public class UsongTray implements Managed {
         PopupMenu popupMenu = trayIcon.getPopupMenu();
         popupMenu.add(statusItem).addActionListener(e -> openWebView("status"));
         popupMenu.add(previewCheckBox);
-        popupMenu.add(hostItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
-        popupMenu.add(ipAddressItem).addActionListener(e -> openBrowser(e.getActionCommand() + "/song?admin=true"));
+        popupMenu.add(hostItem).addActionListener(e -> Browser.open(e.getActionCommand() + "/song?admin=true"));
+        popupMenu.add(ipAddressItem).addActionListener(e -> Browser.open(e.getActionCommand() + "/song?admin=true"));
         popupMenu.addSeparator();
         popupMenu.add(tutorialItem).addActionListener(e -> new TutorialFrame().setVisible(true));
-        popupMenu.add(githubItem).addActionListener(e -> openBrowser(GITHUB_LINK));
+        popupMenu.add(githubItem).addActionListener(e -> Browser.open(GITHUB_LINK));
         popupMenu.add(settingsItem).addActionListener(e -> openWebView("settings"));
         popupMenu.add(exitItem).addActionListener(e -> System.exit(0));
 
@@ -88,22 +88,13 @@ public class UsongTray implements Managed {
         webFrame.setVisible(true);
     }
 
-    private void openBrowser(String url) {
-        try {
-            Desktop.getDesktop().browse(new URL(url).toURI());
-        } catch (Exception e) {
-            logger.error("Failed to open browser", e);
-            USongApplication.showErrorDialogAsync(messages.getString("browserOpenError"), e);
-        }
-    }
-
     private String getHostname() {
-        String hostname = NetworkHostUtils.getHostname();
+        String hostname = NetworkHost.getHostname();
         return hostname != null ? hostname : "localhost";
     }
 
     private String getIpAdress() {
-        String ip = NetworkHostUtils.getHostAddress();
+        String ip = NetworkHost.getHostAddress();
         return ip != null ? ip : "127.0.0.1";
     }
 }

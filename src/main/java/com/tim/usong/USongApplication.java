@@ -8,9 +8,10 @@ import com.tim.usong.resource.SettingsResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
 import com.tim.usong.ui.*;
-import com.tim.usong.util.AutoStartUtil;
-import com.tim.usong.util.SetupUtil;
-import com.tim.usong.util.UpdateApplicationUtil;
+import com.tim.usong.util.AutoStart;
+import com.tim.usong.util.Setup;
+import com.tim.usong.util.UpdateChecker;
+import com.tim.usong.util.SongbeamerUpdateChecker;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.assets.AssetsBundle;
@@ -41,13 +42,14 @@ public class USongApplication extends Application<Configuration> implements Serv
     public static final String LOCAL_DIR = System.getenv("APPDATA") + "\\uSongServer\\";
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private String songbeamerVersion = null;
 
     public static void main(String[] args) throws Exception {
-        SetupUtil.setUpUI();
+        Setup.setUpUI();
         if (GlobalPreferences.isShowSplashScreen()) {
             SplashWindow.showSplash();
         }
-        SetupUtil.setUpRequiredExternalFiles();
+        Setup.setUpRequiredExternalFiles();
         if (args.length == 0) {
             args = new String[]{"server", LOCAL_DIR + "usong.yml"};
         }
@@ -85,8 +87,8 @@ public class USongApplication extends Application<Configuration> implements Serv
         // Assume that the current executed application is the latest version
         // Update Autostart registry entry
         try {
-            if (AutoStartUtil.isAutostartEnabled()) {
-                AutoStartUtil.enableAutoStart(getCurrentJarPath());
+            if (AutoStart.isAutostartEnabled()) {
+                AutoStart.enableAutoStart(getCurrentJarPath());
             }
         } catch (Exception e) {
             logger.error("Failed to ensure autostart jar path is correct", e);
@@ -97,6 +99,7 @@ public class USongApplication extends Application<Configuration> implements Serv
         Boolean titleHasOwnPage = sbSettings.titleHasOwnPage;
         Integer maxLinesPerPage = sbSettings.maxLinesPerPage;
 
+        songbeamerVersion = sbSettings.version;
         if (songDir == null) {
             String songDirString = GlobalPreferences.getSongDir();
             if (songDirString == null || !(songDir = new File(songDirString)).exists()) {
@@ -158,7 +161,10 @@ public class USongApplication extends Application<Configuration> implements Serv
             prefs.putBoolean("first_run", false);
         }
         if (GlobalPreferences.isNotifyUpdates()) {
-            UpdateApplicationUtil.checkForUpdateAsync();
+            UpdateChecker.checkForUpdateAsync();
+        }
+        if (GlobalPreferences.isNotifySongbeamerUpdates() && songbeamerVersion != null) {
+            SongbeamerUpdateChecker.checkForUpdateAsync(songbeamerVersion);
         }
     }
 

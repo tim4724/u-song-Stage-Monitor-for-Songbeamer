@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public class NetworkHostUtils {
+public class NetworkHost {
     public static String getHostname() {
         try {
             return InetAddress.getLocalHost().getHostName();

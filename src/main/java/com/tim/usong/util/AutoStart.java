@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.stream.Collectors;
 
-public class AutoStartUtil {
-    private static final Logger logger = LoggerFactory.getLogger(AutoStartUtil.class);
+public class AutoStart {
+    private static final Logger logger = LoggerFactory.getLogger(AutoStart.class);
     private static final String REG_RUN_KEY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
     private static final String VALUE = "uSongStageMonitor";
 

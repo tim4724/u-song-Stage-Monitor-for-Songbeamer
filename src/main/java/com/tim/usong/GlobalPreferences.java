@@ -25,6 +25,14 @@ public class GlobalPreferences {
         return preferences.getBoolean("notifyUpdates", true);
     }
 
+    public static void setNotifySongbamerUpdates(boolean notify) {
+        preferences.putBoolean("notifyUpdatesSongbeamer", notify);
+    }
+
+    public static boolean isNotifySongbeamerUpdates() {
+        return preferences.getBoolean("notifyUpdatesSongbeamer", false);
+    }
+
     public static void setSongDir(String songDir) {
         preferences.put("songDir", songDir);
     }

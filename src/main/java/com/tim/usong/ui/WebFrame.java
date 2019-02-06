@@ -1,6 +1,6 @@
 package com.tim.usong.ui;
 
-import com.tim.usong.USongApplication;
+import com.tim.usong.util.Browser;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -76,7 +75,7 @@ public class WebFrame extends JFrame {
                         + "{ if ( list.item(i).getAttribute('href') ) "
                         + "{ list.item(i).getAttribute('href'); break; } }");
                 if (o != null) {
-                    openBrowser(o.toString());
+                    Browser.open(o.toString());
                 }
                 return null; // prevent from opening in webView
             });
@@ -89,7 +88,7 @@ public class WebFrame extends JFrame {
             plus.setOnAction(e -> webView.setZoom(zoom += 0.02));
             minus.setOnAction(e -> webView.setZoom(zoom -= 0.02));
             reload.setOnAction(e -> webEngine.reload());
-            openInBrowser.setOnAction(e -> openBrowser());
+            openInBrowser.setOnAction(e -> Browser.open(url));
 
             ContextMenu contextMenu = new ContextMenu();
             contextMenu.getItems().addAll(plus, minus, reload, openInBrowser);
@@ -139,18 +138,5 @@ public class WebFrame extends JFrame {
         prefs.putInt("width", getWidth());
         prefs.putInt("x", getX());
         prefs.putInt("y", getY());
-    }
-
-    private void openBrowser() {
-        openBrowser(this.url);
-    }
-
-    private void openBrowser(String url) {
-        try {
-            Desktop.getDesktop().browse(new URL(url).toURI());
-        } catch (Exception e) {
-            logger.error("Failed to open browser", e);
-            USongApplication.showErrorDialogAsync(messages.getString("browserOpenError"), e);
-        }
     }
 }
