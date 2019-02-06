@@ -4,6 +4,7 @@ function main() {
     const errorElement = document.getElementById('errorBox');
     const clientsCountElement = document.getElementById('activeClients');
     const clockButton = document.getElementById('clock');
+    const clockInSong = document.getElementById('clockInSong');
 
     let currentPage = undefined; // element
     let lastPageNumber = -2; // number
@@ -81,14 +82,23 @@ function main() {
 
             let offset = 10;
             let scrollTarget;
-            if (newPageNumber === 0 || (newPageNumber === 1 && pages[0].children.length === 0)) {
+            if ((newPageNumber === 0 || (newPageNumber === 1 && pages[0].children.length === 0))
+                && currentPage.parentElement.scrollHeight < innerHeight * 0.6) {
                 scrollTarget = titleElement;
-            } else if (currentPage.parentElement.scrollHeight < (innerHeight * 0.8)) {
+            } else if (currentPage.parentElement.scrollHeight < (innerHeight * 0.9)) {
                 scrollTarget = currentPage.parentNode;
             } else {
                 scrollTarget = currentPage;
                 if (currentPage.parentElement.getElementsByClassName('page')[0] !== currentPage) {
                     offset = innerHeight * 0.2;
+                }
+            }
+
+            if (clockInSong) {
+                if (currentPage.parentElement.scrollHeight > (innerHeight - clockInSong.scrollHeight)) {
+                    clockInSong.classList.add('hideClock')
+                } else {
+                    clockInSong.classList.remove('hideClock')
                 }
             }
 

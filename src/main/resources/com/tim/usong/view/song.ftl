@@ -42,6 +42,12 @@
 
 <#if (song.sections?size == 0) >
     <#include "clock.ftl" >
+<#else>
+    <#if !admin && isShowClockInSong()>
+        <div id="clockInSong">
+            <#include "clock.ftl">
+        </div>
+    </#if>
 </#if>
 
 <div id="bottomSpacer"></div>

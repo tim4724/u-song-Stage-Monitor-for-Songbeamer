@@ -2,7 +2,6 @@
          class='currentSection currentPage'
          style='font-size: 4em;
                 border-color: #00a39d;
-                margin-top: 64px;
                 opacity: 0;
                 transition: opacity 2s linear'>
     <span id="timeHoursMinutes"></span><span id='timeSeconds'
@@ -10,7 +9,6 @@
                                              margin-left: 0.1em;
                                              color: #C1C1C1;"></span>
 
-    <title>${messages.getString("clock")}</title>
 </section>
 
 <script>
@@ -25,6 +23,9 @@
         var hours = date.getHours();
         var minutes = date.getMinutes();
         var seconds = date.getSeconds();
+        if (hours < 10) {
+            hours = '0' + hours;
+        }
         if (minutes < 10) {
             minutes = '0' + minutes;
         }

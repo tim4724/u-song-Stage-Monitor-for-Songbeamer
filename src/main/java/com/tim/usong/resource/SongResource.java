@@ -81,6 +81,14 @@ public class SongResource {
         SongWebSocket.notifyDataChanged();
     }
 
+    public void forceClientReload() {
+        int currentSongId = SongWebSocket.songId;
+        SongWebSocket.songId = 0;
+        SongWebSocket.notifyDataChanged();
+        SongWebSocket.songId = currentSongId;
+        SongWebSocket.notifyDataChanged();
+    }
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public SongView getSong(@Context HttpServletRequest request, @QueryParam("admin") boolean admin) {

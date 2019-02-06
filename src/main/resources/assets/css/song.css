@@ -113,7 +113,7 @@ section {
 }
 
 #bottomSpacer {
-    height: 50px;
+    height: 75px;
 }
 
 #title.negative {
@@ -132,4 +132,28 @@ section {
     border-radius: 2px;
     bottom: 20px;
     right: 20px;
+}
+
+#clockInSong {
+    position: fixed;
+    bottom: 0;
+    opacity: 0.6;
+    right: 0;
+    font-size: 0.4em;
+    margin-right: 14px;
+    background: black;
+}
+
+#clockInSong #timeSeconds {
+    display: none;
+}
+
+#clockInSong #timeBox {
+    margin: 0;
+    padding: 0 12px;
+    border-width: 0;
+}
+
+#clockInSong.hideClock {
+    opacity: 0.1;
 }

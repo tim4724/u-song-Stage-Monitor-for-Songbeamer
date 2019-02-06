@@ -56,6 +56,15 @@
                 <span class="slider"></span>
             </label>
         </div>
+        
+        <div class="setting">
+            <span class="settingText">${messages.getString("showClockInSong")}</span>
+            <label class="switch right">
+                <input id="showClockInSong" type="checkbox"  ${isShowClockInSong()?then("checked", "")}
+                       onchange="new function() {onCheckedChanged('showClockInSong')};">
+                <span class="slider"></span>
+            </label>
+        </div>
 
         <div class="setting">
             <span class="settingText">${messages.getString("checkUpdates")}</span>

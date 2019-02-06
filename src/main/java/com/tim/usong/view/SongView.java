@@ -1,5 +1,6 @@
 package com.tim.usong.view;
 
+import com.tim.usong.GlobalPreferences;
 import com.tim.usong.core.entity.Song;
 import io.dropwizard.views.View;
 
@@ -28,5 +29,9 @@ public class SongView extends View {
 
     public boolean isAdmin() {
         return admin;
+    }
+
+    public boolean isShowClockInSong() {
+        return GlobalPreferences.isShowClockInSong();
     }
 }

@@ -68,4 +68,8 @@ public class SettingsView extends View {
     public boolean isAllowSetMaxLinesPerPage() {
         return sbSettings.maxLinesPerPage == null;
     }
+
+    public boolean isShowClockInSong() {
+        return GlobalPreferences.isShowClockInSong();
+    }
 }

@@ -33,6 +33,14 @@ public class GlobalPreferences {
         return preferences.getBoolean("notifyUpdatesSongbeamer", false);
     }
 
+    public static void setShowClockInSong(boolean show) {
+        preferences.putBoolean("showClockInSong", show);
+    }
+
+    public static boolean isShowClockInSong() {
+        return preferences.getBoolean("showClockInSong", true);
+    }
+
     public static void setSongDir(String songDir) {
         preferences.put("songDir", songDir);
     }

@@ -46,11 +46,13 @@ public class SettingsResource {
                                  @QueryParam("splashScreen") Boolean showSplashScreen,
                                  @QueryParam("checkUpdates") Boolean notifyUpdates,
                                  @QueryParam("checkSongbeamerUpdates") Boolean notifySongbeamerUpdates,
+                                 @QueryParam("showClockInSong") Boolean showClockInSong,
                                  @QueryParam("songDir") Boolean songDir,
                                  @QueryParam("titleHasPage") Boolean titleHasPage,
-                                 @QueryParam("maxLinesPage") Integer maxLinesPage) throws IOException {
+                                 @QueryParam("maxLinesPage") Integer maxLinesPage) {
         if (autoStart == null && showSplashScreen == null && notifyUpdates == null && songDir == null
-                && titleHasPage == null && maxLinesPage == null && notifySongbeamerUpdates == null) {
+                && titleHasPage == null && maxLinesPage == null && notifySongbeamerUpdates == null
+                && showClockInSong == null) {
             return Response.status(400).build();
         }
 
@@ -68,6 +70,10 @@ public class SettingsResource {
         }
         if (showSplashScreen != null) {
             GlobalPreferences.setShowSplashScreen(showSplashScreen);
+        }
+        if (showClockInSong != null) {
+            GlobalPreferences.setShowClockInSong(showClockInSong);
+            songResource.forceClientReload();
         }
         if (notifyUpdates != null) {
             GlobalPreferences.setNotifyUpdates(notifyUpdates);
