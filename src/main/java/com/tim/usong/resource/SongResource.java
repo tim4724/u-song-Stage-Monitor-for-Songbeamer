@@ -37,7 +37,10 @@ public class SongResource {
 
     public void setSong(String songFilename) {
         if (!songFilename.endsWith(".sng")) {
-            String title = messages.getString("noSongSelected") + "<br>\n" + songFilename;
+            String title = messages.getString("noSongSelected");
+            if (!songFilename.isEmpty()) {
+                title += "<br>\n" + songFilename;
+            }
             setSong(new Song(title, Song.Type.INFO));
         } else {
             setSong(songParser.parse(songFilename));
@@ -81,7 +84,7 @@ public class SongResource {
         SongWebSocket.notifyDataChanged();
     }
 
-    public void forceClientReload() {
+    void forceClientReload() {
         int currentSongId = SongWebSocket.songId;
         SongWebSocket.songId = 0;
         SongWebSocket.notifyDataChanged();
