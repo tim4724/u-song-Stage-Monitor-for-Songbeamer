@@ -13,7 +13,7 @@ body {
     text-align: center;
 }
 
-.settingGroupTitle{
+.settingGroupTitle {
     margin-bottom: 16px;
     font-size: 0.7em;
 }
@@ -109,7 +109,7 @@ main {
     opacity: 0.5;
 }
 
-.disabled .slider{
+.disabled .slider {
     cursor: default;
 }
 
@@ -123,4 +123,21 @@ input:checked + .slider:before {
 
 input[type="text"], input[type="number"] {
     padding: 6px 12px;
+}
+
+#savedHint {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: #49bc49;
+    color: #ffffff;
+    border: 3px solid #ffffff;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 16px;
+    transition: opacity 1s;
+}
+
+.invisible {
+    opacity: 0;
 }

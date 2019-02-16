@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="/assets/css/settings.css">
     <title>${messages.getString("settings")}</title>
     <script>
+        let timer;
+
         function simplePutRequest(path, forceReload = false) {
             let xhr = new XMLHttpRequest();
             xhr.open('PUT', path, true);
@@ -14,8 +16,19 @@
                 if (xhr.status !== 200) {
                     alert(xhr.responseText);
                     location.reload(true);
-                } else if (forceReload) {
-                    location.reload(true);
+                } else {
+                    if (forceReload) {
+                        location.reload(true);
+                    } else {
+                        const savedHint = document.getElementById("savedHint");
+                        savedHint.classList.remove("invisible");
+                        if (timer) {
+                            clearTimeout(timer);
+                        }
+                        timer = setTimeout(function () {
+                            savedHint.classList.add("invisible");
+                        }, 2000);
+                    }
                 }
             };
             xhr.send()
@@ -56,11 +69,11 @@
                 <span class="slider"></span>
             </label>
         </div>
-        
+
         <div class="setting">
             <span class="settingText">${messages.getString("showClockInSong")}</span>
             <label class="switch right">
-                <input id="showClockInSong" type="checkbox"  ${isShowClockInSong()?then("checked", "")}
+                <input id="showClockInSong" type="checkbox" ${isShowClockInSong()?then("checked", "")}
                        onchange="new function() {onCheckedChanged('showClockInSong')};">
                 <span class="slider"></span>
             </label>
@@ -69,7 +82,7 @@
         <div class="setting">
             <span class="settingText">${messages.getString("checkUpdates")}</span>
             <label class="switch right">
-                <input id="checkUpdates" type="checkbox"  ${isNotifyUpdates()?then("checked", "")}
+                <input id="checkUpdates" type="checkbox" ${isNotifyUpdates()?then("checked", "")}
                        onchange="new function() {onCheckedChanged('checkUpdates')};">
                 <span class="slider"></span>
             </label>
@@ -80,7 +93,7 @@
                 <span class="settingText">${messages.getString("checkUpdatesSongbeamer")}</span>
                 <label class="switch right">
                     <input id="checkSongbeamerUpdates"
-                           type="checkbox"  ${isNotifySongbeamerUpdates()?then("checked", "")}
+                           type="checkbox" ${isNotifySongbeamerUpdates()?then("checked", "")}
                            onchange="new function() {onCheckedChanged('checkSongbeamerUpdates')};">
                     <span class="slider"></span>
                 </label>
@@ -131,6 +144,10 @@
 
         <div class="warning">${messages.getString("restartSongbeamerWarning")}</div>
     </section>
+
+    <div id="savedHint" class="invisible">
+        ${messages.getString("saved")} &#x1f4be;
+    </div>
 </main>
 </body>
 </html>

@@ -4,16 +4,13 @@ import com.google.common.base.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 public class SongbeamerSettings {
@@ -72,9 +69,9 @@ public class SongbeamerSettings {
         Path configPath = Paths.get(System.getenv("APPDATA"), "SongBeamer", "SBConfig.sfs4");
         List<String> lines = Files.readAllLines(configPath, Charsets.ISO_8859_1);
         for (String l : lines) {
-            int maxLinesIndey = l.indexOf("MaxLinesPerPage");
-            if (maxLinesIndey >= 0) {
-                maxLinesPerPage = (int) l.charAt(maxLinesIndey + 16);
+            int maxLinesIndex = l.indexOf("MaxLinesPerPage");
+            if (maxLinesIndex >= 0) {
+                maxLinesPerPage = (int) l.charAt(maxLinesIndex + 16);
             }
         }
     }
