@@ -13,6 +13,19 @@ public class Page {
     }
 
     public void addLine(String line, List<Chord> chords) {
+        // Combine chords, that would end up in the same position
+        if (chords != null) {
+            for (int i = chords.size() - 1; i > 0; i--) {
+                Chord a = chords.get(i - 1);
+                Chord b = chords.get(i);
+                if (Math.round(a.column) == Math.round(b.column)) {
+                    Chord combinedChord = new Chord(b.column, a.chord + b.chord);
+                    chords.add(chords.indexOf(a), combinedChord);
+                    chords.remove(a);
+                    chords.remove(b);
+                }
+            }
+        }
         lines.add(new Line(line, chords));
     }
 
@@ -42,20 +55,6 @@ public class Page {
             if (line.chords != null) {
                 int offset = htmlBuilder.length();
                 htmlBuilder.append(line.textLine);
-                List<Chord> chords = line.chords;
-
-                // Combine chords, that would end up in the same position
-                for (int i = chords.size() - 1; i > 0; i--) {
-                    Chord a = chords.get(i - 1);
-                    Chord b = chords.get(i);
-                    if (Math.round(a.column) == Math.round(b.column)) {
-                        Chord combinedChord = new Chord(b.column, a.chord + b.chord);
-                        line.chords.add(line.chords.indexOf(a), combinedChord);
-                        line.chords.remove(a);
-                        line.chords.remove(b);
-                    }
-                }
-
                 for (Chord c : line.chords) {
                     int insertIndex = offset + Math.max(Math.round(c.column), 0);
                     if (c.column < 0) {

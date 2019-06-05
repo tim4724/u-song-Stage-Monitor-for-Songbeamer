@@ -178,6 +178,7 @@ section {
     position: absolute;
     right: 10px;
     font-size: 1em;
+    background: black;
 }
 
 .currentSection .chord, #title .chord {
