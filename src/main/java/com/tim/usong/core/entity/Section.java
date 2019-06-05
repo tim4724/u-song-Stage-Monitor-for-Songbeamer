@@ -19,15 +19,15 @@ public class Section {
     public Section(String name, List<Page> pages) {
         this.name = name;
         if (name.matches("(?i)^(Vers|Verse|Strophe)($| .*)")) {
-            type = Section.Type.VERSE;
+            type = Type.VERSE;
         } else if (name.matches("(?i)^(Pre-Refrain|Pre-Chorus)($| .*)")) {
             type = Type.PRE_CHORUS;
         } else if (name.matches("(?i)^(Refrain|Chorus)($| .*)")) {
-            type = Section.Type.CHORUS;
+            type = Type.CHORUS;
         } else if (name.matches("(?i)^(Pre-Bridge)($| .*)")) {
             type = Type.PRE_BRIDGE;
         } else if (name.matches("(?i)^(Bridge)($| .*)")) {
-            type = Section.Type.BRIDGE;
+            type = Type.BRIDGE;
         } else if (name.matches("(?i)^(Ending|Outro)($| .*)")) {
             type = Type.ENDING;
         } else {

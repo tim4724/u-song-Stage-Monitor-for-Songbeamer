@@ -2,6 +2,7 @@ package com.tim.usong.core;
 
 import com.google.common.base.Strings;
 import com.tim.usong.USongApplication;
+import com.tim.usong.core.entity.Chord;
 import com.tim.usong.core.entity.Page;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
@@ -14,14 +15,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.prefs.Preferences;
 
 public class SongParser {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final Map<String, Integer> langMap = new HashMap<>();
     private File songDir;
-
     // Text will be on a new page, if it has more than "n" lines
     // This can be selected in songbeamer: "Extras" -> "Options" -> "Song" -> "Maximum text lines"
     private int maxLinesPerPage;
@@ -76,7 +75,7 @@ public class SongParser {
                 : header.title;
         int desiredLang = langMap.getOrDefault(songFile.getName(), 1);
 
-        List<Section> sections = parseSongText(pages, header.langCount, desiredLang);
+        List<Section> sections = parseSongText(pages, header.chords, header.langCount, desiredLang);
 
         List<Section> finalSectionList = new ArrayList<>();
         if (header.verseOrder != null) {
@@ -107,7 +106,9 @@ public class SongParser {
 
         long duration = System.currentTimeMillis() - startTime;
         logger.info(String.format("Parsed song \"%s (Language %d)\" in %dms", title, desiredLang, duration));
-        return new Song(songFile.getName(), title, finalSectionList, desiredLang, header.langCount, Song.Type.SNG);
+        Chord keyChord = header.keyChord;
+        String fileName = songFile.getName();
+        return new Song(fileName, title, finalSectionList, keyChord, desiredLang, header.langCount, Song.Type.SNG);
     }
 
     /**
@@ -115,9 +116,12 @@ public class SongParser {
      *
      * @return List of sections. Every section holds one or many pages
      */
-    private List<Section> parseSongText(List<String> pages, int langCount, int desiredLang) {
+    private List<Section> parseSongText(List<String> pages, Map<Integer, List<Chord>> chords, int langCount, int desiredLang) {
         List<Section> allSections = new ArrayList<>();
         String currentSectionName = "";
+
+        // counts all text lines. Do include section names
+        int pureLineCounter = 0;
 
         for (int i = 0; i < pages.size(); i++) {
             String page = pages.get(i);
@@ -125,10 +129,10 @@ public class SongParser {
             // One page may actuality be split into multiple pages, when presented
             List<Page> newPages = new ArrayList<>();
 
-            // counts all textlines inclusive empty ones. Do not include section names
-            int lineCounter = 0;
-            // counts only not empty text lines. Do not include section names
-            int lineCounterNotEmpty = 0;
+            // counts all song text lines inclusive empty ones. Do not include section names
+            int songTextLineCounter = 0;
+            // counts only text lines which are not empty. Do not include section names
+            int songTextLineCounterNotEmpty = 0;
 
             // limit "-1" -> do not discard any empty strings at the end
             String[] lines = page.split("\\r?\\n", -1);
@@ -136,13 +140,15 @@ public class SongParser {
             // iterate, but ignore last element, because its empty always
             for (int j = 0; j < lines.length - 1; j++) {
                 String line = lines[j].trim();
+
                 if (isBlockName(line)) {
                     // Vers 22x -> Vers 2, because the "2x" means repeat 2 times.
                     currentSectionName = line.replaceAll("[0-9]x$", "");
+                    pureLineCounter++;
                     continue;
                 }
 
-                if (lineCounter == 0 || (maxLinesPerPage > 0 && lineCounter % maxLinesPerPage == 0)) {
+                if (songTextLineCounter == 0 || (maxLinesPerPage > 0 && songTextLineCounter % maxLinesPerPage == 0)) {
                     // if something should be a new page, according to the maxLinesPerPage setting
                     // is determined by counting lines, inclusively empty ones.
                     // the upcoming text is part of a new page
@@ -150,7 +156,7 @@ public class SongParser {
                 }
 
                 // lang is determined by counting not empty lines
-                int lang = ((lineCounterNotEmpty) % langCount) + 1;
+                int lang = ((songTextLineCounterNotEmpty) % langCount) + 1;
 
                 // substring(0, 4) because of bug with special characters
                 if (line.length() >= 4 && line.substring(0, 4).matches("^#?#[0-9] (.)*")) {
@@ -160,13 +166,19 @@ public class SongParser {
                 }
 
                 if (lang == desiredLang) {
-                    lastOf(newPages).addLine(line);
+                    List<Chord> chordsForLine = null;
+                    if (chords != null && chords.containsKey(pureLineCounter)) {
+                        chordsForLine = chords.get(pureLineCounter);
+                        Collections.sort(chordsForLine);
+                    }
+                    lastOf(newPages).addLine(line, chordsForLine);
                 }
 
                 if (!line.isEmpty()) {
-                    lineCounterNotEmpty++;
+                    songTextLineCounterNotEmpty++;
                 }
-                lineCounter++;
+                songTextLineCounter++;
+                pureLineCounter++;
             }
 
             // Somehow there is an exception if the last page in the song contains only 1 line.
@@ -176,10 +188,9 @@ public class SongParser {
             if (lastPageOfSong && newPages.size() > 1) {
                 //TODO: Different compared to songbeamer in some rare cases with empty lines
                 Page lastPage = lastOf(newPages);
-                String lastPageText = lastPage.getContent();
-                if (!lastPageText.contains("\n") && lines.length > 1) {
+                if (lastPage.getLinesCount() == 1 && lines.length > 1) {
                     newPages.remove(newPages.size() - 1);
-                    lastOf(newPages).addLine(lastPageText);
+                    lastOf(newPages).addLinesFromPage(lastPage);
                 }
             }
 
@@ -190,6 +201,10 @@ public class SongParser {
             } else {
                 lastSection.addPages(newPages);
             }
+
+            // The pages are seperated with "--" or "---"
+            // In the original textfile this is one extra line, therefore increase counter
+            pureLineCounter++;
         }
         return allSections;
     }
@@ -210,9 +225,16 @@ public class SongParser {
         private int langCount = 1;
         private String title;
         private String[] verseOrder;
+        private Map<Integer, List<Chord>> chords;
+        private Chord keyChord;
 
         private Header(String in) {
-            String lines[] = in.split("\\r?\\n");
+            String[] lines = in.split("\\r?\\n");
+            int transpose = 0;
+            boolean transposeAccidental = false;
+            String chordsValue = null;
+            String key = null;
+
             for (String line : lines) {
                 try {
                     if (line.startsWith("#LangCount=")) {
@@ -221,15 +243,47 @@ public class SongParser {
                         title = getValue(line);
                     } else if (line.startsWith("#VerseOrder=")) {
                         verseOrder = getValue(line).split(",");
+                    } else if (line.startsWith("#Chords=")) {
+                        chordsValue = getValue(line);
+                    } else if (line.startsWith("#Transpose=")) {
+                        transpose = Integer.parseInt(getValue(line));
+                    } else if (line.startsWith("#TransposeAccidental")) {
+                        transposeAccidental = Integer.parseInt(getValue(line)) == 1;
+                    } else if (line.startsWith("#Key")) {
+                        key = getValue(line);
                     }
+                    // "#Key"
                 } catch (Exception e) {
                     logger.error("Failed to parse song-header", e);
                 }
             }
+
+            if (chordsValue != null) {
+                chords = new HashMap<>();
+                byte[] decodedChords = Base64.getDecoder().decode(chordsValue);
+                for (String chord : new String(decodedChords).split("\r")) {
+                    String[] values = chord.split(",");
+                    if (values.length == 3) {
+                        try {
+                            int lineNumber = Integer.parseInt(values[1]);
+                            if (!chords.containsKey(lineNumber)) {
+                                chords.put(lineNumber, new ArrayList<>());
+                            }
+                            float col = Float.parseFloat(values[0]);
+                            chords.get(lineNumber).add(new Chord(col, values[2], transpose, transposeAccidental));
+                        } catch (Exception e) {
+                            logger.error("Failed to parse chord", e);
+                        }
+                    }
+                }
+            }
+            if (key != null) {
+                this.keyChord = new Chord(0, key, transpose, transposeAccidental);
+            }
         }
 
         private String getValue(String line) {
-            return line.substring(line.indexOf("=") + 1);
+            return line.substring(line.indexOf('=') + 1);
         }
     }
 

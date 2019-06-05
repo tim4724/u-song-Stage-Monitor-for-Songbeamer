@@ -17,7 +17,10 @@
 <body onload="backend = main(); backend.connectToWebSocket()" class="notranslate">
 <header>
     <h1 id="title" data-songId="#{song.hashCode()}" <#if song.type.name() == "ERROR"> class="negative" </#if>>
-    ${song.title}
+        ${song.title}
+        <#if chords && song.keyChord??>
+            <span class="chord">${messages.getString("key")} ${song.keyChord.toHtml()}</span>
+        </#if>
     </h1>
 </header>
 
@@ -27,15 +30,17 @@
             <div class="sectionName">${section.name}</div>
         </#if>
         <#list section.pages as page>
-            <#if page.content??>
             <div class="page">
-                <#if page.content?has_content >
+                <#if (page.linesCount > 0)>
                     <div class="pageContent">
-                        ${page.content}
+                        <#if chords>
+                            ${page.toHtmlWithCords()}
+                        <#else>
+                            ${page.toHtml()}
+                        </#if>
                     </div>
                 </#if>
             </div>
-            </#if>
         </#list>
     </section>
 </#list>
@@ -60,7 +65,7 @@
         <#if (song.langCount > 1)>
             <#list 1..song.langCount as i>
                 <button type="button" <#if i == song.lang> class="active" disabled</#if>
-                        onclick="backend.setLang(${i});">Sprache ${i}</button>
+                        onclick="backend.setLang(${i});">${messages.getString("language")} ${i}</button>
             </#list>
         </#if>
         <button type="button" id="clock">&#128340;</button>

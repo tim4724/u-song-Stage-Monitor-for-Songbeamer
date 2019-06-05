@@ -7,6 +7,7 @@ import java.util.Objects;
 public class Song {
     private final String fileName;
     private final String title;
+    private final Chord keyChord;
     private final List<Section> sections;
     private final int pageCount;
     private final int lang;
@@ -14,12 +15,13 @@ public class Song {
     private final Type type;
 
     public Song(String title, Type type) {
-        this(null, title, new ArrayList<>(), 1, 1, type);
+        this(null, title, new ArrayList<>(), null, 1, 1, type);
     }
 
-    public Song(String fileName, String title, List<Section> sections, int lang, int langCount, Type type) {
+    public Song(String fileName, String title, List<Section> sections, Chord keyChord, int lang, int langCount, Type type) {
         this.fileName = fileName;
         this.title = title;
+        this.keyChord = keyChord;
         this.sections = sections;
         this.pageCount = sections.stream().mapToInt(s -> s.getPages().size()).sum();
         this.lang = lang;
@@ -28,7 +30,7 @@ public class Song {
     }
 
     public Song(String fileName, String title, Exception e) {
-        this(fileName, title, new ArrayList<>(), 1, 1, Type.ERROR);
+        this(fileName, title, new ArrayList<>(), null, 1, 1, Type.ERROR);
         String errString = e.toString().replace("\n", "\n<br />");
         sections.add(new Section(e.getClass().getName(), new Page(errString)));
     }
@@ -51,6 +53,10 @@ public class Song {
 
     public int getPageCount() {
         return pageCount;
+    }
+
+    public Chord getKeyChord() {
+        return keyChord;
     }
 
     public int getLang() {
@@ -81,7 +87,7 @@ public class Song {
     public enum Type {
         SNG, // Real .sng song from file
         ERROR, // Error message
-        INFO,// Information, like "no song selected"
+        INFO, // Information, like "no song selected"
         CLOCK
     }
 }

@@ -72,4 +72,8 @@ public class SettingsView extends View {
     public boolean isShowClockInSong() {
         return GlobalPreferences.isShowClockInSong();
     }
+
+    public boolean isShowChords() {
+        return GlobalPreferences.getShowChords();
+    }
 }

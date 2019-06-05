@@ -64,4 +64,12 @@ public class GlobalPreferences {
     public static int getMaxLinesPage() {
         return preferences.getInt("maxLinesPage", 0);
     }
+
+    public static void setShowChords(boolean chords) {
+        preferences.putBoolean("chords", chords);
+    }
+
+    public static boolean getShowChords() {
+        return preferences.getBoolean("chords", false);
+    }
 }

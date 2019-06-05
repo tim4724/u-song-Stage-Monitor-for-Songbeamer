@@ -1,10 +1,13 @@
-body {
+html {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 64px;
+}
+
+body {
     text-align: center;
     background: black;
     cursor: none;
     overflow: hidden;
-    font-size: 64px;
     animation-name: enterAnimation;
     animation-duration: 0.7s;
     animation-fill-mode: backwards;
@@ -19,8 +22,7 @@ body {
     color: #ff7c00;
     font-weight: normal;
     font-size: 0.7em;
-    margin-top: 10px;
-    margin-bottom: 1px;
+    margin: 10px 10px 1px;
 }
 
 @keyframes enterAnimation {
@@ -156,4 +158,32 @@ section {
 
 #clockInSong.hideClock {
     opacity: 0.1;
+}
+
+.chordPos {
+    vertical-align: 0.8em;
+}
+
+.chordPos .chord {
+    position: absolute;
+}
+
+.chord {
+    font-size: 0.8em;
+    line-height: 1;
+    color: #8c8a05;
+}
+
+#title .chord {
+    position: absolute;
+    right: 10px;
+    font-size: 1em;
+}
+
+.currentSection .chord, #title .chord {
+    color: #eae609;
+}
+
+.simplePlaceholder {
+    visibility: hidden;
 }

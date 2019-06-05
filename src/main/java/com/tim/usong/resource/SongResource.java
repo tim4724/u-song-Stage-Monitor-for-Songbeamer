@@ -13,7 +13,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.ResourceBundle;
 
 @Path("song")
 public class SongResource {
@@ -94,8 +97,10 @@ public class SongResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public SongView getSong(@Context HttpServletRequest request, @QueryParam("admin") boolean admin) {
-        return new SongView(song, request.getLocale(), admin);
+    public SongView getSong(@Context HttpServletRequest request,
+                            @QueryParam("admin") boolean admin,
+                            @QueryParam("chords") Boolean chords) {
+        return new SongView(song, request.getLocale(), admin, chords);
     }
 
     @POST

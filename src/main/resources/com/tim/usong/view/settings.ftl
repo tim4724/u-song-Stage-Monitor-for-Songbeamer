@@ -71,15 +71,6 @@
         </div>
 
         <div class="setting">
-            <span class="settingText">${messages.getString("showClockInSong")}</span>
-            <label class="switch right">
-                <input id="showClockInSong" type="checkbox" ${isShowClockInSong()?then("checked", "")}
-                       onchange="new function() {onCheckedChanged('showClockInSong')};">
-                <span class="slider"></span>
-            </label>
-        </div>
-
-        <div class="setting">
             <span class="settingText">${messages.getString("checkUpdates")}</span>
             <label class="switch right">
                 <input id="checkUpdates" type="checkbox" ${isNotifyUpdates()?then("checked", "")}
@@ -99,6 +90,28 @@
                 </label>
             </div>
         </#if>
+    </section>
+
+    <section class="settingGroup">
+        <div class="settingGroupTitle">${messages.getString("presentation")}</div>
+
+        <div class="setting">
+            <span class="settingText">${messages.getString("showClockInSong")}</span>
+            <label class="switch right">
+                <input id="showClockInSong" type="checkbox" ${isShowClockInSong()?then("checked", "")}
+                       onchange="new function() {onCheckedChanged('showClockInSong')};">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="setting">
+            <span class="settingText">${messages.getString("showChords")}</span>
+            <label class="switch right">
+                <input id="chords" type="checkbox" ${isShowChords()?then("checked", "")}
+                       onchange="new function() {onCheckedChanged('chords')};">
+                <span class="slider"></span>
+            </label>
+        </div>
     </section>
 
     <section class="settingGroup">

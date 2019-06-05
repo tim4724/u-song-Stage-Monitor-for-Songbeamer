@@ -11,12 +11,17 @@ public class SongView extends View {
     private final ResourceBundle messages;
     private final Song song;
     private final boolean admin;
+    private final boolean chords;
 
-    public SongView(Song song, Locale locale, boolean admin) {
+    public SongView(Song song, Locale locale, boolean admin, Boolean chords) {
         super("song.ftl");
+        if (chords == null) {
+            chords = GlobalPreferences.getShowChords();
+        }
         this.messages = ResourceBundle.getBundle("MessagesBundle", locale);
         this.song = song;
         this.admin = admin;
+        this.chords = chords;
     }
 
     public ResourceBundle getMessages() {
@@ -29,6 +34,10 @@ public class SongView extends View {
 
     public boolean isAdmin() {
         return admin;
+    }
+
+    public boolean isChords() {
+        return chords;
     }
 
     public boolean isShowClockInSong() {

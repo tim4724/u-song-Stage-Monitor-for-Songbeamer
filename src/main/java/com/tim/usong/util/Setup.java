@@ -56,7 +56,6 @@ public class Setup {
         UIManager.put("TextArea.background", darkGrayBg);
         UIManager.put("TextArea.font", font);
         UIManager.put("Panel.background", darkGrayBg);
-        UIManager.put("Panel.foregrount", Color.WHITE);
         UIManager.put("Button.background", accent);
         UIManager.put("Button.border", BorderFactory.createEmptyBorder(5, 20, 5, 20));
         UIManager.put("Button.foreground", Color.WHITE);

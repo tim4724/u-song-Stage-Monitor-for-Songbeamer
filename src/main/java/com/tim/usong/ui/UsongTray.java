@@ -1,8 +1,8 @@
 package com.tim.usong.ui;
 
 import com.tim.usong.USongApplication;
-import com.tim.usong.util.NetworkHost;
 import com.tim.usong.util.Browser;
+import com.tim.usong.util.NetworkHost;
 import io.dropwizard.lifecycle.Managed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class UsongTray implements Managed {
         MenuItem statusItem = new MenuItem(messages.getString("status"));
         CheckboxMenuItem previewCheckBox = new CheckboxMenuItem(previewMsg, previewFrame.isVisible());
         MenuItem hostItem = new MenuItem("http://" + getHostname());
-        MenuItem ipAddressItem = new MenuItem("http://" + getIpAdress());
+        MenuItem ipAddressItem = new MenuItem("http://" + getIpAddress());
         MenuItem exitItem = new MenuItem(messages.getString("exit"));
         previewCheckBox.addItemListener(e -> previewFrame.setVisible(e.getStateChange() == ItemEvent.SELECTED));
         MenuItem tutorialItem = new MenuItem(messages.getString("tutorial"));
@@ -66,7 +66,7 @@ public class UsongTray implements Managed {
             public void mouseReleased(MouseEvent e) {
                 // update the checkbox states, which could have changed
                 previewCheckBox.setState(previewFrame.isVisible());
-                ipAddressItem.setLabel("http://" + getIpAdress());
+                ipAddressItem.setLabel("http://" + getIpAddress());
             }
         });
         try {
@@ -93,7 +93,7 @@ public class UsongTray implements Managed {
         return hostname != null ? hostname : "localhost";
     }
 
-    private String getIpAdress() {
+    private String getIpAddress() {
         String ip = NetworkHost.getHostAddress();
         return ip != null ? ip : "127.0.0.1";
     }

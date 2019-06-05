@@ -18,7 +18,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -49,10 +48,11 @@ public class SettingsResource {
                                  @QueryParam("showClockInSong") Boolean showClockInSong,
                                  @QueryParam("songDir") Boolean songDir,
                                  @QueryParam("titleHasPage") Boolean titleHasPage,
-                                 @QueryParam("maxLinesPage") Integer maxLinesPage) {
+                                 @QueryParam("maxLinesPage") Integer maxLinesPage,
+                                 @QueryParam("chords") Boolean showChords) {
         if (autoStart == null && showSplashScreen == null && notifyUpdates == null && songDir == null
                 && titleHasPage == null && maxLinesPage == null && notifySongbeamerUpdates == null
-                && showClockInSong == null) {
+                && showClockInSong == null && showChords == null) {
             return Response.status(400).build();
         }
 
@@ -103,6 +103,10 @@ public class SettingsResource {
         if (maxLinesPage != null) {
             GlobalPreferences.setMaxLinesPage(maxLinesPage);
             songParser.setMaxLinesPerPage(maxLinesPage);
+            reloadSong();
+        }
+        if (showChords != null) {
+            GlobalPreferences.setShowChords(showChords);
             reloadSong();
         }
         return Response.ok().build();
