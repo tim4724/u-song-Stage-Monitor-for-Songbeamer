@@ -10,8 +10,8 @@ import com.tim.usong.resource.StatusResource;
 import com.tim.usong.ui.*;
 import com.tim.usong.util.AutoStart;
 import com.tim.usong.util.Setup;
-import com.tim.usong.util.UpdateChecker;
 import com.tim.usong.util.SongbeamerUpdateChecker;
+import com.tim.usong.util.UpdateChecker;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.assets.AssetsBundle;
@@ -97,6 +97,7 @@ public class USongApplication extends Application<Configuration> implements Serv
         SongbeamerSettings sbSettings = SongbeamerSettings.readSongbeamerSettings();
         File songDir = sbSettings.songDir;
         Boolean titleHasOwnPage = sbSettings.titleHasOwnPage;
+        Boolean showChords = sbSettings.showChords;
         Integer maxLinesPerPage = sbSettings.maxLinesPerPage;
 
         songbeamerVersion = sbSettings.version;
@@ -122,6 +123,10 @@ public class USongApplication extends Application<Configuration> implements Serv
             maxLinesPerPage = GlobalPreferences.getMaxLinesPage();
         } else {
             GlobalPreferences.setMaxLinesPage(maxLinesPerPage);
+        }
+        if (GlobalPreferences.getShowChordsOrNull() == null) {
+            // if show chords pref is not initialized, initialize it with the songbeamer settings value
+            GlobalPreferences.setShowChords(sbSettings.showChords != null && sbSettings.showChords);
         }
 
         SongParser songParser = new SongParser(songDir, titleHasOwnPage, maxLinesPerPage);

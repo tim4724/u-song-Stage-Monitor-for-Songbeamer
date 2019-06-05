@@ -18,6 +18,7 @@ public class SongbeamerSettings {
     public File songDir;
     public Boolean titleHasOwnPage;
     public Integer maxLinesPerPage;
+    public Boolean showChords;
 
     private SongbeamerSettings() {
     }
@@ -61,6 +62,8 @@ public class SongbeamerSettings {
                 version = l.replace("Version=", "");
             } else if (l.startsWith("TitlePosition=")) {
                 titleHasOwnPage = l.contains("extrapage");
+            } else if(l.startsWith("ShowChords")) {
+                showChords = l.contains("1");
             }
         }
     }

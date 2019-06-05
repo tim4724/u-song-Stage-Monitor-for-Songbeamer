@@ -1,5 +1,7 @@
 package com.tim.usong;
 
+import java.util.Arrays;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class GlobalPreferences {
@@ -71,5 +73,16 @@ public class GlobalPreferences {
 
     public static boolean getShowChords() {
         return preferences.getBoolean("chords", false);
+    }
+
+    public static Boolean getShowChordsOrNull() {
+        try {
+            if (!Arrays.asList(preferences.keys()).contains("chords")) {
+                return null;
+            }
+        } catch (BackingStoreException e) {
+            return null;
+        }
+        return getShowChords();
     }
 }
