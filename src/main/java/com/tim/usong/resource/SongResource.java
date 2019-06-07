@@ -1,5 +1,6 @@
 package com.tim.usong.resource;
 
+import com.tim.usong.GlobalPreferences;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.entity.Song;
 import com.tim.usong.view.SongView;
@@ -100,13 +101,13 @@ public class SongResource {
     public SongView getSong(@Context HttpServletRequest request,
                             @QueryParam("admin") boolean admin,
                             @QueryParam("chords") Boolean chords) {
-        return new SongView(song, request.getLocale(), admin, chords);
+        return new SongView(song, nextSong, request.getLocale(), admin, chords);
     }
 
     @POST
     @Path("page/{newPage}")
     public Response setPageForCurrentSong(@PathParam("newPage") int newPage) {
-        if (newPage < 0 || newPage >= song.getPageCount()) {
+        if (newPage < -1 || newPage >= song.getPageCount()) {
             return Response.status(400).build();
         }
         setPage(newPage);
@@ -130,6 +131,16 @@ public class SongResource {
     }
 
     @POST
+    @Path("next")
+    public Response setNextSongAsCurrentSong() {
+        if (nextSong != null && nextSong.getFileName() != null
+                && !nextSong.getFileName().equals(song.getFileName())) {
+            setSong(nextSong);
+        }
+        return Response.ok().build();
+    }
+
+    @POST
     @Path("lang/{newLang}")
     public Response setLangForCurrentSong(@PathParam("newLang") int newLang) {
         if (newLang <= 0 || newLang > song.getLangCount()) {
@@ -137,6 +148,16 @@ public class SongResource {
         }
         songParser.setLangForSong(song.getFileName(), newLang);
         setSong(song.getFileName());
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("chords/{enable}")
+    public Response setChordsEnabled(@PathParam("enable") boolean enable) {
+        GlobalPreferences.setShowChords(enable);
+        if (song != null && song.getFileName() != null) {
+            setSong(song.getFileName());
+        }
         return Response.ok().build();
     }
 

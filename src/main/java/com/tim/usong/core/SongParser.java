@@ -252,7 +252,6 @@ public class SongParser {
                     } else if (line.startsWith("#Key")) {
                         key = getValue(line);
                     }
-                    // "#Key"
                 } catch (Exception e) {
                     logger.error("Failed to parse song-header", e);
                 }

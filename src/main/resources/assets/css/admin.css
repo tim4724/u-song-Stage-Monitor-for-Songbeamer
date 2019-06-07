@@ -13,7 +13,9 @@ body {
     position: fixed;
     bottom: 0;
     left: 0;
+    padding: 16px;
     background-color: #eeeeee;
+    color: #ffffff;
 }
 
 .active {
@@ -21,13 +23,13 @@ body {
 }
 
 button {
-    margin: 8px;
-    color: #ffffff;
     background-color: #555555;
     transition: all 0.5s ease-in-out;
     font-size: 1em;
     padding: 10px 20px 10px 20px;
     border: 2px solid transparent;
+    border-radius: 1em;
+    color: #ffffff;
 }
 
 button:hover:enabled {
@@ -36,29 +38,37 @@ button:hover:enabled {
     border-color: #49bc49;
 }
 
+.circleButton {
+    width: calc(1em + 34px);
+    height: calc(1em + 34px);
+    padding: 0;
+    border-radius: calc(1em + 34px);
+}
+
 #upButton, #downButton {
-    padding: 10px 30px;
 }
 
 #activeClients {
     float: left;
-    margin: 16px;
     background: #49bc49;
-    width: calc(1em - 10px);
-    padding: 10px 20px 10px 20px;
-    border-radius: 50%;
-    color: white;
+    line-height: 1.5em;
 }
 
-#clock {
+#clock, #black {
     float: right;
-    margin: 8px 16px 8px 8px;
-    color: white;
-    border-radius: 50%;
-    padding: 0 4px 6px;
-    opacity: 0;
-    width: calc(1em + 34px);
-    height: calc(1em + 34px);
+    display: none;
+    line-height: 1.5em;
+}
+
+#black {
+    color: #000;
+}
+
+#chord {
+}
+
+#chord.deactivate {
+    background-image: linear-gradient(45deg, transparent 45%, #FFFFFF 45%, #FFFFFF 55%, transparent 55%);
 }
 
 #activeClients.negative {

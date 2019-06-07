@@ -4,9 +4,10 @@ function main() {
     const errorElement = document.getElementById('errorBox');
     const clientsCountElement = document.getElementById('activeClients');
     const clockButton = document.getElementById('clock');
+    const blackButton = document.getElementById('black');
     const clockInSong = document.getElementById('clockInSong');
 
-    let currentPage = undefined; // element
+    let currentPage; // element
     let lastPageNumber = -2; // number
 
     function simplePostRequest(path) {
@@ -28,13 +29,16 @@ function main() {
                 setTimeout(function () {
                     location.reload(true);
                 }, 700);
-                document.body.classList.add('bodyExit');
+                document.body.classList.add('fadeOut');
             } else {
-                if (clockButton) {
-                    const visible = data.page === -1 && data.songType === "SNG";
-                    clockButton.style.opacity = visible ? "1" : "0";
-                    clockButton.style.cursor = visible ? "pointer" : "default";
-                    clockButton.onclick = visible ? backend.clock : "";
+                if (clockButton && blackButton && data.songType === "SNG") {
+                    const isBlack = data.page === -1;
+                    clockButton.style.display = isBlack ? "initial" : "none";
+                    clockButton.style.cursor = isBlack ? "pointer" : "default";
+                    clockButton.onclick = isBlack ? backend.clock : "";
+                    blackButton.style.display = isBlack ? "none" : "initial";
+                    blackButton.style.cursor = isBlack ? "default" : "pointer";
+                    blackButton.onclick = isBlack ? "" : backend.black;
                 }
                 updatePageNumber(Math.min(data.page, pages.length - 1));
             }
@@ -111,6 +115,9 @@ function main() {
         setLang: function (newLang) {
             simplePostRequest('song/lang/' + newLang);
         },
+        setChords: function (enable) {
+            simplePostRequest('song/chords/' + enable);
+        },
         pageUp: function () {
             for (let i = lastPageNumber - 1; i >= 0; i--) {
                 // skip emtpy pages
@@ -128,6 +135,12 @@ function main() {
                     break;
                 }
             }
+        },
+        black: function () {
+            simplePostRequest('song/page/' + -1);
+        },
+        next: function () {
+            simplePostRequest('song/next/');
         },
         connectToWebSocket: connectToWebSocket,
         clock: function () {

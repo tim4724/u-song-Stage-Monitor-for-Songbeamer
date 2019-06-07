@@ -18,7 +18,8 @@ public class Song {
         this(null, title, new ArrayList<>(), null, 1, 1, type);
     }
 
-    public Song(String fileName, String title, List<Section> sections, Chord keyChord, int lang, int langCount, Type type) {
+    public Song(String fileName, String title, List<Section> sections, Chord keyChord, int lang, int langCount,
+                Type type) {
         this.fileName = fileName;
         this.title = title;
         this.keyChord = keyChord;
@@ -69,6 +70,17 @@ public class Song {
 
     public Type getType() {
         return type;
+    }
+
+    public boolean hasChords() {
+        for (Section s : sections) {
+            for (Page p : s.getPages()) {
+                if (p.hasChords()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

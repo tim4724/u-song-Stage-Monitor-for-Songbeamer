@@ -66,9 +66,11 @@ public class Page {
                         offset += 6;
                         insertIndex += 5;
                         if (i == l - 1) {
-                            htmlBuilder.append("<span class=\"chord simplePlaceholder\">")
-                                    .append(c.toHtml())
-                                    .append("</span>");
+                            String placeHolderText = String.format(
+                                    "<span class=\"chord simplePlaceholder\">%s</span>",
+                                    c.toHtml());
+                            htmlBuilder.append(placeHolderText);
+                            offset += placeHolderText.length();
                         }
                     }
 
@@ -93,6 +95,15 @@ public class Page {
 
     public int getLinesCount() {
         return lines.size();
+    }
+
+    public boolean hasChords() {
+        for (Line l : lines) {
+            if (l.chords != null && l.chords.size() > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static class Line {
