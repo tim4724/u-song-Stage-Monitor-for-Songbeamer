@@ -83,7 +83,6 @@
                 ${nextSong.title}
             </button>
         </#if>
-        <button class="circleButton" type="button" id="black">&#11035;</button>
         <button class="circleButton" type="button" id="clock">&#128340;</button>
     </footer>
 </#if>

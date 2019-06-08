@@ -54,10 +54,10 @@ button:hover:enabled {
     line-height: 1.5em;
 }
 
-#clock, #black {
+#clock {
     float: right;
-    display: none;
     line-height: 1.5em;
+    opacity: 0;
 }
 
 #black {

@@ -4,7 +4,6 @@ function main() {
     const errorElement = document.getElementById('errorBox');
     const clientsCountElement = document.getElementById('activeClients');
     const clockButton = document.getElementById('clock');
-    const blackButton = document.getElementById('black');
     const clockInSong = document.getElementById('clockInSong');
 
     let currentPage; // element
@@ -31,14 +30,11 @@ function main() {
                 }, 700);
                 document.body.classList.add('fadeOut');
             } else {
-                if (clockButton && blackButton && data.songType === "SNG") {
+                if (clockButton && data.songType === "SNG") {
                     const isBlack = data.page === -1;
-                    clockButton.style.display = isBlack ? "initial" : "none";
+                    clockButton.style.opacity = isBlack ? "1" : "0";
                     clockButton.style.cursor = isBlack ? "pointer" : "default";
                     clockButton.onclick = isBlack ? backend.clock : "";
-                    blackButton.style.display = isBlack ? "none" : "initial";
-                    blackButton.style.cursor = isBlack ? "default" : "pointer";
-                    blackButton.onclick = isBlack ? "" : backend.black;
                 }
                 updatePageNumber(Math.min(data.page, pages.length - 1));
             }
