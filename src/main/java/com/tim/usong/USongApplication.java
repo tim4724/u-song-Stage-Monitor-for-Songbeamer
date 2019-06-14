@@ -97,7 +97,6 @@ public class USongApplication extends Application<Configuration> implements Serv
         SongbeamerSettings sbSettings = SongbeamerSettings.readSongbeamerSettings();
         File songDir = sbSettings.songDir;
         Boolean titleHasOwnPage = sbSettings.titleHasOwnPage;
-        Boolean showChords = sbSettings.showChords;
         Integer maxLinesPerPage = sbSettings.maxLinesPerPage;
 
         songbeamerVersion = sbSettings.version;
@@ -127,6 +126,9 @@ public class USongApplication extends Application<Configuration> implements Serv
         if (GlobalPreferences.getShowChordsOrNull() == null) {
             // if show chords pref is not initialized, initialize it with the songbeamer settings value
             GlobalPreferences.setShowChords(sbSettings.showChords != null && sbSettings.showChords);
+        }
+        if (sbSettings.chordsUseBNatural != null) {
+            GlobalPreferences.setChordsUseBNatural(sbSettings.chordsUseBNatural);
         }
 
         SongParser songParser = new SongParser(songDir, titleHasOwnPage, maxLinesPerPage);

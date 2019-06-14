@@ -85,4 +85,12 @@ public class GlobalPreferences {
         }
         return getShowChords();
     }
+
+    public static void setChordsUseBNatural(boolean chords) {
+        preferences.putBoolean("chordsUseBNatural", chords);
+    }
+
+    public static boolean getChordsUseBNatural() {
+        return preferences.getBoolean("chordsUseBNatural", false);
+    }
 }

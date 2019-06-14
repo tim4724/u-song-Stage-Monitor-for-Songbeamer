@@ -19,6 +19,7 @@ public class SongbeamerSettings {
     public Boolean titleHasOwnPage;
     public Integer maxLinesPerPage;
     public Boolean showChords;
+    public Boolean chordsUseBNatural;
 
     private SongbeamerSettings() {
     }
@@ -62,7 +63,7 @@ public class SongbeamerSettings {
                 version = l.replace("Version=", "");
             } else if (l.startsWith("TitlePosition=")) {
                 titleHasOwnPage = l.contains("extrapage");
-            } else if(l.startsWith("ShowChords")) {
+            } else if (l.startsWith("ShowChords")) {
                 showChords = l.contains("1");
             }
         }
@@ -75,6 +76,11 @@ public class SongbeamerSettings {
             int maxLinesIndex = l.indexOf("MaxLinesPerPage");
             if (maxLinesIndex >= 0) {
                 maxLinesPerPage = (int) l.charAt(maxLinesIndex + 16);
+            }
+            int bNaturalIndex = l.indexOf("Song.ChordUseBNatural");
+            if (bNaturalIndex >= 0) {
+                // If enabled the character apparently is '\t'
+                chordsUseBNatural = l.charAt(bNaturalIndex + 21) == '\t';
             }
         }
     }

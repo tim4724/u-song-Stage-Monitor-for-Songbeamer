@@ -1,5 +1,6 @@
 package com.tim.usong.core.entity;
 
+import com.tim.usong.GlobalPreferences;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,6 +24,9 @@ public class Chord implements Comparable<Chord> {
             if (chordIndex != -1) {
                 int transposedIndex = (chordIndex + transpose + CHORDS.length) % CHORDS.length;
                 String newChord = transpAccidental ? CHORDS_ACC[transposedIndex] : CHORDS[transposedIndex];
+                if (GlobalPreferences.getChordsUseBNatural() && transposedIndex == 11) {
+                    newChord += "=";
+                }
                 subChords[i] = subChords[i].replace(simpleChord, newChord);
             }
         }
