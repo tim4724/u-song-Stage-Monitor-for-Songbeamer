@@ -13,19 +13,6 @@ public class Page {
     }
 
     public void addLine(String line, List<Chord> chords) {
-        // Combine chords, that would end up in the same position
-        if (chords != null) {
-            for (int i = chords.size() - 1; i > 0; i--) {
-                Chord a = chords.get(i - 1);
-                Chord b = chords.get(i);
-                if (Math.round(a.column) == Math.round(b.column)) {
-                    Chord combinedChord = new Chord(b.column, a.chord + b.chord);
-                    chords.add(chords.indexOf(a), combinedChord);
-                    chords.remove(a);
-                    chords.remove(b);
-                }
-            }
-        }
         lines.add(new Line(line, chords));
     }
 
@@ -56,24 +43,11 @@ public class Page {
                 int offset = htmlBuilder.length();
                 htmlBuilder.append(line.textLine);
                 for (Chord c : line.chords) {
-                    int insertIndex = offset + Math.max(Math.round(c.column), 0);
+                    int insertIndex = Math.min(offset + Math.max(Math.round(c.column), 0), htmlBuilder.length());
                     if (c.column < 0) {
                         htmlBuilder.insert(offset, "&nbsp;");
                         offset += 6;
                     }
-                    for (int i = 0, l = insertIndex - htmlBuilder.length(); i < l; i++) {
-                        htmlBuilder.append("&nbsp;");
-                        offset += 6;
-                        insertIndex += 5;
-                        if (i == l - 1) {
-                            String placeHolderText = String.format(
-                                    "<span class=\"chord simplePlaceholder\">%s</span>",
-                                    c.toHtml());
-                            htmlBuilder.append(placeHolderText);
-                            offset += placeHolderText.length();
-                        }
-                    }
-
                     String insertText = String.format(
                             "<span class=\"chordPos\"><span class=\"chord\">%s</span></span>",
                             c.toHtml());

@@ -14,7 +14,7 @@
     <title>${song.getTitle()}</title>
 </head>
 
-<body onload="backend = main(); backend.connectToWebSocket()" class="notranslate">
+<body onload="backend = main(); backend.connectToWebSocket(); " class="notranslate">
 
 <main>
     <header>
@@ -92,6 +92,9 @@
 </div>
 
 <script>
+    <#if song.hasChords() && isChords()>
+    fixOverlappingChords();
+    </#if>
     window.onerror = function (e) {
         document.getElementById("errorBox").style.display = 'block';
         console.error(e);

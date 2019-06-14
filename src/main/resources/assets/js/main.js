@@ -142,6 +142,22 @@ function main() {
     }
 }
 
+function fixOverlappingChords() {
+    const allChords = document.getElementsByClassName("chord");
+    for (let i = 1; i < allChords.length; i++) {
+        try {
+            const rectA = allChords[i - 1].getBoundingClientRect();
+            const rectB = allChords[i].getBoundingClientRect();
+            const xDistance = rectB.left - rectA.right - 16;
+            if (xDistance < 0 && !(rectA.bottom < rectB.top || rectA.top > rectB.bottom)) {
+                allChords[i].parentElement.style.paddingLeft = -xDistance + "px";
+            }
+        } catch (e) {
+            console.error("Failed to fix overlapping chords", e);
+        }
+    }
+}
+
 function scroll(e, offset, duration) {
     if (typeof zenscroll !== "undefined") {
         zenscroll.setup(duration, offset);
