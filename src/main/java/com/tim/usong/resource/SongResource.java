@@ -124,7 +124,6 @@ public class SongResource {
             song = new Song(messages.getString("clock"), Song.Type.CLOCK);
             SongWebSocket.songId = song.hashCode();
             SongWebSocket.songType = song.getType();
-            SongWebSocket.page = -1;
             SongWebSocket.notifyDataChanged();
         }
         return Response.ok().build();
@@ -135,7 +134,16 @@ public class SongResource {
     public Response setNextSongAsCurrentSong() {
         if (nextSong != null && nextSong.getFileName() != null
                 && !nextSong.getFileName().equals(song.getFileName())) {
-            setSong(nextSong);
+            if (song.getType() == Song.Type.CLOCK) {
+                // do not change the page number, because we return from the clock
+                song = nextSong;
+                nextSong = null;
+                SongWebSocket.songId = song.hashCode();
+                SongWebSocket.songType = song.getType();
+                SongWebSocket.notifyDataChanged();
+            } else {
+                setSong(nextSong);
+            }
         }
         return Response.ok().build();
     }

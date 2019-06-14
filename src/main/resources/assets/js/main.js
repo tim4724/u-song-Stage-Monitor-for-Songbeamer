@@ -132,9 +132,6 @@ function main() {
                 }
             }
         },
-        black: function () {
-            simplePostRequest('song/page/' + -1);
-        },
         next: function () {
             simplePostRequest('song/next/');
         },

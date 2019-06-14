@@ -1,44 +1,30 @@
 package com.tim.usong.core.entity;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class Chord implements Comparable<Chord> {
-    private static final String[] CHORDS = {
-            "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
-    };
-    private static final String[] CHORDS_ACCIDENTAL = {
-            "C", "D<", "D", "E<", "E", "F", "G<", "G", "A<", "A", "B<", "B"
-    };
+    private static final String[] CHORDS = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    private static final String[] CHORDS_ACC = {"C", "D<", "D", "E<", "E", "F", "G<", "G", "A<", "A", "B<", "B"};
     public final String chord;
     public final float column;
 
     public Chord(float column, String chord, int transpose, boolean transpAccidental) {
         this.column = column;
-        if (transpose == 0 || (transpose + CHORDS.length) % CHORDS.length == 0) {
+        if ((transpose + CHORDS.length) % CHORDS.length == 0) {
             this.chord = chord.replaceAll("M", "maj");
             return;
         }
 
         String[] subChords = chord.split("/");
         for (int i = 0; i < subChords.length; i++) {
-            int chordIndex = -1;
-            for (int j = CHORDS.length - 1; j >= 0 && chordIndex < 0; j--) {
-                if (subChords[i].startsWith(CHORDS[j])) {
-                    chordIndex = j;
-                }
+            String simpleChord = getSimpleChord(subChords[i]);
+            int chordIndex = getChordIndex(simpleChord);
+            if (chordIndex != -1) {
+                int transposedIndex = (chordIndex + transpose + CHORDS.length) % CHORDS.length;
+                String newChord = transpAccidental ? CHORDS_ACC[transposedIndex] : CHORDS[transposedIndex];
+                subChords[i] = subChords[i].replace(simpleChord, newChord);
             }
-            for (int j = 0; j < CHORDS_ACCIDENTAL.length && chordIndex < 0; j++) {
-                if (subChords[i].startsWith(CHORDS_ACCIDENTAL[j])) {
-                    chordIndex = j;
-                }
-            }
-            if (chordIndex < 0) {
-                // Not a valid chord. Just ignore it.
-                continue;
-            }
-            int transposedIndex = (chordIndex + transpose + CHORDS.length) % CHORDS.length;
-            String newChord = transpAccidental ? CHORDS_ACCIDENTAL[transposedIndex] : CHORDS[transposedIndex];
-            subChords[i] = newChord + subChords[i].substring(CHORDS[chordIndex].length());
         }
         this.chord = StringUtils.join(subChords, "/").replaceAll("M", "maj");
     }
@@ -53,22 +39,16 @@ public class Chord implements Comparable<Chord> {
     }
 
     public String toHtml() {
-        StringBuilder htmlChord = new StringBuilder();
-        for (char c : chord.toCharArray()) {
-            if (c == ' ') {
-                htmlChord.append("&nbsp;");
-            } else if (c >= '0' && c <= '3') {
-                htmlChord.append("&#").append(177 + Character.getNumericValue(c)).append(';');
-            } else if (c >= '4' && c <= '9') {
-                htmlChord.append("&#").append(8304 + Character.getNumericValue(c)).append(';');
-            } else if (c == '<') {
-                htmlChord.append("&flat;");
-            } else if (c == '=') {
-                htmlChord.append("&natur;");
-            } else {
-                htmlChord.append(c);
-            }
-        }
-        return htmlChord.toString();
+        return chord.replaceAll("<", "&flat;").replaceAll("=", "&natur;");
+    }
+
+    private static int getChordIndex(String c) {
+        String[] allChords = {"C", "D<", "D", "E<", "F<", "F", "G<", "G", "A<", "A", "B<", "C<",
+                "B#", "C#", "D", "D#", "E", "E#", "F#", "G", "G#", "A", "A#", "B"};
+        return ArrayUtils.indexOf(allChords, c) % CHORDS.length;
+    }
+
+    private static String getSimpleChord(String c) {
+        return c.substring(0, (c.length() > 1 && (c.charAt(1) == '#' || c.charAt(1) == '<')) ? 2 : 1);
     }
 }
