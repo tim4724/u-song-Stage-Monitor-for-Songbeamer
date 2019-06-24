@@ -3,6 +3,7 @@ package com.tim.usong.resource;
 import com.tim.usong.GlobalPreferences;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.entity.Song;
+import com.tim.usong.ui.FullScreenStageMonitor;
 import com.tim.usong.view.SongView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import java.util.ResourceBundle;
 
 @Path("song")
 public class SongResource {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
     private final SongParser songParser;
     private Song song;
@@ -48,6 +50,15 @@ public class SongResource {
             setSong(new Song(title, Song.Type.INFO));
         } else {
             setSong(songParser.parse(songFilename));
+        }
+
+        int showOnDisplay = GlobalPreferences.getFullscreenDisplay();
+        if (showOnDisplay != -1 && !FullScreenStageMonitor.isDisplaying()) {
+            try {
+                FullScreenStageMonitor.showOnDisplay(showOnDisplay);
+            } catch (Exception e) {
+                logger.error("Failed to display in fullscreen mode", e);
+            }
         }
     }
 

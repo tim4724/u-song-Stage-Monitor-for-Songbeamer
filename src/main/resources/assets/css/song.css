@@ -6,7 +6,6 @@ html {
 body {
     text-align: center;
     background: black;
-    cursor: none;
     overflow: hidden;
     animation-name: enterAnimation;
     animation-duration: 0.7s;

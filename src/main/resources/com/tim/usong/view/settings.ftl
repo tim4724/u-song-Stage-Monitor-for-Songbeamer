@@ -43,10 +43,30 @@
             const input = document.getElementById(id);
             simplePutRequest("settings?" + id + "=" + input.value, forceReload);
         }
+
+        let clientsCount = -1;
+        const connectToWebSocket = function () {
+            const ws = new WebSocket("ws://" + location.host + "/song/ws?status=true");
+            ws.onmessage = function (ev) {
+                let data = JSON.parse(ev.data);
+                if (clientsCount === -1) {
+                    clientsCount = data.clients
+                } else if (clientsCount !== data.clients) {
+                    // listen for changes in clientsCount because this could mean,
+                    // the fullscreen window was closed
+                    // Reload the page to ensure the correct value is displayed in preference "showFullscreen"
+                    location.reload(true);
+                }
+            };
+            ws.onclose = function (ev) {
+                setTimeout(connectToWebSocket, 500);
+                console.error("ws closed" + ev.reason);
+            };
+        }
     </script>
 </head>
 
-<body>
+<body onload="connectToWebSocket()">
 <main>
     <h1 id="title">${messages.getString("settings")}</h1>
 
@@ -94,6 +114,28 @@
 
     <section class="settingGroup">
         <div class="settingGroupTitle">${messages.getString("presentation")}</div>
+
+        <div class="setting">
+            <span class="settingText">${messages.getString("showFullscreen")}</span>
+            <label class="right">
+                <#if isAllowSetMaxLinesPerPage() || true>
+                    <select id="showOnDisplay" onchange="new function() {onInputChanged('showOnDisplay')};">
+                        <option value="-1" ${(getFullscreenDisplay() == -1)?then("selected", "")}>
+                            Nicht zeigen
+                        </option>
+                        <#list 1..screensCount as i>
+                            <option value="${i-1}" ${(getFullscreenDisplay() == i-1)?then("selected", "")}>
+                                Display ${i}
+                            </option>
+                        </#list>
+                    </select>
+                <#else>
+                    <span class="disabled">
+                    ${messages.getString("showFullscreenNotAvailable")}
+                </span>
+                </#if>
+            </label>
+        </div>
 
         <div class="setting">
             <span class="settingText">${messages.getString("showClockInSong")}</span>

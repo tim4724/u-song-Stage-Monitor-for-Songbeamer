@@ -6,6 +6,7 @@ import com.tim.usong.core.SongbeamerSettings;
 import com.tim.usong.util.AutoStart;
 import io.dropwizard.views.View;
 
+import java.awt.*;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -13,12 +14,14 @@ public class SettingsView extends View {
     private final ResourceBundle messages;
     private final SongParser songParser;
     private final SongbeamerSettings sbSettings;
+    private final int screensCount;
 
     public SettingsView(Locale locale, SongbeamerSettings sbSettings, SongParser songParser) {
         super("settings.ftl");
         this.messages = ResourceBundle.getBundle("MessagesBundle", locale);
         this.sbSettings = sbSettings;
         this.songParser = songParser;
+        screensCount = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices().length;
     }
 
     public boolean isAutostartEnabled() {
@@ -73,7 +76,15 @@ public class SettingsView extends View {
         return GlobalPreferences.isShowClockInSong();
     }
 
+    public int getFullscreenDisplay() {
+        return GlobalPreferences.getFullscreenDisplay();
+    }
+
     public boolean isShowChords() {
         return GlobalPreferences.getShowChords();
+    }
+
+    public int getScreensCount() {
+        return screensCount;
     }
 }

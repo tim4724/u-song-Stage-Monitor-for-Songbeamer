@@ -5,6 +5,7 @@ import com.tim.usong.USongApplication;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerSettings;
 import com.tim.usong.core.entity.Song;
+import com.tim.usong.ui.FullScreenStageMonitor;
 import com.tim.usong.ui.SelectSongDirectoryDialog;
 import com.tim.usong.util.AutoStart;
 import com.tim.usong.util.SongbeamerUpdateChecker;
@@ -49,11 +50,12 @@ public class SettingsResource {
                                  @QueryParam("songDir") Boolean songDir,
                                  @QueryParam("titleHasPage") Boolean titleHasPage,
                                  @QueryParam("maxLinesPage") Integer maxLinesPage,
-                                 @QueryParam("chords") Boolean showChords) {
+                                 @QueryParam("chords") Boolean showChords,
+                                 @QueryParam("showOnDisplay") Integer showOnDisplay) {
         if (autoStart == null && showSplashScreen == null && notifyUpdates == null && songDir == null
                 && titleHasPage == null && maxLinesPage == null && notifySongbeamerUpdates == null
-                && showClockInSong == null && showChords == null) {
-            return Response.status(400).build();
+                && showClockInSong == null && showChords == null && showOnDisplay == null) {
+            return Response.status(400).entity("Fehler").build();
         }
 
         if (autoStart != null) {
@@ -108,6 +110,18 @@ public class SettingsResource {
         if (showChords != null) {
             GlobalPreferences.setShowChords(showChords);
             reloadSong();
+        }
+        if (showOnDisplay != null) {
+            try {
+                if (showOnDisplay >= 0) {
+                    GlobalPreferences.setFullscreenDisplay(showOnDisplay);
+                    FullScreenStageMonitor.showOnDisplay(showOnDisplay);
+                } else {
+                    FullScreenStageMonitor.remove();
+                }
+            } catch (Exception e) {
+                return Response.status(500).entity("Fehler").build();
+            }
         }
         return Response.ok().build();
     }

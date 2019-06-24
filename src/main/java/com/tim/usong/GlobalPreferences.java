@@ -93,4 +93,12 @@ public class GlobalPreferences {
     public static boolean getChordsUseBNatural() {
         return preferences.getBoolean("chordsUseBNatural", false);
     }
+
+    public static void setFullscreenDisplay(int displayIndex) {
+        preferences.putInt("fullscreenDisplay", displayIndex);
+    }
+
+    public static int getFullscreenDisplay() {
+        return preferences.getInt("fullscreenDisplay", -1);
+    }
 }
