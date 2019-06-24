@@ -146,6 +146,16 @@
                 <td>${status.lang} / ${status.langCount}</td>
             </tr>
         </#if>
+        <tr>
+            <th>${messages.getString("songHasChords")}</th>
+            <td>
+                <#if status.songHasChords>
+                    ${messages.getString("yes")}
+                <#else>
+                    ${messages.getString("no")}
+                </#if>
+            </td>
+        </tr>
     </table>
 </main>
 

@@ -52,7 +52,7 @@ public class StatusResource {
 
     public class Status {
         private final String version, hostname, ipAddress, sbVersion, songDir, songTitle, currentSection;
-        private final boolean startWithWindows, connected, preview, titelHasOwnPage;
+        private final boolean startWithWindows, connected, preview, titelHasOwnPage, songHasChords;
         private final int clientCount, songCount, currentPage, lang, langCount, maxLinesPerPage;
 
         public Status(Locale locale) {
@@ -77,6 +77,7 @@ public class StatusResource {
             this.langCount = song.getLangCount();
             this.titelHasOwnPage = songParser.isTitleHasOwnPage();
             this.maxLinesPerPage = songParser.getMaxLinesPerPage();
+            this.songHasChords = song.hasChords();
         }
 
         private long countSongs(String songPath) {
@@ -163,6 +164,10 @@ public class StatusResource {
 
         public int getMaxLinesPerPage() {
             return maxLinesPerPage;
+        }
+
+        public boolean isSongHasChords() {
+            return songHasChords;
         }
     }
 }

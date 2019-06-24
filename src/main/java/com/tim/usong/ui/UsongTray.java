@@ -83,8 +83,8 @@ public class UsongTray implements Managed {
     private void openWebView(String path) {
         String title = USongApplication.APP_NAME;
         String url = "http://localhost/" + path;
-        Preferences prefs = Preferences.userNodeForPackage(WebFrame.class).node(path + "2");
-        WebFrame webFrame = new WebFrame(title, url, prefs, 1000, 700, 0.8);
+        Preferences prefs = Preferences.userNodeForPackage(WebFrame.class).node(path);
+        WebFrame webFrame = new WebFrame(title, url, prefs, 1000, 750, 0.8);
         webFrame.setVisible(true);
     }
 

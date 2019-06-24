@@ -22,7 +22,7 @@ public class PreviewFrame implements Managed {
             int x = prefs.getInt("x", -1);
             int y = prefs.getInt("y", -1);
             int defaultWidth = prefs.getInt("width", 300);
-            int defaultHeight = prefs.getInt("height", 200);
+            int defaultHeight = prefs.getInt("height", 240);
 
             GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment()
                     .getDefaultScreenDevice().getDefaultConfiguration();
