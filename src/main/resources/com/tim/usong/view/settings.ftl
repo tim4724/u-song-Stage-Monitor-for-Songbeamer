@@ -14,7 +14,11 @@
             xhr.open('PUT', path, true);
             xhr.onloadend = function () {
                 if (xhr.status !== 200) {
-                    alert(xhr.responseText);
+                    if(xhr.responseText && xhr.responseText.length > 0) {
+                        alert(xhr.responseText);
+                    } else {
+                        alert(${messages.getString("error")})
+                    }
                     location.reload(true);
                 } else {
                     if (forceReload) {
@@ -52,8 +56,7 @@
                 if (clientsCount === -1) {
                     clientsCount = data.clients
                 } else if (clientsCount !== data.clients) {
-                    // listen for changes in clientsCount because this could mean,
-                    // the fullscreen window was closed
+                    // listen for changes in clientsCount because the fullscreen window could have been closed
                     // Reload the page to ensure the correct value is displayed in preference "showFullscreen"
                     location.reload(true);
                 }
@@ -121,11 +124,11 @@
                 <#if isAllowSetMaxLinesPerPage() || true>
                     <select id="showOnDisplay" onchange="new function() {onInputChanged('showOnDisplay')};">
                         <option value="-1" ${(getFullscreenDisplay() == -1)?then("selected", "")}>
-                            Nicht zeigen
+                            ${messages.getString("showNotFullscreen")}
                         </option>
                         <#list 1..screensCount as i>
                             <option value="${i-1}" ${(getFullscreenDisplay() == i-1)?then("selected", "")}>
-                                Display ${i}
+                                ${messages.getString("display")} ${i}
                             </option>
                         </#list>
                     </select>

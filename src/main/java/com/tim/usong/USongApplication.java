@@ -135,9 +135,7 @@ public class USongApplication extends Application<Configuration> implements Serv
             try {
                 FullScreenStageMonitor.showOnDisplay(showOnDisplay);
             } catch (Exception e) {
-                logger.error("Failed to display in fullscreen mode", e);
-                // TODO: messages
-                showErrorDialog("asdf", e);
+                logger.error("Failed to display in fullscreen mode " + showOnDisplay, e);
             }
         }
 

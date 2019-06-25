@@ -120,7 +120,8 @@ public class SettingsResource {
                     FullScreenStageMonitor.remove();
                 }
             } catch (Exception e) {
-                return Response.status(500).entity("Fehler").build();
+                ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+                return Response.status(500).entity(messages.getString("showFullscreenError")).build();
             }
         }
         return Response.ok().build();
