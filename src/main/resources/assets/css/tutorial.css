@@ -2,7 +2,7 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: center;
     background: #000;
-    font-size: 16px;
+    font-size: 18px;
     color: white;
 }
 
@@ -13,6 +13,8 @@ body {
 }
 
 main {
+    max-width: calc(100vw - 32px);
+    min-width: 640px;
     margin: 16px 16px 0;
     display: inline-block;
     padding: 0 24px 24px 24px;
@@ -21,8 +23,8 @@ main {
     border: 6px solid #181818;
 }
 
-#urls {
-    font-size: 2em;
+.setting {
+    font-size: 1.3em;
 }
 
 a {
@@ -32,12 +34,35 @@ a {
 .tutorialHeadline {
     text-align: left;
     font-weight: normal;
-    font-size: 1.5em;
 }
 
 img {
-    max-width: 100%;
+    max-width: 95%;
     height: auto;
     border-radius: 4px;
     border: 2px solid white;
+}
+
+#tutorialRemote {
+    width: 49%;
+    display: inline-block;
+    float: left;
+}
+
+#tutorialLocal {
+    width: 49%;
+    display: inline-block;
+    float: right;
+}
+
+.setting select {
+    zoom: 1.3;
+}
+
+.tutorialNumber {
+    font-size: 1.3em;
+}
+
+.disabled {
+    opacity: 0.5;
 }

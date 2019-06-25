@@ -117,7 +117,7 @@ public class SettingsResource {
                     GlobalPreferences.setFullscreenDisplay(showOnDisplay);
                     FullScreenStageMonitor.showOnDisplay(showOnDisplay);
                 } else {
-                    FullScreenStageMonitor.remove();
+                    FullScreenStageMonitor.close();
                 }
             } catch (Exception e) {
                 ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");

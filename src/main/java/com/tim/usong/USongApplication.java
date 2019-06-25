@@ -130,14 +130,7 @@ public class USongApplication extends Application<Configuration> implements Serv
         if (sbSettings.chordsUseBNatural != null) {
             GlobalPreferences.setChordsUseBNatural(sbSettings.chordsUseBNatural);
         }
-        int showOnDisplay = GlobalPreferences.getFullscreenDisplay();
-        if (showOnDisplay != -1) {
-            try {
-                FullScreenStageMonitor.showOnDisplay(showOnDisplay);
-            } catch (Exception e) {
-                logger.error("Failed to display in fullscreen mode " + showOnDisplay, e);
-            }
-        }
+
 
         SongParser songParser = new SongParser(songDir, titleHasOwnPage, maxLinesPerPage);
         SongResource songResource = new SongResource(songParser);
@@ -151,7 +144,6 @@ public class USongApplication extends Application<Configuration> implements Serv
             return;
         }
         PreviewFrame previewFrame = new PreviewFrame();
-
         jersey.register(new RootResource());
         jersey.register(songResource);
         jersey.register(new SettingsResource(sbSettings, songParser, songResource));
@@ -180,6 +172,14 @@ public class USongApplication extends Application<Configuration> implements Serv
         }
         if (GlobalPreferences.isNotifySongbeamerUpdates() && songbeamerVersion != null) {
             SongbeamerUpdateChecker.checkForUpdateAsync(songbeamerVersion);
+        }
+        int showOnDisplay = GlobalPreferences.getFullscreenDisplay();
+        if (showOnDisplay != -1) {
+            try {
+                FullScreenStageMonitor.showOnDisplay(showOnDisplay);
+            } catch (Exception e) {
+                logger.error("Failed to display in fullscreen mode " + showOnDisplay, e);
+            }
         }
     }
 

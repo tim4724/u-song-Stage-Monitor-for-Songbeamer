@@ -6,67 +6,7 @@
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/settings.css">
     <title>${messages.getString("settings")}</title>
-    <script>
-        let timer;
-
-        function simplePutRequest(path, forceReload = false) {
-            let xhr = new XMLHttpRequest();
-            xhr.open('PUT', path, true);
-            xhr.onloadend = function () {
-                if (xhr.status !== 200) {
-                    if(xhr.responseText && xhr.responseText.length > 0) {
-                        alert(xhr.responseText);
-                    } else {
-                        alert(${messages.getString("error")})
-                    }
-                    location.reload(true);
-                } else {
-                    if (forceReload) {
-                        location.reload(true);
-                    } else {
-                        const savedHint = document.getElementById("savedHint");
-                        savedHint.classList.remove("invisible");
-                        if (timer) {
-                            clearTimeout(timer);
-                        }
-                        timer = setTimeout(function () {
-                            savedHint.classList.add("invisible");
-                        }, 2000);
-                    }
-                }
-            };
-            xhr.send()
-        }
-
-        function onCheckedChanged(id) {
-            const cb = document.getElementById(id);
-            simplePutRequest("settings?" + id + "=" + cb.checked);
-        }
-
-        function onInputChanged(id, forceReload = false) {
-            const input = document.getElementById(id);
-            simplePutRequest("settings?" + id + "=" + input.value, forceReload);
-        }
-
-        let clientsCount = -1;
-        const connectToWebSocket = function () {
-            const ws = new WebSocket("ws://" + location.host + "/song/ws?status=true");
-            ws.onmessage = function (ev) {
-                let data = JSON.parse(ev.data);
-                if (clientsCount === -1) {
-                    clientsCount = data.clients
-                } else if (clientsCount !== data.clients) {
-                    // listen for changes in clientsCount because the fullscreen window could have been closed
-                    // Reload the page to ensure the correct value is displayed in preference "showFullscreen"
-                    location.reload(true);
-                }
-            };
-            ws.onclose = function (ev) {
-                setTimeout(connectToWebSocket, 500);
-                console.error("ws closed" + ev.reason);
-            };
-        }
-    </script>
+    <script src="/assets/js/settings.js"></script>
 </head>
 
 <body onload="connectToWebSocket()">
@@ -121,7 +61,7 @@
         <div class="setting">
             <span class="settingText">${messages.getString("showFullscreen")}</span>
             <label class="right">
-                <#if isAllowSetMaxLinesPerPage() || true>
+                <#if (getScreensCount() > 1)>
                     <select id="showOnDisplay" onchange="new function() {onInputChanged('showOnDisplay')};">
                         <option value="-1" ${(getFullscreenDisplay() == -1)?then("selected", "")}>
                             ${messages.getString("showNotFullscreen")}
@@ -134,8 +74,8 @@
                     </select>
                 <#else>
                     <span class="disabled">
-                    ${messages.getString("showFullscreenNotAvailable")}
-                </span>
+                        ${messages.getString("showFullscreenNotAvailable")}
+                    </span>
                 </#if>
             </label>
         </div>

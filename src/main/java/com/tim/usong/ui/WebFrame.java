@@ -1,38 +1,18 @@
 package com.tim.usong.ui;
 
-import com.tim.usong.util.Browser;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class WebFrame extends JFrame {
     private static final Map<String, WebFrame> activeFrames = new HashMap<>();
-    private final ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-    private final KeyCombination increaseZoom = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination increaseZoom2 = new KeyCodeCombination(KeyCode.ADD, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination decreaseZoom = new KeyCodeCombination(KeyCode.SUBTRACT, KeyCombination.CONTROL_DOWN);
-    private final KeyCombination decreaseZoom2 = new KeyCodeCombination(KeyCode.MINUS, KeyCombination.CONTROL_DOWN);
     private final Preferences prefs;
     private final String url;
-    private WebView webView;
-    private double zoom;
+    private final WebJFXPanel webPanel;
 
-    WebFrame(String title, String url, Preferences prefs, int width, int height, double z) {
-        this.zoom = z;
+    WebFrame(String title, String url, Preferences prefs, int width, int height, double zoom) {
         this.url = url;
         this.prefs = prefs;
         setTitle(title);
@@ -53,58 +33,8 @@ public class WebFrame extends JFrame {
             setLocationRelativeTo(null);
         }
 
-        final JFXPanel jfxPanel = new JFXPanel();
-        jfxPanel.setBackground(Color.BLACK);
-        add(jfxPanel);
-
-        // avoid that some kinda important jfx thread dies or something if preview window is closed
-        Platform.setImplicitExit(false);
-
-        Platform.runLater(() -> {
-            webView = new WebView();
-            webView.setZoom(zoom = prefs.getDouble("zoom", zoom));
-            WebEngine webEngine = webView.getEngine();
-            webEngine.load(url);
-            webEngine.setCreatePopupHandler(config -> {
-                // grab the last hyperlink that has :hover pseudoclass
-                Object o = webEngine.executeScript("var list = document.querySelectorAll( ':hover' );"
-                        + "for (i=list.length-1; i>-1; i--) "
-                        + "{ if ( list.item(i).getAttribute('href') ) "
-                        + "{ list.item(i).getAttribute('href'); break; } }");
-                if (o != null) {
-                    Browser.open(o.toString());
-                }
-                return null; // prevent from opening in webView
-            });
-            jfxPanel.setScene(new Scene(webView));
-
-            MenuItem plus = new MenuItem(messages.getString("zoomIncrease"));
-            MenuItem minus = new MenuItem(messages.getString("zoomDecrease"));
-            MenuItem reload = new MenuItem(messages.getString("reload"));
-            MenuItem openInBrowser = new MenuItem(messages.getString("openInBrowser"));
-            plus.setOnAction(e -> webView.setZoom(zoom += 0.02));
-            minus.setOnAction(e -> webView.setZoom(zoom -= 0.02));
-            reload.setOnAction(e -> webEngine.reload());
-            openInBrowser.setOnAction(e -> Browser.open(url));
-
-            ContextMenu contextMenu = new ContextMenu();
-            contextMenu.getItems().addAll(plus, minus, reload, openInBrowser);
-
-            webView.setContextMenuEnabled(false);
-            webView.setOnContextMenuRequested(event -> {
-                event.consume();
-                contextMenu.show(webView, event.getScreenX(), event.getScreenY());
-            });
-            webView.setOnKeyPressed(event -> {
-                if (increaseZoom.match(event) || increaseZoom2.match(event)) {
-                    webView.setZoom(zoom += 0.02);
-                } else if (decreaseZoom.match(event) || decreaseZoom2.match(event)) {
-                    webView.setZoom(zoom -= 0.02);
-                } else if (event.getCode() == KeyCode.F5) {
-                    webEngine.reload();
-                }
-            });
-        });
+        webPanel = new WebJFXPanel(prefs.getDouble("zoom", zoom), url, this::dispose);
+        add(webPanel);
         Runtime.getRuntime().addShutdownHook(new Thread(this::savePrefs));
     }
 
@@ -117,20 +47,23 @@ public class WebFrame extends JFrame {
                 oldWebFrame.dispose();
             }
             activeFrames.put(url, this);
-            Platform.runLater(() -> webView.getEngine().load(url));
+            webPanel.reload();
+
+        } else {
+            webPanel.stopWebEngine();
         }
     }
 
     @Override
     public void dispose() {
         // stop webview engine
-        Platform.runLater(() -> webView.getEngine().load(null));
+        webPanel.stopWebEngine();
         savePrefs();
         super.dispose();
     }
 
     private void savePrefs() {
-        prefs.putDouble("zoom", zoom);
+        prefs.putDouble("zoom", webPanel.getZoom());
         prefs.putInt("height", getHeight());
         prefs.putInt("width", getWidth());
         prefs.putInt("x", getX());
