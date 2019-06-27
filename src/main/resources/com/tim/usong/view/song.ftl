@@ -35,11 +35,13 @@
                 <div class="page">
                     <#if (page.linesCount > 0)>
                         <div class="pageContent">
-                            <#if song.hasChords() && isChords()>
-                                ${page.toHtmlWithCords()}
-                            <#else>
-                                ${page.toHtml()}
-                            </#if>
+                            <#noautoesc>
+                                <#if song.hasChords() && isChords()>
+                                    ${page.toHtmlWithCords()}
+                                <#else>
+                                    ${page.toHtml()}
+                                </#if>
+                            </#noautoesc>
                         </div>
                     </#if>
                 </div>

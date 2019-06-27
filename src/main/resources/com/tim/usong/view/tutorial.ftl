@@ -33,7 +33,7 @@
         <h2 class="tutorialHeadline"><span class="tutorialNumber">2b </span>${messages.getString("tutorial2b")}</h2>
         <div class="setting">
             <label>
-                <#if (getScreensCount() > 1)>
+                <#if (getScreensCount() > 1 || true ) >
                     <select id="showOnDisplay" onchange="new function() {onInputChanged('showOnDisplay')};">
                         <option value="-1" ${(getFullscreenDisplay() == -1)?then("selected", "")}>
                             ${messages.getString("showNotFullscreen")}

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 public class WebFrame extends JFrame {
+    //TODO: ensure that multithreading will be no problem
     private static final Map<String, WebFrame> activeFrames = new HashMap<>();
     private final Preferences prefs;
     private final String url;
@@ -35,6 +36,7 @@ public class WebFrame extends JFrame {
 
         webPanel = new WebJFXPanel(prefs.getDouble("zoom", zoom), url, this::dispose);
         add(webPanel);
+        // TODO: probably not the best idea to add a shutdownhook for every webframe instance ever created
         Runtime.getRuntime().addShutdownHook(new Thread(this::savePrefs));
     }
 

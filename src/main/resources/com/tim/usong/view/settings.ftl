@@ -140,7 +140,9 @@
             </label>
         </div>
 
-        <div class="warning">${messages.getString("restartSongbeamerWarning")}</div>
+        <#noautoesc>
+            <div class="warning">${messages.getString("restartSongbeamerWarning")}</div>
+        </#noautoesc>
     </section>
 
     <div id="savedHint" class="invisible">

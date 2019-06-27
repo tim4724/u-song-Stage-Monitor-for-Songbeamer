@@ -37,6 +37,19 @@ class WebJFXPanel extends JFXPanel {
         webView.setZoom(zoom);
         WebEngine webEngine = webView.getEngine();
         webEngine.load(url);
+
+        webEngine.setCreatePopupHandler(config -> {
+            // grab the last hyperlink that has :hover pseudoclass
+            Object o = webEngine.executeScript("var list = document.querySelectorAll( ':hover' );"
+                    + "for (i=list.length-1; i>-1; i--) "
+                    + "{ if ( list.item(i).getAttribute('href') ) "
+                    + "{ list.item(i).getAttribute('href'); break; } }");
+            if (o != null) {
+                Browser.open(o.toString());
+            }
+            return null; // prevent from opening in webView
+        });
+
         MenuItem plus = new MenuItem(messages.getString("zoomIncrease"));
         MenuItem minus = new MenuItem(messages.getString("zoomDecrease"));
         MenuItem reload = new MenuItem(messages.getString("reload"));
@@ -65,6 +78,7 @@ class WebJFXPanel extends JFXPanel {
                 reload();
             }
         });
+
 
         setScene(new Scene(webView));
     }
