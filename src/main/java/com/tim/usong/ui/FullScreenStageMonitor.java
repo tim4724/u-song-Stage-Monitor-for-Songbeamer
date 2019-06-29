@@ -8,6 +8,7 @@ import java.util.prefs.Preferences;
 
 public class FullScreenStageMonitor extends JWindow {
     private static final Object lock = new Object();
+    private static final String url = "http://localhost/song";
     private static FullScreenStageMonitor INSTANCE;
     private final Preferences prefs = Preferences.userNodeForPackage(FullScreenStageMonitor.class)
             .node("fullscreenStageMonitor");
@@ -45,7 +46,6 @@ public class FullScreenStageMonitor extends JWindow {
 
     private FullScreenStageMonitor() {
         setBackground(Color.BLACK);
-        String url = "http://localhost/song";
         webPanel = new WebJFXPanel(prefs.getDouble("zoom", 1), url, FullScreenStageMonitor::close);
         add(webPanel);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
@@ -77,7 +77,7 @@ public class FullScreenStageMonitor extends JWindow {
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {
-            webPanel.reload();
+            webPanel.load(url);
         } else {
             webPanel.stopWebEngine();
         }

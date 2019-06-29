@@ -1,5 +1,6 @@
 package com.tim.usong.ui;
 
+import com.tim.usong.USongApplication;
 import com.tim.usong.util.Browser;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -57,7 +58,7 @@ class WebJFXPanel extends JFXPanel {
         MenuItem close = new MenuItem(messages.getString("close"));
         plus.setOnAction(e -> webView.setZoom(webView.getZoom() + 0.02));
         minus.setOnAction(e -> webView.setZoom(webView.getZoom() - 0.02));
-        reload.setOnAction(e -> reload());
+        reload.setOnAction(e -> webEngine.reload());
         openInBrowser.setOnAction(e -> Browser.open(url));
         close.setOnAction(e -> closeAction.run());
 
@@ -75,16 +76,16 @@ class WebJFXPanel extends JFXPanel {
             } else if (decreaseZoom.match(event) || decreaseZoom2.match(event)) {
                 webView.setZoom(webView.getZoom() - 0.02);
             } else if (event.getCode() == KeyCode.F5) {
-                reload();
+                webEngine.reload();
             }
         });
-
+        webEngine.setOnAlert(e -> USongApplication.showErrorDialogAsync(e.getData(), null));
 
         setScene(new Scene(webView));
     }
 
-    void reload() {
-        Platform.runLater(() -> webView.getEngine().reload());
+    void load(String url) {
+        Platform.runLater(() -> webView.getEngine().load(url));
     }
 
     double getZoom() {

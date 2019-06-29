@@ -126,6 +126,12 @@
     </table>
 
     <table>
+        <#if (status.fullscreenDisplay >= 0) >
+            <tr>
+                <th>${messages.getString("fullscreenMode")}</th>
+                <td>${messages.getString("display")} ${status.fullscreenDisplay +1}</td>
+            </tr>
+        </#if>
         <tr>
             <th>${messages.getString("currentSong")}</th>
             <td>${status.songTitle}</td>

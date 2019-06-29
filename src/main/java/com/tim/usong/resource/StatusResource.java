@@ -1,11 +1,13 @@
 package com.tim.usong.resource;
 
 import com.google.common.base.Strings;
+import com.tim.usong.GlobalPreferences;
 import com.tim.usong.USongApplication;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.SongbeamerActionListener;
 import com.tim.usong.core.entity.Section;
 import com.tim.usong.core.entity.Song;
+import com.tim.usong.ui.FullScreenStageMonitor;
 import com.tim.usong.ui.PreviewFrame;
 import com.tim.usong.util.AutoStart;
 import com.tim.usong.util.NetworkHost;
@@ -53,7 +55,7 @@ public class StatusResource {
     public class Status {
         private final String version, hostname, ipAddress, sbVersion, songDir, songTitle, currentSection;
         private final boolean startWithWindows, connected, preview, titelHasOwnPage, songHasChords;
-        private final int clientCount, songCount, currentPage, lang, langCount, maxLinesPerPage;
+        private final int clientCount, songCount, currentPage, lang, langCount, maxLinesPerPage, fullscreenDisplay;
 
         public Status(Locale locale) {
             ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle", locale);
@@ -78,6 +80,8 @@ public class StatusResource {
             this.titelHasOwnPage = songParser.isTitleHasOwnPage();
             this.maxLinesPerPage = songParser.getMaxLinesPerPage();
             this.songHasChords = song.hasChords();
+            boolean isDisplaying = FullScreenStageMonitor.isDisplaying();
+            this.fullscreenDisplay = isDisplaying ? GlobalPreferences.getFullscreenDisplay() : -1;
         }
 
         private long countSongs(String songPath) {
@@ -168,6 +172,10 @@ public class StatusResource {
 
         public boolean isSongHasChords() {
             return songHasChords;
+        }
+
+        public int getFullscreenDisplay() {
+            return fullscreenDisplay;
         }
     }
 }

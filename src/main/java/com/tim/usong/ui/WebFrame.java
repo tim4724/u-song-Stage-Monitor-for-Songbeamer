@@ -2,12 +2,9 @@ package com.tim.usong.ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 
 public class WebFrame extends JFrame {
-    private static final Map<String, WebFrame> activeFrames = new ConcurrentHashMap<>();
     private final Thread shutdownHook = new Thread(this::savePrefs);
     private final Preferences prefs;
     private final String url;
@@ -43,13 +40,7 @@ public class WebFrame extends JFrame {
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible) {
-            WebFrame oldWebFrame = activeFrames.get(url);
-            if (oldWebFrame != null && oldWebFrame.isVisible()) {
-                oldWebFrame.dispose();
-            }
-            activeFrames.put(url, this);
-            webPanel.reload();
-
+            webPanel.load(url);
         } else {
             webPanel.stopWebEngine();
         }

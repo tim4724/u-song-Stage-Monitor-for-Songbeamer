@@ -12,9 +12,9 @@
 <body onload="connectToWebSocket()">
 <main>
     <h1 id="title">${messages.getString("welcome")}</h1>
-
-    <h2 class="tutorialHeadline"><span class="tutorialNumber">1 </span>${messages.getString("tutorial1")}</h2>
-
+    <#noautoesc>
+        <h2 class="tutorialHeadline"><span class="tutorialNumber">1 </span>${messages.getString("tutorial1")}</h2>
+    </#noautoesc>
     <img src="/assets/img/tutorial.png">
 
     <div id="tutorialRemote">
