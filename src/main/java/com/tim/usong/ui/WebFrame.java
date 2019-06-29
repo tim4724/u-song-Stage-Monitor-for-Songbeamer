@@ -2,13 +2,13 @@ package com.tim.usong.ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 
 public class WebFrame extends JFrame {
-    //TODO: ensure that multithreading will be no problem
-    private static final Map<String, WebFrame> activeFrames = new HashMap<>();
+    private static final Map<String, WebFrame> activeFrames = new ConcurrentHashMap<>();
+    private final Thread shutdownHook = new Thread(this::savePrefs);
     private final Preferences prefs;
     private final String url;
     private final WebJFXPanel webPanel;
@@ -36,8 +36,7 @@ public class WebFrame extends JFrame {
 
         webPanel = new WebJFXPanel(prefs.getDouble("zoom", zoom), url, this::dispose);
         add(webPanel);
-        // TODO: probably not the best idea to add a shutdownhook for every webframe instance ever created
-        Runtime.getRuntime().addShutdownHook(new Thread(this::savePrefs));
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
     }
 
     @Override
@@ -58,7 +57,6 @@ public class WebFrame extends JFrame {
 
     @Override
     public void dispose() {
-        // stop webview engine
         webPanel.stopWebEngine();
         savePrefs();
         super.dispose();
@@ -70,5 +68,6 @@ public class WebFrame extends JFrame {
         prefs.putInt("width", getWidth());
         prefs.putInt("x", getX());
         prefs.putInt("y", getY());
+        Runtime.getRuntime().removeShutdownHook(shutdownHook);
     }
 }

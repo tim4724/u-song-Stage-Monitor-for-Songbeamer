@@ -117,6 +117,7 @@ public class SettingsResource {
                     GlobalPreferences.setFullscreenDisplay(showOnDisplay);
                     FullScreenStageMonitor.showOnDisplay(showOnDisplay);
                 } else {
+                    GlobalPreferences.setFullscreenDisplay(-1);
                     FullScreenStageMonitor.close();
                 }
             } catch (Exception e) {

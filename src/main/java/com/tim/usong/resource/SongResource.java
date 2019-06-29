@@ -207,10 +207,18 @@ public class SongResource {
             String data = String.format(format, songId, songType, page, clientsCount);
             logger.debug("send data to clients");
             for (Session session : sessions) {
-                session.getAsyncRemote().sendText(data);
+                try {
+                    session.getAsyncRemote().sendText(data);
+                } catch (Exception e) {
+                    logger.warn("Failed to sent song data in ws", e);
+                }
             }
             for (Session session : statusSessions) {
-                session.getAsyncRemote().sendText(data);
+                try {
+                    session.getAsyncRemote().sendText(data);
+                } catch (Exception e) {
+                    logger.warn("Failed to sent song data in ws to status client", e);
+                }
             }
         }
 

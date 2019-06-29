@@ -131,7 +131,6 @@ public class USongApplication extends Application<Configuration> implements Serv
             GlobalPreferences.setChordsUseBNatural(sbSettings.chordsUseBNatural);
         }
 
-
         SongParser songParser = new SongParser(songDir, titleHasOwnPage, maxLinesPerPage);
         SongResource songResource = new SongResource(songParser);
         SongbeamerActionListener songbeamerActionListener;
