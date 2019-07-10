@@ -175,9 +175,9 @@ public class USongApplication extends Application<Configuration> implements Serv
         int showOnDisplay = GlobalPreferences.getFullscreenDisplay();
         if (showOnDisplay != -1) {
             try {
-                FullScreenStageMonitor.showOnDisplay(showOnDisplay);
+                //FullScreenStageMonitor.showOnDisplay(showOnDisplay);
             } catch (Exception e) {
-                logger.error("Failed to display in fullscreen mode " + showOnDisplay, e);
+                logger.debug("Failed to display in fullscreen mode " + showOnDisplay, e);
             }
         }
     }

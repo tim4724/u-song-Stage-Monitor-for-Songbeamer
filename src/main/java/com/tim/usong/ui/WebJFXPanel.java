@@ -12,11 +12,14 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.ResourceBundle;
 
 class WebJFXPanel extends JFXPanel {
+    private final Logger logger = LoggerFactory.getLogger(WebJFXPanel.class);
     private final KeyCombination increaseZoom = new KeyCodeCombination(KeyCode.PLUS, KeyCombination.CONTROL_DOWN);
     private final KeyCombination increaseZoom2 = new KeyCodeCombination(KeyCode.ADD, KeyCombination.CONTROL_DOWN);
     private final KeyCombination decreaseZoom = new KeyCodeCombination(KeyCode.SUBTRACT, KeyCombination.CONTROL_DOWN);
@@ -50,6 +53,7 @@ class WebJFXPanel extends JFXPanel {
             }
             return null; // prevent from opening in webView
         });
+        webEngine.setOnError(event -> logger.error(event.getMessage()));
 
         MenuItem plus = new MenuItem(messages.getString("zoomIncrease"));
         MenuItem minus = new MenuItem(messages.getString("zoomDecrease"));
