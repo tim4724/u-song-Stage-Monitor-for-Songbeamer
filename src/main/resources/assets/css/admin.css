@@ -81,17 +81,3 @@ button:hover:enabled {
     right: 20px;
     bottom: unset;
 }
-
-@media only screen and (max-device-width: 1024px) {
-    body {
-        overflow: scroll;
-    }
-
-    button, #activeClients {
-        font-size: 3.5em;
-    }
-
-    #bottomSpacer {
-        height: 550px;
-    }
-}

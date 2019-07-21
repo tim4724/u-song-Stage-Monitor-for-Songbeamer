@@ -57,7 +57,7 @@ public class PreviewFrame implements Managed {
 
     @Override
     public void stop() {
-        // System.exit(0) -> stop() -> isVisible() will still be true even if window is not visible (for some reason)
+        // System.exit(0) -> dispose() -> isVisible() will still be true even if window is not visible (for some reason)
         prefs.putBoolean("show_preview", isVisible());
     }
 }
