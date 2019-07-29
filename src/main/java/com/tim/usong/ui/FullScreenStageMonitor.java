@@ -2,8 +2,6 @@ package com.tim.usong.ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.prefs.Preferences;
 
 public class FullScreenStageMonitor extends JWindow {
@@ -13,7 +11,7 @@ public class FullScreenStageMonitor extends JWindow {
     private final Preferences prefs = Preferences.userNodeForPackage(FullScreenStageMonitor.class)
             .node("fullscreenStageMonitor");
     private final Thread shutdownHook = new Thread(this::savePrefs);
-    private final WebJFXPanel webPanel;
+    private final WebView webPanel;
 
     public static void showOnDisplay(int displayIndex) throws IllegalArgumentException {
         GraphicsDevice[] screenDevices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
@@ -46,8 +44,10 @@ public class FullScreenStageMonitor extends JWindow {
 
     private FullScreenStageMonitor() {
         setBackground(Color.BLACK);
-        webPanel = new WebJFXPanel(prefs.getDouble("zoom", 1), url, FullScreenStageMonitor::close);
-        add(webPanel);
+        //webPanel = new WebJFXPanel(prefs.getDouble("zoom", 1), url, FullScreenStageMonitor::close);
+        //add(webPanel);
+        webPanel = new WebView("http://localhost/song");
+        add(webPanel.getUIComponent());
         Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         // JFX tends to freeze if mouse is dragged
@@ -55,6 +55,7 @@ public class FullScreenStageMonitor extends JWindow {
         // And only on jre newer than 8
         // So what to do? Just Capture all Mouse inputs and dispatch only right clicks to the jfx view
         // Big Hack but it works.
+        /*
         getGlassPane().setVisible(true);
         getGlassPane().addMouseListener(new MouseAdapter() {
             @Override
@@ -70,7 +71,7 @@ public class FullScreenStageMonitor extends JWindow {
                     webPanel.dispatchEvent(e);
                 }
             }
-        });
+        });*/
     }
 
     @Override
@@ -79,14 +80,16 @@ public class FullScreenStageMonitor extends JWindow {
         if (visible) {
             webPanel.load(url);
         } else {
-            webPanel.stopWebEngine();
+            webPanel.closeBrowser();
+            // webPanel.stopWebEngine();
         }
     }
 
     @Override
     public void dispose() {
         savePrefs();
-        webPanel.stopWebEngine();
+        webPanel.closeBrowser();
+        // webPanel.stopWebEngine();
         super.dispose();
     }
 
