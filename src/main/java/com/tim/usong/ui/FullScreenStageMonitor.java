@@ -20,6 +20,9 @@ public class FullScreenStageMonitor extends JWindow {
         if (displayIndex >= screenDevices.length) {
             throw new IllegalArgumentException("Display not found");
         }
+        if(true) {
+            return;
+        }
         synchronized (lock) {
             // Allow only one instance at a time
             if (INSTANCE != null) {

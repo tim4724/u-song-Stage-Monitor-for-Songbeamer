@@ -14,7 +14,7 @@ public class PreviewFrame implements Managed {
 
     public void setVisible(boolean visible) {
         if (isVisible()) {
-            frame.dispose(); // free resources
+        //    frame.dispose(); // free resources
             frame = null;  // free all resources
         }
 
@@ -39,14 +39,16 @@ public class PreviewFrame implements Managed {
             String url = "http://localhost/song?admin=true";
 
             frame = new WebFrame(title, url, prefs, defaultWidth, defaultHeight, 0.2);
+            /*
             frame.setType(Window.Type.POPUP); // TYPE POPUP will not make the taskbar icon blink because of new window
             frame.setAlwaysOnTop(true);
             frame.setVisible(true);
+            */
         }
     }
 
     public boolean isVisible() {
-        return frame != null && frame.isVisible();
+        return frame != null;//&& frame.isVisible();
     }
 
     @Override

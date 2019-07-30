@@ -50,7 +50,7 @@ public class UsongTray implements Managed {
         popupMenu.add(hostItem).addActionListener(e -> Browser.open(e.getActionCommand() + "/song?admin=true"));
         popupMenu.add(ipAddressItem).addActionListener(e -> Browser.open(e.getActionCommand() + "/song?admin=true"));
         popupMenu.addSeparator();
-        popupMenu.add(tutorialItem).addActionListener(e -> new TutorialFrame().setVisible(true));
+        popupMenu.add(tutorialItem).addActionListener(e ->  new TutorialFrame()); //.setVisible(true));
         popupMenu.add(githubItem).addActionListener(e -> Browser.open(GITHUB_LINK));
         popupMenu.add(settingsItem).addActionListener(e -> openWebView("settings"));
         popupMenu.add(exitItem).addActionListener(e -> System.exit(0));
@@ -85,7 +85,7 @@ public class UsongTray implements Managed {
         String url = "http://localhost/" + path;
         Preferences prefs = Preferences.userNodeForPackage(WebFrame.class).node(path);
         WebFrame webFrame = new WebFrame(title, url, prefs, 1000, 750, 0.8);
-        webFrame.setVisible(true);
+      //  webFrame.setVisible(true);
     }
 
     private String getHostname() {
