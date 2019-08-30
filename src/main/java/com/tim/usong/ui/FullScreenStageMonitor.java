@@ -1,100 +1,78 @@
 package com.tim.usong.ui;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Monitor;
+import org.eclipse.swt.widgets.Shell;
+
 import java.util.prefs.Preferences;
 
-public class FullScreenStageMonitor extends JWindow {
+public class FullScreenStageMonitor {
     private static final Object lock = new Object();
     private static final String url = "http://localhost/song";
     private static FullScreenStageMonitor INSTANCE;
     private final Preferences prefs = Preferences.userNodeForPackage(FullScreenStageMonitor.class)
             .node("fullscreenStageMonitor");
     private final Thread shutdownHook = new Thread(this::savePrefs);
-    private final WebJFXPanel webPanel;
+    //private final WebJFXPanel webPanel;
+    private final WebBrowser webBrowser;
 
     public static void showOnDisplay(int displayIndex) throws IllegalArgumentException {
-        GraphicsDevice[] screenDevices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-        if (displayIndex >= screenDevices.length) {
+        Display display = new Display();
+        Monitor[] monitors = display.getMonitors();
+        display.dispose();
+        if (displayIndex >= monitors.length) {
             throw new IllegalArgumentException("Display not found");
-        }
-        if(true) {
-            return;
         }
         synchronized (lock) {
             // Allow only one instance at a time
             if (INSTANCE != null) {
-                INSTANCE.dispose();
+                // INSTANCE.dispose();
             }
-            INSTANCE = new FullScreenStageMonitor();
-            screenDevices[displayIndex].setFullScreenWindow(INSTANCE);
+            INSTANCE = new FullScreenStageMonitor(monitors[displayIndex]);
         }
     }
 
     public static boolean isDisplaying() {
         FullScreenStageMonitor instance = INSTANCE;
-        return instance != null && instance.isVisible();
+        return instance != null;// && instance.isVisible();
     }
 
     public static void close() {
         synchronized (lock) {
             if (INSTANCE != null) {
-                INSTANCE.dispose();
+                // INSTANCE.dispose();
                 INSTANCE = null;
             }
         }
     }
 
-    private FullScreenStageMonitor() {
-        setBackground(Color.BLACK);
-        webPanel = new WebJFXPanel(prefs.getDouble("zoom", 1), url, FullScreenStageMonitor::close);
-        add(webPanel);
-        Runtime.getRuntime().addShutdownHook(shutdownHook);
+    private FullScreenStageMonitor(Monitor monitor) {
+        Display display = new Display();
+        Shell shell = new Shell(display, SWT.ON_TOP | SWT.NO_FOCUS);
+        shell.setImage(new Image(display, getClass().getResourceAsStream("/icon-small2.png")));
+        Rectangle monitorBounds = monitor.getBounds();
+        shell.setSize(monitorBounds.width, monitorBounds.height);
+        shell.setLocation(monitorBounds.x, monitorBounds.y);
+        shell.setFullScreen(true);
+        shell.setLayout(new FillLayout());
+        webBrowser = new WebBrowser(shell, url, 16);
 
-        // JFX tends to freeze if mouse is dragged
-        // But only inside a JWindow (not JFrame)
-        // And only on jre newer than 8
-        // So what to do? Just Capture all Mouse inputs and dispatch only right clicks to the jfx view
-        // Big Hack but it works.
-        getGlassPane().setVisible(true);
-        getGlassPane().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    webPanel.dispatchEvent(e);
-                }
+        shell.open();
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
             }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    webPanel.dispatchEvent(e);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
-        if (visible) {
-            webPanel.load(url);
-        } else {
-            webPanel.stopWebEngine();
         }
+        display.dispose();
     }
 
-    @Override
-    public void dispose() {
-        savePrefs();
-        webPanel.stopWebEngine();
-        super.dispose();
-    }
 
     private void savePrefs() {
-        prefs.putDouble("zoom", webPanel.getZoom());
-        Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        // prefs.putDouble("zoom", webPanel.getZoom());
+        //  Runtime.getRuntime().removeShutdownHook(shutdownHook);
     }
 }

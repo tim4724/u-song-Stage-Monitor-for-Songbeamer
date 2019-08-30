@@ -143,12 +143,26 @@ function main() {
 }
 
 function fixOverlappingChords() {
+    if (!String.prototype.endsWith) {
+        String.prototype.endsWith = function(suffix) {
+            return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        };
+    }
+
     const allChords = document.getElementsByClassName("chord");
+
+    for (let i = 1; i < allChords.length; i++) {
+        allChords[i].parentElement.style.paddingLeft = "0";
+        if(!allChords[i].innerHTML.endsWith("&nbsp;")){
+            allChords[i].innerHTML = allChords[i].innerHTML.trim() + "&nbsp;";
+        }
+    }
+
     for (let i = 1; i < allChords.length; i++) {
         try {
             const rectA = allChords[i - 1].getBoundingClientRect();
             const rectB = allChords[i].getBoundingClientRect();
-            const xDistance = rectB.left - rectA.right - 16;
+            const xDistance = rectB.left - rectA.right;
             if (xDistance < 0 && !(rectA.bottom < rectB.top || rectA.top > rectB.bottom)) {
                 allChords[i].parentElement.style.paddingLeft = -xDistance + "px";
             }

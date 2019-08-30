@@ -64,7 +64,7 @@
 
 <#if admin>
     <footer id="controlsWrapper">
-        <span id="activeClients" class="circleButton">-</span>
+        <button id="activeClients" class="circleButton" disabled>-</button>
         <#if (song.pageCount > 1)>
             <button type="button" class="circleButton" id="upButton" onclick="backend.pageUp()">&#9650;</button>
             <button type="button" class="circleButton" id="downButton" onclick="backend.pageDown()">&#9660;</button>
