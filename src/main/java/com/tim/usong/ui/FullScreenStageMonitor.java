@@ -3,6 +3,7 @@ package com.tim.usong.ui;
 import com.tim.usong.GlobalPreferences;
 import com.tim.usong.util.Browse;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -15,7 +16,13 @@ import java.util.prefs.Preferences;
 public class FullScreenStageMonitor {
     private static final String url = "http://localhost/song";
     private static FullScreenStageMonitor INSTANCE;
+    private static FullscreenStageMonitorListener listener;
+    private final Preferences prefs = Preferences.userNodeForPackage(FullScreenStageMonitor.class)
+            .node("fullscreenStageMonitor");
+    private final Thread shutdownHook = new Thread(this::savePrefs);
     private final Shell shell;
+    private final Rectangle clientArea;
+    private final WebBrowser webBrowser;
 
     public static void showOnDisplay(int displayIndex) throws IllegalArgumentException {
         Display display = new Display();
@@ -25,14 +32,19 @@ public class FullScreenStageMonitor {
             throw new IllegalArgumentException("Display not found");
         }
 
+        close();
         new Thread(() -> {
             synchronized (FullScreenStageMonitor.class) {
                 // Allow only one instance at a time
-                if (INSTANCE == null || INSTANCE.shell.isDisposed()) {
-                    INSTANCE = new FullScreenStageMonitor(monitors[displayIndex]);
-                } else {
-                    INSTANCE.shell.setBounds(monitors[displayIndex].getBounds());
+                INSTANCE = new FullScreenStageMonitor(monitors[displayIndex]);
+                if (listener != null) {
+                    listener.onShown();
                 }
+                INSTANCE.loop();
+                if (listener != null) {
+                    listener.onDisposed();
+                }
+                INSTANCE = null;
             }
         }).start();
     }
@@ -49,15 +61,46 @@ public class FullScreenStageMonitor {
         }
     }
 
-    private FullScreenStageMonitor(Monitor monitor) {
-        Preferences prefs = Preferences.userNodeForPackage(FullScreenStageMonitor.class)
-                .node("fullscreenStageMonitor");
-        Display display = new Display();
-        shell = new Shell(display, SWT.NO_TRIM | SWT.ON_TOP | SWT.NO_FOCUS);
-        shell.setLayout(new FillLayout());
-        shell.setBounds(monitor.getBounds());
+    public static void setListener(FullscreenStageMonitorListener listener) {
+        FullScreenStageMonitor.listener = listener;
+    }
 
-        WebBrowser webBrowser = new WebBrowser(shell, url, prefs.getDouble("zoom2", 16), 16) {
+    public static Rectangle getClientArea() {
+        FullScreenStageMonitor instance = INSTANCE;
+        if (instance != null && !instance.shell.isDisposed()) {
+            return instance.clientArea;
+        }
+        return null;
+    }
+
+    public static double getZoom() {
+        FullScreenStageMonitor instance = INSTANCE;
+        if (instance != null && !instance.shell.isDisposed()) {
+            return instance.webBrowser.getZoom();
+        }
+        return -1;
+    }
+
+    public static void setZoom(double zoom) {
+        FullScreenStageMonitor instance = INSTANCE;
+        if (instance != null && !instance.shell.isDisposed()) {
+            instance.shell.getDisplay().asyncExec(() -> instance.webBrowser.setZoom(zoom));
+        }
+    }
+
+    private FullScreenStageMonitor(Monitor monitor) {
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+        // shell = new Shell(new Display(), SWT.NO_TRIM | SWT.ON_TOP | SWT.NO_FOCUS);
+        Display display = new Display();
+        shell = new Shell(display, SWT.NO_TRIM | SWT.NO_FOCUS);
+        shell.setBounds(monitor.getBounds());
+        shell.setLayout(new FillLayout());
+
+        double initialZoom = prefs.getDouble("zoom2", 16);
+        WebBrowser.ZoomListener zoomListener = newValue -> {
+            if (listener != null) listener.onZoomChange();
+        };
+        webBrowser = new WebBrowser(shell, url, initialZoom, 16, zoomListener) {
             @Override
             public void onCreateMenu(Menu menu) {
                 ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
@@ -72,14 +115,33 @@ public class FullScreenStageMonitor {
             }
         };
 
-        display.disposeExec(() -> prefs.putDouble("zoom2", webBrowser.getZoom()));
+        shell.addDisposeListener(e -> {
+            Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            savePrefs();
+        });
         shell.open();
+        clientArea = webBrowser.getClientArea();
+    }
 
+    private void loop() {
+        Display display = shell.getDisplay();
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
             }
         }
         display.dispose();
+    }
+
+    private void savePrefs() {
+        prefs.putDouble("zoom2", webBrowser.getZoom());
+    }
+
+    public interface FullscreenStageMonitorListener {
+        void onShown();
+
+        void onZoomChange();
+
+        void onDisposed();
     }
 }

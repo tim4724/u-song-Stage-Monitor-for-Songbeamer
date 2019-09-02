@@ -17,7 +17,10 @@ import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class WebFrame {
+    private final Thread shutdownHook = new Thread(this::savePrefs);
+    private final Preferences prefs;
     private Shell shell;
+    private WebBrowser webBrowser;
 
     WebFrame(String title, String url, Preferences prefs, int defaultWidth, int defaultHeight, double defaultZoom) {
         this(title, url, prefs, defaultWidth, defaultHeight, defaultZoom, SWT.SHELL_TRIM);
@@ -25,6 +28,8 @@ public class WebFrame {
 
     WebFrame(String title, String url, Preferences prefs, int defaultWidth, int defaultHeight, double defaultZoom,
              int style) {
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+        this.prefs = prefs;
         int x = prefs.getInt("x", -1);
         int y = prefs.getInt("y", -1);
         int width = prefs.getInt("width", defaultWidth);
@@ -46,7 +51,7 @@ public class WebFrame {
             layout.marginHeight = layout.marginWidth = 0;
             shell.setLayout(layout);
 
-            WebBrowser webBrowser = new WebBrowser(shell, url, zoom, defaultZoom) {
+            webBrowser = new WebBrowser(shell, url, zoom, defaultZoom) {
                 @Override
                 public void onCreateMenu(Menu menu) {
                     ResourceBundle msgs = ResourceBundle.getBundle("MessagesBundle");
@@ -61,16 +66,12 @@ public class WebFrame {
             shell.addShellListener(new ShellAdapter() {
                 @Override
                 public void shellClosed(ShellEvent e) {
-                    Rectangle bounds = shell.getBounds();
-                    prefs.putDouble("zoom2", webBrowser.getZoom());
-                    prefs.putInt("height", bounds.height);
-                    prefs.putInt("width", bounds.width);
-                    prefs.putInt("x", bounds.x);
-                    prefs.putInt("y", bounds.y);
+                    Runtime.getRuntime().removeShutdownHook(shutdownHook);
+                    savePrefs();
                 }
             });
 
-            onBeforeOpen(shell);
+            onBeforeOpen(shell, webBrowser);
             shell.open();
             while (!shell.isDisposed()) {
                 if (!display.readAndDispatch()) {
@@ -81,7 +82,7 @@ public class WebFrame {
         }).start();
     }
 
-    public void onBeforeOpen(Shell shell) {
+    public void onBeforeOpen(Shell shell, WebBrowser webBrowser) {
     }
 
     public void close() {
@@ -93,5 +94,16 @@ public class WebFrame {
 
     public boolean isDisposed() {
         return shell == null || shell.isDisposed();
+    }
+
+    private void savePrefs() {
+        shell.getDisplay().syncExec(() -> {
+            Rectangle bounds = shell.getBounds();
+            prefs.putDouble("zoom2", webBrowser.getZoom());
+            prefs.putInt("height", bounds.height);
+            prefs.putInt("width", bounds.width);
+            prefs.putInt("x", bounds.x);
+            prefs.putInt("y", bounds.y);
+        });
     }
 }

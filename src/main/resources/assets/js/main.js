@@ -32,7 +32,15 @@ function main() {
                 // reload page if new song is selected or beamer does show something that is not a song
                 setTimeout(function () {
                     location.reload(true);
-                }, 700);
+                }, 500);
+                const sectionNames = document.getElementsByClassName('sectionName');
+                for (let i = 0; i < sectionNames.length; i++) {
+                    sectionNames[i].classList.add('fadeOut');
+                }
+                const allChords = document.getElementsByClassName("chord");
+                for (let i = 0; i < allChords.length; i++) {
+                    allChords[i].classList.add('fadeOut');
+                }
                 document.body.classList.add('fadeOut');
             } else {
                 if (clockButton && data.songType === "SNG") {
@@ -156,7 +164,7 @@ function fixOverlappingChords() {
 
     const allChords = document.getElementsByClassName("chord");
 
-    for (let i = 1; i < allChords.length; i++) {
+    for (let i = 0; i < allChords.length; i++) {
         allChords[i].parentElement.style.paddingLeft = "0";
         if (!allChords[i].innerHTML.endsWith("&nbsp;")) {
             allChords[i].innerHTML = allChords[i].innerHTML.trim() + "&nbsp;";

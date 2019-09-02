@@ -6,6 +6,7 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -14,10 +15,16 @@ import org.eclipse.swt.widgets.MenuItem;
 public class WebBrowser {
     final Browser browser;
     private final double defaultZoom;
+    private ZoomListener zoomListener;
     private double zoom;
 
     public WebBrowser(Composite parent, String url, double initialZoom, double defaultZoom) {
+        this(parent, url, initialZoom, defaultZoom, null);
+    }
+
+    public WebBrowser(Composite parent, String url, double initialZoom, double defaultZoom, ZoomListener listener) {
         this.defaultZoom = defaultZoom;
+        this.zoomListener = listener;
         this.zoom = initialZoom;
         browser = new Browser(parent, SWT.NONE);
         browser.setJavascriptEnabled(true);
@@ -27,6 +34,7 @@ public class WebBrowser {
         browser.setMenu(menu);
 
         browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+
 
         browser.addTitleListener(event -> {
             // Reset the zoom
@@ -66,6 +74,11 @@ public class WebBrowser {
     public void onCreateMenu(Menu menu) {
     }
 
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
+        performZoom(0);
+    }
+
     void addMenuItem(Menu parent, String text, Runnable onSelected) {
         MenuItem item = new MenuItem(parent, SWT.NONE);
         item.setText(text);
@@ -79,6 +92,9 @@ public class WebBrowser {
 
     void performZoom(double delta) {
         this.zoom = Math.max(1.0, (zoom / defaultZoom + delta) * defaultZoom);
+        if (zoomListener != null) {
+            zoomListener.onChanged(this.zoom);
+        }
         browser.execute("document.body.parentNode.style.fontSize = \"" + zoom + "px\";" +
                 "fixOverlappingChords();" +
                 "document.body.style.transition = \"font-size 0.1s linear\";");
@@ -86,5 +102,17 @@ public class WebBrowser {
 
     public double getZoom() {
         return zoom;
+    }
+
+    public Rectangle getClientArea() {
+        return browser.getClientArea();
+    }
+
+    public void setZoomListener(ZoomListener zoomListener) {
+        this.zoomListener = zoomListener;
+    }
+
+    public interface ZoomListener {
+        void onChanged(double newValue);
     }
 }

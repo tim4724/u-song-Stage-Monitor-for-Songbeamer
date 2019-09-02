@@ -1,5 +1,5 @@
 #bottomSpacer {
-    height: 150px;
+    height: 8em;
 }
 
 #controlsWrapper {
@@ -13,6 +13,8 @@
     padding: 0.25em;
     background-color: #eeeeee;
     color: #ffffff;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
 }
 
 .active {
@@ -74,8 +76,22 @@ button:hover:enabled {
     color: #d80000;
 }
 
-#errorBox { 
-    top: 1.25em;
-    right: 1.25em;
-    bottom: auto;
+body:hover #controlsWrapper {
+    opacity: 0.75;
+}
+
+footer#controlsWrapper:hover {
+    opacity: 0.95;
+    transition: opacity 0.25 ease-in-out;
+}
+
+body {
+    min-height: 100vh;
+}
+
+@media (pointer: coarse) {
+    #controlsWrapper {
+        opacity: 1;
+        font-size: 5em;
+    }
 }
