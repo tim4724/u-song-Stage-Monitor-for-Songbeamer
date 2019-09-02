@@ -206,18 +206,22 @@ public class SongResource {
             String format = "{\"songId\": %d, \"songType\": \"%s\", \"page\": %d, \"clients\": %d}";
             String data = String.format(format, songId, songType, page, clientsCount);
             logger.debug("send data to clients");
-            for (Session session : sessions) {
-                try {
-                    session.getAsyncRemote().sendText(data);
-                } catch (Exception e) {
-                    logger.warn("Failed to sent song data in ws", e);
+            synchronized (sessions) {
+                for (Session session : sessions) {
+                    try {
+                        session.getAsyncRemote().sendText(data);
+                    } catch (Exception e) {
+                        logger.warn("Failed to sent song data in ws", e);
+                    }
                 }
             }
-            for (Session session : statusSessions) {
-                try {
-                    session.getAsyncRemote().sendText(data);
-                } catch (Exception e) {
-                    logger.warn("Failed to sent song data in ws to status client", e);
+            synchronized (statusSessions) {
+                for (Session session : statusSessions) {
+                    try {
+                        session.getAsyncRemote().sendText(data);
+                    } catch (Exception e) {
+                        logger.warn("Failed to sent song data in ws to status client", e);
+                    }
                 }
             }
         }

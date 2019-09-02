@@ -1,58 +1,58 @@
+html {
+    font-size: 16px;
+}
+
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: center;
     background: #000;
-    font-size: 18px;
     color: white;
+    font-size: 1.3em;
 }
 
 #title {
     color: #ff7c00;
     font-weight: normal;
-    margin-bottom: 10px;
+    margin-bottom: 0.6em;
     text-align: center;
 }
 
 .settingGroupTitle {
-    margin-bottom: 16px;
+    margin-bottom: 1em;
     font-size: 0.7em;
 }
 
 main {
-    margin: 16px;
-    width: 100%;
-    max-width: 1024px;
+    margin: 1em;
     display: inline-block;
-    padding: 0 24px 24px 24px;
+    padding: 0 1.5em 0 1.5em;
     background: #181818;
-    border-radius: 4px;
+    border-radius: 0.25em;
     text-align: left;
-    border: 6px solid #181818;
+    border: 0.375em solid #181818;
 }
 
 .settingGroup {
-    margin-top: 32px;
-    margin-bottom: 32px;
+    margin-top: 1em;
+    margin-bottom: 1em;
     background: #111111;
-    padding: 12px 24px;
+    padding: 0.75em 1.5em;
 }
 
 .setting {
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
     overflow: hidden;
-    min-height: 34px;
+    min-height: 2em;
 }
 
 .settingText {
-    min-width: 300px;
     display: inline-block;
 }
 
 #maxLinesPage {
-    width: 40px;
     border-width: 0;
-    border-radius: 4px;
+    border-radius: 0.25em;
 }
 
 #saveSongDir {
@@ -70,8 +70,8 @@ main {
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    height: 2em;
+    width: 3.5em;
     zoom: 0.7;
 }
 
@@ -90,16 +90,16 @@ main {
     bottom: 0;
     background-color: #ccc;
     transition: 0.4s;
-    border-radius: 34px;
+    border-radius: 1.75em;
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
+    height: 1.5em;
+    width: 1.5em;
+    left: 0.25em;
+    bottom: 0.25em;
     background-color: white;
     transition: 0.4s;
     border-radius: 50%;
@@ -118,11 +118,11 @@ input:checked + .slider {
 }
 
 input:checked + .slider:before {
-    transform: translateX(26px);
+    transform: translateX(1.5em);
 }
 
 input[type="text"], input[type="number"] {
-    padding: 6px 12px;
+    padding: 0.375em 0.75em;
 }
 
 #savedHint {
@@ -131,10 +131,10 @@ input[type="text"], input[type="number"] {
     right: 0;
     background: #49bc49;
     color: #ffffff;
-    border: 3px solid #ffffff;
-    border-radius: 4px;
-    padding: 8px;
-    margin: 16px;
+    border: 0.2em solid #ffffff;
+    border-radius: 0.25em;
+    padding: 0.5em;
+    margin: 1em;
     transition: opacity 1s;
 }
 

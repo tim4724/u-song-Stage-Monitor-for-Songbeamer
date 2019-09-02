@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.swing.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -88,7 +90,7 @@ public class UpdateChecker {
                     JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
             if (result == 0) {
-                Browser.open(downloadUrl);
+                Browse.open(downloadUrl);
             } else if (result == 2) {
                 prefs.put("do_not_ask_update", tagName);
             }

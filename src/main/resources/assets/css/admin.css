@@ -3,14 +3,14 @@
 }
 
 #controlsWrapper {
-    font-size: 32px; font-size: 2em; font-size: 2rem;
+    font-size: 4em;
     width: 100%;
     z-index: 50;
     box-sizing: border-box;
     position: fixed;
     bottom: 0;
     left: 0;
-    padding: 8px; padding: 0.25em; padding: 0.5rem;
+    padding: 0.25em;
     background-color: #eeeeee;
     color: #ffffff;
 }
@@ -24,8 +24,8 @@ button {
     transition: all 0.5s ease-in-out;
     transition-property: background-color, border-color;
     font-size: 1em;
-    padding: 0 16px 0 16px; padding: 0 1rem 0 1rem;
-    border: 2px solid transparent; border: 0.125rem solid transparent;
+    padding: 0 1em 0 1em;
+    border: 0.125em solid transparent;
     border-radius: 1em;
     height: 2em;
     line-height: 1em;
@@ -74,8 +74,8 @@ button:hover:enabled {
     color: #d80000;
 }
 
-#errorBox {
-    top: 20px; top: 1.25rem;
-    right: 20px; right: 1.25rem;
-    bottom: unset;
+#errorBox { 
+    top: 1.25em;
+    right: 1.25em;
+    bottom: auto;
 }

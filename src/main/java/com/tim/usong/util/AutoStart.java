@@ -11,6 +11,9 @@ public class AutoStart {
     private static final String REG_RUN_KEY = "HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
     private static final String VALUE = "uSongStageMonitor";
 
+    private AutoStart() {
+    }
+
     public static void enableAutoStart(String path) throws IOException {
         File f = new File(path);
         if (f.exists() && f.getName().endsWith(".jar")) {

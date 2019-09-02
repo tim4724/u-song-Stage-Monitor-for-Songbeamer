@@ -159,11 +159,7 @@ public class USongApplication extends Application<Configuration> implements Serv
         SplashWindow.started();
         Preferences prefs = Preferences.userNodeForPackage(USongApplication.class);
         if (prefs.getBoolean("first_run", true)) {
-            Object tutorialFrame = new TutorialFrame();
-            // bring to front, because of any reason the window is not
-            //tutorialFrame.setAlwaysOnTop(true);
-            //tutorialFrame.setVisible(true);
-            //tutorialFrame.setAlwaysOnTop(false);
+            TutorialFrame.showTutorial();
             prefs.putBoolean("first_run", false);
         }
         if (GlobalPreferences.isNotifyUpdates()) {

@@ -6,34 +6,32 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 public class WebBrowser {
-    private double zoom = 16;
+    final Browser browser;
+    private final double defaultZoom;
+    private double zoom;
 
-    public WebBrowser(Composite parent, String url, double zoom) {
-        Browser browser = new Browser(parent, SWT.NONE);
+    public WebBrowser(Composite parent, String url, double initialZoom, double defaultZoom) {
+        this.defaultZoom = defaultZoom;
+        this.zoom = initialZoom;
+        browser = new Browser(parent, SWT.NONE);
         browser.setJavascriptEnabled(true);
 
-        Menu customMenu = new Menu(browser);
-        MenuItem test = new MenuItem(customMenu, SWT.NONE);
-        test.setText("&Close");
-        test.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                System.out.println(e);
-                browser.getDisplay().close();
-            }
-        });
-        browser.setMenu(customMenu);
+        Menu menu = new Menu(browser);
+        onCreateMenu(menu);
+        browser.setMenu(menu);
 
-        browser.setUrl(url);
+        browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
-        // Prevent zooming at browser level
         browser.addTitleListener(event -> {
-            zoom(browser, 0);
+            // Reset the zoom
+            performZoom(0);
+            // Prevent zooming at browser level
             browser.execute("window.onkeydown = function (event) {" +
                     "if (event.ctrlKey==true) {event.preventDefault();" +
                     "}}");
@@ -43,7 +41,7 @@ public class WebBrowser {
         });
         browser.addMouseWheelListener(e -> {
             if ((e.stateMask & SWT.CTRL) != 0) {
-                zoom(browser, e.count / 6f);
+                performZoom((((double) e.count) / 120.0));
             }
         });
         browser.addKeyListener(new KeyAdapter() {
@@ -52,21 +50,41 @@ public class WebBrowser {
                 if ((e.stateMask & SWT.CTRL) != 0) {
                     switch (e.keyCode) {
                         case '=':
-                            zoom(browser, 0.25);
+                            performZoom(0.025);
                             break;
                         case '-':
-                            zoom(browser, -0.25);
+                            performZoom(-0.025);
                             break;
                     }
                 }
             }
         });
+
+        browser.setUrl(url);
     }
 
-    public void zoom(Browser browser, double delta) {
-        zoom = Math.max(1, zoom + delta);
+    public void onCreateMenu(Menu menu) {
+    }
+
+    void addMenuItem(Menu parent, String text, Runnable onSelected) {
+        MenuItem item = new MenuItem(parent, SWT.NONE);
+        item.setText(text);
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                onSelected.run();
+            }
+        });
+    }
+
+    void performZoom(double delta) {
+        this.zoom = Math.max(1.0, (zoom / defaultZoom + delta) * defaultZoom);
         browser.execute("document.body.parentNode.style.fontSize = \"" + zoom + "px\";" +
                 "fixOverlappingChords();" +
                 "document.body.style.transition = \"font-size 0.1s linear\";");
+    }
+
+    public double getZoom() {
+        return zoom;
     }
 }

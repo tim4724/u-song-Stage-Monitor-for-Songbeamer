@@ -24,7 +24,7 @@ public class SongbeamerUpdateChecker {
 
     private static void checkForUpdate(String currentVersion) {
         try {
-            Document doc = Jsoup.connect(url).get();
+            Document doc = Jsoup.connect(url).execute().parse();
             Elements versionCandidates = doc.select("td > p > strong");
             String newestVersion = "0.0.0";
             for (Element element : versionCandidates) {
@@ -57,7 +57,7 @@ public class SongbeamerUpdateChecker {
                         JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
                 if (result == 0) {
-                    Browser.open(url);
+                    Browse.open(url);
                 } else if (result == 2) {
                     prefs.put("do_not_ask_update", newestVersion);
                 }

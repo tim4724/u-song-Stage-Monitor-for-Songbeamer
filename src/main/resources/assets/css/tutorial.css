@@ -1,30 +1,31 @@
+html {
+    font-size: 16px;
+}
+
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: center;
     background: #000;
-    font-size: 18px;
     color: white;
+    max-width: calc(100vw - 2em);
 }
 
 #title {
     color: #ff7c00;
     font-weight: normal;
-    margin-bottom: 10px;
 }
 
 main {
-    max-width: calc(100vw - 32px);
-    min-width: 640px;
-    margin: 16px 16px 0;
+    margin: 1em 1em 0;
     display: inline-block;
-    padding: 0 24px 24px 24px;
+    padding: 0 1.5em 1.5em 1.5em;
     background: #181818;
-    border-radius: 4px;
-    border: 6px solid #181818;
+    border-radius: 0.25em;
+    border: 0.375em solid #181818;
 }
 
 .setting {
-    font-size: 1.3em;
+    font-size: 1.5em;
 }
 
 a {
@@ -37,10 +38,10 @@ a {
 }
 
 img {
-    max-width: 90%;
+    width: 100%;
     height: auto;
-    border-radius: 4px;
-    border: 2px solid white;
+    border-radius: 0.25em;
+    border: 0.125em solid white;
 }
 
 #tutorialRemote {
@@ -56,7 +57,7 @@ img {
 }
 
 .setting select {
-    zoom: 1.3;
+    zoom: 1.2;
 }
 
 .tutorialNumber {

@@ -1,6 +1,7 @@
 package com.tim.usong.ui;
 
 import io.dropwizard.lifecycle.Managed;
+import org.eclipse.swt.SWT;
 
 import java.awt.*;
 import java.util.ResourceBundle;
@@ -12,17 +13,16 @@ public class PreviewFrame implements Managed {
             .userNodeForPackage(PreviewFrame.class)
             .node("preview");
 
-    public void setVisible(boolean visible) {
+    public synchronized void setVisible(boolean visible) {
         if (isVisible()) {
-        //    frame.dispose(); // free resources
-            frame = null;  // free all resources
+            frame.close();
+            frame = null;
         }
-
         if (visible) {
             int x = prefs.getInt("x", -1);
             int y = prefs.getInt("y", -1);
-            int defaultWidth = prefs.getInt("width", 300);
-            int defaultHeight = prefs.getInt("height", 240);
+            int defaultWidth = 320;
+            int height = prefs.getInt("height", 240);
 
             GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment()
                     .getDefaultScreenDevice().getDefaultConfiguration();
@@ -31,24 +31,20 @@ public class PreviewFrame implements Managed {
             if (x == -1 && y == -1 || x > screenBounds.width || y > screenBounds.height) {
                 Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(config);
                 prefs.putInt("x", 0);
-                prefs.putInt("y", screenBounds.height - defaultHeight - screenInsets.bottom);
+                prefs.putInt("y", screenBounds.height - height - screenInsets.bottom);
             }
 
             ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
             String title = messages.getString("preview");
             String url = "http://localhost/song?admin=true";
 
-            frame = new WebFrame(title, url, prefs, defaultWidth, defaultHeight, 0.2);
-            /*
-            frame.setType(Window.Type.POPUP); // TYPE POPUP will not make the taskbar icon blink because of new window
-            frame.setAlwaysOnTop(true);
-            frame.setVisible(true);
-            */
+            int style = SWT.ON_TOP | SWT.MIN | SWT.RESIZE;
+            frame = new WebFrame(title, url, prefs, defaultWidth, height, 3, style);
         }
     }
 
     public boolean isVisible() {
-        return frame != null;//&& frame.isVisible();
+        return frame != null && !frame.isDisposed();
     }
 
     @Override

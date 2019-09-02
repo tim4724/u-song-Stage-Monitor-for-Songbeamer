@@ -122,6 +122,8 @@ public class SettingsResource {
                 }
             } catch (Exception e) {
                 ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+                // TODO: log
+                // TODO: show alert
                 return Response.status(500).entity(messages.getString("showFullscreenError")).build();
             }
         }

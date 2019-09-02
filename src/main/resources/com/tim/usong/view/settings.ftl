@@ -148,6 +148,15 @@
     <div id="savedHint" class="invisible">
         ${messages.getString("saved")} &#x1f4be;
     </div>
+
+
 </main>
+
+<script>
+    window.onerror = function () {
+        alert("Error")
+    };
+</script>
+
 </body>
 </html>

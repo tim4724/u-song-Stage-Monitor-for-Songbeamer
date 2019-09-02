@@ -20,6 +20,11 @@ function main() {
         const ws = new WebSocket('ws://' + location.host + '/song/ws');
         ws.onopen = function () {
             errorElement.style.display = 'none';
+            window.onbeforeunload = function () {
+                ws.onclose = function () {
+                };
+                ws.close();
+            };
         };
         ws.onmessage = function (ev) {
             let data = JSON.parse(ev.data);
@@ -80,7 +85,7 @@ function main() {
             currentPage.classList.add('currentPage');
             currentPage.parentElement.classList.add('currentSection');
 
-            let offset = 10;
+            let offset = parseFloat(getComputedStyle(document.body).fontSize) / 4;
             let scrollTarget;
             if ((newPageNumber === 0 || (newPageNumber === 1 && pages[0].children.length === 0))
                 && currentPage.parentElement.scrollHeight < innerHeight * 0.6) {
@@ -144,7 +149,7 @@ function main() {
 
 function fixOverlappingChords() {
     if (!String.prototype.endsWith) {
-        String.prototype.endsWith = function(suffix) {
+        String.prototype.endsWith = function (suffix) {
             return this.indexOf(suffix, this.length - suffix.length) !== -1;
         };
     }
@@ -153,7 +158,7 @@ function fixOverlappingChords() {
 
     for (let i = 1; i < allChords.length; i++) {
         allChords[i].parentElement.style.paddingLeft = "0";
-        if(!allChords[i].innerHTML.endsWith("&nbsp;")){
+        if (!allChords[i].innerHTML.endsWith("&nbsp;")) {
             allChords[i].innerHTML = allChords[i].innerHTML.trim() + "&nbsp;";
         }
     }

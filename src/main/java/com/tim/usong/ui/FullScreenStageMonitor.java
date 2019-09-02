@@ -1,24 +1,21 @@
 package com.tim.usong.ui;
 
+import com.tim.usong.GlobalPreferences;
+import com.tim.usong.util.Browse;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
+import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class FullScreenStageMonitor {
-    private static final Object lock = new Object();
     private static final String url = "http://localhost/song";
     private static FullScreenStageMonitor INSTANCE;
-    private final Preferences prefs = Preferences.userNodeForPackage(FullScreenStageMonitor.class)
-            .node("fullscreenStageMonitor");
-    private final Thread shutdownHook = new Thread(this::savePrefs);
-    //private final WebJFXPanel webPanel;
-    private final WebBrowser webBrowser;
+    private final Shell shell;
 
     public static void showOnDisplay(int displayIndex) throws IllegalArgumentException {
         Display display = new Display();
@@ -27,52 +24,62 @@ public class FullScreenStageMonitor {
         if (displayIndex >= monitors.length) {
             throw new IllegalArgumentException("Display not found");
         }
-        synchronized (lock) {
-            // Allow only one instance at a time
-            if (INSTANCE != null) {
-                // INSTANCE.dispose();
+
+        new Thread(() -> {
+            synchronized (FullScreenStageMonitor.class) {
+                // Allow only one instance at a time
+                if (INSTANCE == null || INSTANCE.shell.isDisposed()) {
+                    INSTANCE = new FullScreenStageMonitor(monitors[displayIndex]);
+                } else {
+                    INSTANCE.shell.setBounds(monitors[displayIndex].getBounds());
+                }
             }
-            INSTANCE = new FullScreenStageMonitor(monitors[displayIndex]);
-        }
+        }).start();
     }
 
     public static boolean isDisplaying() {
         FullScreenStageMonitor instance = INSTANCE;
-        return instance != null;// && instance.isVisible();
+        return instance != null && !instance.shell.isDisposed();
     }
 
     public static void close() {
-        synchronized (lock) {
-            if (INSTANCE != null) {
-                // INSTANCE.dispose();
-                INSTANCE = null;
-            }
+        FullScreenStageMonitor instance = INSTANCE;
+        if (instance != null && instance.shell != null && !instance.shell.isDisposed()) {
+            instance.shell.getDisplay().asyncExec(instance.shell::close);
         }
     }
 
     private FullScreenStageMonitor(Monitor monitor) {
+        Preferences prefs = Preferences.userNodeForPackage(FullScreenStageMonitor.class)
+                .node("fullscreenStageMonitor");
         Display display = new Display();
-        Shell shell = new Shell(display, SWT.ON_TOP | SWT.NO_FOCUS);
-        shell.setImage(new Image(display, getClass().getResourceAsStream("/icon-small2.png")));
-        Rectangle monitorBounds = monitor.getBounds();
-        shell.setSize(monitorBounds.width, monitorBounds.height);
-        shell.setLocation(monitorBounds.x, monitorBounds.y);
-        shell.setFullScreen(true);
+        shell = new Shell(display, SWT.NO_TRIM | SWT.ON_TOP | SWT.NO_FOCUS);
         shell.setLayout(new FillLayout());
-        webBrowser = new WebBrowser(shell, url, 16);
+        shell.setBounds(monitor.getBounds());
 
+        WebBrowser webBrowser = new WebBrowser(shell, url, prefs.getDouble("zoom2", 16), 16) {
+            @Override
+            public void onCreateMenu(Menu menu) {
+                ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+                addMenuItem(menu, messages.getString("zoomIncrease"), () -> performZoom(0.025));
+                addMenuItem(menu, messages.getString("zoomDecrease"), () -> performZoom(-0.025));
+                addMenuItem(menu, messages.getString("reload"), browser::refresh);
+                addMenuItem(menu, messages.getString("openInBrowser"), () -> Browse.open(browser.getUrl()));
+                addMenuItem(menu, messages.getString("closeFullscreenMode"), () -> {
+                    GlobalPreferences.setFullscreenDisplay(-1);
+                    shell.close();
+                });
+            }
+        };
+
+        display.disposeExec(() -> prefs.putDouble("zoom2", webBrowser.getZoom()));
         shell.open();
+
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
             }
         }
         display.dispose();
-    }
-
-
-    private void savePrefs() {
-        // prefs.putDouble("zoom", webPanel.getZoom());
-        //  Runtime.getRuntime().removeShutdownHook(shutdownHook);
     }
 }

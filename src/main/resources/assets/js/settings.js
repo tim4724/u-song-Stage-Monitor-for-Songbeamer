@@ -1,6 +1,6 @@
 let timer;
 
-function simplePutRequest(path, forceReload = false) {
+function simplePutRequest(path, forceReload) {
     let xhr = new XMLHttpRequest();
     xhr.open('PUT', path, true);
     xhr.onloadend = function () {
@@ -36,13 +36,14 @@ function onCheckedChanged(id) {
     simplePutRequest("settings?" + id + "=" + cb.checked);
 }
 
-function onInputChanged(id, forceReload = false) {
+function onInputChanged(id, forceReload) {
     const input = document.getElementById(id);
     simplePutRequest("settings?" + id + "=" + input.value, forceReload);
 }
 
 let clientsCount = -1;
-const connectToWebSocket = function () {
+
+function connectToWebSocket() {
     const ws = new WebSocket("ws://" + location.host + "/song/ws?status=true");
     ws.onmessage = function (ev) {
         let data = JSON.parse(ev.data);
@@ -58,4 +59,4 @@ const connectToWebSocket = function () {
         setTimeout(connectToWebSocket, 500);
         console.error("ws closed" + ev.reason);
     };
-};
+}

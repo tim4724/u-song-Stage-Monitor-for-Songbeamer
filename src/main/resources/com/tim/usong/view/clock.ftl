@@ -1,14 +1,14 @@
 <section id='timeBox'
          class='currentSection currentPage'
-         style='font-size: 4em;
-                border-color: #00a39d;
+         style='border-color: #00a39d;
                 opacity: 0;
                 transition: opacity 2s linear'>
+    <span style='font-size: 4em;'>
     <span id="timeHoursMinutes"></span><span id='timeSeconds'
                                              style="font-size: 0.7em;
                                              margin-left: 0.1em;
                                              color: #C1C1C1;"></span>
-
+    </span>
 </section>
 
 <script>
