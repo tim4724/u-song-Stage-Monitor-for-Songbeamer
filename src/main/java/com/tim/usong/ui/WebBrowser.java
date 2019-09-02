@@ -91,13 +91,12 @@ public class WebBrowser {
     }
 
     void performZoom(double delta) {
-        this.zoom = Math.max(1.0, (zoom / defaultZoom + delta) * defaultZoom);
+        this.zoom = Math.max(0.1, (zoom / defaultZoom + delta) * defaultZoom);
         if (zoomListener != null) {
             zoomListener.onChanged(this.zoom);
         }
         browser.execute("document.body.parentNode.style.fontSize = \"" + zoom + "px\";" +
-                "fixOverlappingChords();" +
-                "document.body.style.transition = \"font-size 0.1s linear\";");
+                "if(window.fixOverlappingChords) {fixOverlappingChords();}");
     }
 
     public double getZoom() {

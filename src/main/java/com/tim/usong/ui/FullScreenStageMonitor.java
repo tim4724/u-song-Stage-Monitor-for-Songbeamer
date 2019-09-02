@@ -90,9 +90,7 @@ public class FullScreenStageMonitor {
 
     private FullScreenStageMonitor(Monitor monitor) {
         Runtime.getRuntime().addShutdownHook(shutdownHook);
-        // shell = new Shell(new Display(), SWT.NO_TRIM | SWT.ON_TOP | SWT.NO_FOCUS);
-        Display display = new Display();
-        shell = new Shell(display, SWT.NO_TRIM | SWT.NO_FOCUS);
+        shell = new Shell(new Display(), SWT.NO_TRIM | SWT.ON_TOP | SWT.NO_FOCUS);
         shell.setBounds(monitor.getBounds());
         shell.setLayout(new FillLayout());
 

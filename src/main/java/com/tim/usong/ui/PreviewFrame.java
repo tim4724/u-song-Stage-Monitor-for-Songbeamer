@@ -39,8 +39,7 @@ public class PreviewFrame implements Managed {
                 prefs.putInt("y", screenBounds.height - height - screenInsets.bottom);
             }
 
-            ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-            String title = messages.getString("preview");
+            String title = ResourceBundle.getBundle("MessagesBundle").getString("preview");
             String url = "http://localhost/song?admin=true";
 
             int style = SWT.ON_TOP | SWT.MIN | SWT.RESIZE;
@@ -68,6 +67,7 @@ public class PreviewFrame implements Managed {
                         }
                     });
                     webBrowser.setZoomListener(newValue -> {
+                        // Update the zoom in the fullscreen window
                         Rectangle fullScreenBounds = FullScreenStageMonitor.getClientArea();
                         if (fullScreenBounds != null && PreviewFrame.this.zoom != newValue) {
                             Rectangle browserArea = webBrowser.getClientArea();
@@ -109,7 +109,7 @@ public class PreviewFrame implements Managed {
 
             Rectangle browserArea = webBrowser.getClientArea();
             double fullscreenZoom = FullScreenStageMonitor.getZoom();
-            zoom = Math.max(1, (fullscreenZoom * browserArea.height / fullScreenBounds.height
+            zoom = Math.max(0.1, (fullscreenZoom * browserArea.height / fullScreenBounds.height
                     + fullscreenZoom * browserArea.width / fullScreenBounds.width) / 2);
             webBrowser.setZoom(zoom);
         } else {

@@ -45,6 +45,12 @@ let clientsCount = -1;
 
 function connectToWebSocket() {
     const ws = new WebSocket("ws://" + location.host + "/song/ws?status=true");
+    ws.onopen = function () {
+        window.onbeforeunload = function () {
+            ws.onclose = function () {};
+            ws.close();
+        };
+    };
     ws.onmessage = function (ev) {
         let data = JSON.parse(ev.data);
         if (clientsCount === -1) {

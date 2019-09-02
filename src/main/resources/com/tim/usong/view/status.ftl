@@ -12,6 +12,11 @@
             const ws = new WebSocket("ws://" + location.host + "/song/ws?status=true");
             ws.onopen = function () {
                 errorElement.style.display = "none";
+                window.onbeforeunload = function () {
+                    ws.onclose = function () {
+                    };
+                    ws.close();
+                };
             };
             ws.onmessage = function () {
                 location.reload(true);
