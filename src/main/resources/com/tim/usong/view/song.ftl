@@ -86,11 +86,6 @@
             <#else>class="circleButton" onclick="backend.setChords(true);"</#if>>&#9835;
             </button>
         </#if>
-        <#if nextSong?? && nextSong.type == "SNG">
-            <button id="nextSong" onclick="backend.next();">
-                ${nextSong.title}
-            </button>
-        </#if>
         <button class="circleButton" type="button" id="clock">&#128340;</button>
     </footer>
 </#if>

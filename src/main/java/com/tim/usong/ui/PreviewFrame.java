@@ -1,43 +1,37 @@
 package com.tim.usong.ui;
 
-import io.dropwizard.lifecycle.Managed;
+import com.tim.usong.GlobalPreferences;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import java.awt.*;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
-public class PreviewFrame implements Managed {
-    private WebFrame frame;
-    private final Preferences prefs = Preferences
-            .userNodeForPackage(PreviewFrame.class)
-            .node("preview");
-    private double zoom;
+public class PreviewFrame {
+    private static WebFrame frame;
+    private static double zoom;
 
-    public synchronized void setVisible(boolean visible) {
+    public static synchronized void setVisible(boolean visible) {
         if (isVisible()) {
             frame.close();
             frame = null;
         }
         if (visible) {
-            int x = prefs.getInt("x", -1);
-            int y = prefs.getInt("y", -1);
+            GlobalPreferences.setShowPreview(true);
+            Preferences prefs = Preferences
+                    .userNodeForPackage(PreviewFrame.class)
+                    .node("preview");
+
             int defaultWidth = 427;
             int height = prefs.getInt("height", 240);
-
-            GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                    .getDefaultScreenDevice().getDefaultConfiguration();
-            java.awt.Rectangle screenBounds = config.getBounds();
-
-            if (x == -1 && y == -1 || x > screenBounds.width || y > screenBounds.height) {
-                Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(config);
-                prefs.putInt("x", 0);
-                prefs.putInt("y", screenBounds.height - height - screenInsets.bottom);
-            }
 
             String title = ResourceBundle.getBundle("MessagesBundle").getString("preview");
             String url = "http://localhost/song?admin=true";
@@ -46,8 +40,31 @@ public class PreviewFrame implements Managed {
             frame = new WebFrame(title, url, prefs, defaultWidth, height, 3, style) {
                 @Override
                 public void onBeforeOpen(Shell shell, WebBrowser webBrowser) {
-                    shell.addListener(SWT.Resize, event -> {
-                        redoLayout(shell, webBrowser);
+                    int x = prefs.getInt("x", -1);
+                    int y = prefs.getInt("y", -1);
+                    GraphicsConfiguration config = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                            .getDefaultScreenDevice().getDefaultConfiguration();
+                    if (x == -1 && y == -1) {
+                        Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(config);
+                        x = 0;
+                        y = config.getBounds().height - height - screenInsets.bottom;
+                    }
+
+                    shell.setLocation(x, y);
+                    shell.addListener(SWT.Resize, event -> redoLayout(shell, webBrowser));
+                    shell.getDisplay().addFilter(SWT.FocusOut, new Listener() {
+                        @Override
+                        public void handleEvent(Event event) {
+                            Rectangle bounds = shell.getBounds();
+                            prefs.putInt("x", bounds.x);
+                            prefs.putInt("y", bounds.y);
+                        }
+                    });
+                    shell.addShellListener(new ShellAdapter() {
+                        @Override
+                        public void shellClosed(ShellEvent e) {
+                            GlobalPreferences.setShowPreview(false);
+                        }
                     });
                     shell.addDisposeListener(e -> FullScreenStageMonitor.setListener(null));
                     FullScreenStageMonitor.setListener(new FullScreenStageMonitor.FullscreenStageMonitorListener() {
@@ -67,9 +84,10 @@ public class PreviewFrame implements Managed {
                         }
                     });
                     webBrowser.setZoomListener(newValue -> {
+                        prefs.putDouble("zoom2", newValue);
                         // Update the zoom in the fullscreen window
                         Rectangle fullScreenBounds = FullScreenStageMonitor.getClientArea();
-                        if (fullScreenBounds != null && PreviewFrame.this.zoom != newValue) {
+                        if (fullScreenBounds != null && PreviewFrame.zoom != newValue) {
                             Rectangle browserArea = webBrowser.getClientArea();
                             double zoom = (newValue * fullScreenBounds.height / browserArea.height
                                     + newValue * fullScreenBounds.width / browserArea.width) / 2;
@@ -84,7 +102,7 @@ public class PreviewFrame implements Managed {
     /**
      * Sync aspect ratio and zoom to the fullscreen stage monitor (if active)
      */
-    private void redoLayout(Shell shell, WebBrowser webBrowser) {
+    private static void redoLayout(Shell shell, WebBrowser webBrowser) {
         Layout l = shell.getLayout();
         if (!(l instanceof GridLayout)) {
             return;
@@ -117,19 +135,7 @@ public class PreviewFrame implements Managed {
         }
     }
 
-    public boolean isVisible() {
+    public static boolean isVisible() {
         return frame != null && !frame.isDisposed();
-    }
-
-    @Override
-    public void start() {
-        boolean visible = prefs.getBoolean("show_preview", true);
-        setVisible(visible);
-    }
-
-    @Override
-    public void stop() {
-        // System.exit(0) -> stop() -> isVisible() will still be true even if window is not visible (for some reason)
-        prefs.putBoolean("show_preview", isVisible());
     }
 }

@@ -29,18 +29,15 @@ public class StatusResource {
     private final SongbeamerActionListener songbeamerListener;
     private final SongResource songResource;
     private final SongParser songParser;
-    private final PreviewFrame previewFrame;
     private final String songbeamerVersion;
 
     public StatusResource(SongbeamerActionListener songbeamerListener,
                           SongResource songResource,
                           SongParser songParser,
-                          PreviewFrame previewFrame,
                           String songbeamerVersion) {
         this.songbeamerListener = songbeamerListener;
         this.songResource = songResource;
         this.songParser = songParser;
-        this.previewFrame = previewFrame;
         this.songbeamerVersion = songbeamerVersion;
     }
 
@@ -65,7 +62,7 @@ public class StatusResource {
             this.version = USongApplication.APP_VERSION;
             this.startWithWindows = AutoStart.isAutostartEnabled();
             this.clientCount = songResource.getClientCount();
-            this.preview = previewFrame.isVisible();
+            this.preview = PreviewFrame.isVisible();
             this.hostname = hostname != null ? hostname : messages.getString("unknown");
             this.ipAddress = ipAddress != null ? ipAddress : messages.getString("unknown");
             this.sbVersion = songbeamerVersion;

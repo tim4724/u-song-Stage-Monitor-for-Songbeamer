@@ -32,16 +32,12 @@ function main() {
             if (songId !== parseInt(data.songId)) {
                 if (data.songType === "INFO_CLOCK" && (type === "CLOCK" || type === "INFO_CLOCK")) {
                     // do not reload the page if a clock is shown and another song of type "INFO_CLOCK" is next
-                    // just update all the
+                    // just update all the attributes
                     type = data.songType;
                     titleElement.setAttribute('data-songId', type);
                     songId = data.songId;
                     titleElement.setAttribute('data-songId', songId);
                     titleElement.innerHTML = data.title.replace("\n", "<br>");
-                    const nextButton = document.getElementById("nextSong");
-                    if (nextButton) {
-                        nextButton.parentNode.removeChild(nextButton);
-                    }
                     return;
                 }
 

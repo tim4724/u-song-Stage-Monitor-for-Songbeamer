@@ -61,7 +61,7 @@
         <div class="setting">
             <span class="settingText">${messages.getString("showFullscreen")}</span>
             <label class="right">
-                <#if (getScreensCount() > 1)>
+                <#if (getScreensCount() > 1 || true)>
                     <select id="showOnDisplay" onchange="new function() {onInputChanged('showOnDisplay')};">
                         <option value="-1" ${(getFullscreenDisplay() == -1)?then("selected", "")}>
                             ${messages.getString("showNotFullscreen")}

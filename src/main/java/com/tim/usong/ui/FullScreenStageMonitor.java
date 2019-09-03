@@ -19,7 +19,6 @@ public class FullScreenStageMonitor {
     private static FullscreenStageMonitorListener listener;
     private final Preferences prefs = Preferences.userNodeForPackage(FullScreenStageMonitor.class)
             .node("fullscreenStageMonitor");
-    private final Thread shutdownHook = new Thread(this::savePrefs);
     private final Shell shell;
     private final Rectangle clientArea;
     private final WebBrowser webBrowser;
@@ -89,13 +88,13 @@ public class FullScreenStageMonitor {
     }
 
     private FullScreenStageMonitor(Monitor monitor) {
-        Runtime.getRuntime().addShutdownHook(shutdownHook);
         shell = new Shell(new Display(), SWT.NO_TRIM | SWT.ON_TOP | SWT.NO_FOCUS);
         shell.setBounds(monitor.getBounds());
         shell.setLayout(new FillLayout());
 
         double initialZoom = prefs.getDouble("zoom2", 16);
         WebBrowser.ZoomListener zoomListener = newValue -> {
+            prefs.putDouble("zoom2", newValue);
             if (listener != null) listener.onZoomChange();
         };
         webBrowser = new WebBrowser(shell, url, initialZoom, 16, zoomListener) {
@@ -113,10 +112,6 @@ public class FullScreenStageMonitor {
             }
         };
 
-        shell.addDisposeListener(e -> {
-            Runtime.getRuntime().removeShutdownHook(shutdownHook);
-            savePrefs();
-        });
         shell.open();
         clientArea = webBrowser.getClientArea();
     }
@@ -129,10 +124,6 @@ public class FullScreenStageMonitor {
             }
         }
         display.dispose();
-    }
-
-    private void savePrefs() {
-        prefs.putDouble("zoom2", webBrowser.getZoom());
     }
 
     public interface FullscreenStageMonitorListener {

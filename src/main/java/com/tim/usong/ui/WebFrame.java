@@ -3,8 +3,6 @@ package com.tim.usong.ui;
 import com.google.common.base.Strings;
 import com.tim.usong.util.Browse;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -17,8 +15,6 @@ import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class WebFrame {
-    private final Thread shutdownHook = new Thread(this::savePrefs);
-    private final Preferences prefs;
     private Shell shell;
     private WebBrowser webBrowser;
 
@@ -28,10 +24,6 @@ public class WebFrame {
 
     WebFrame(String title, String url, Preferences prefs, int defaultWidth, int defaultHeight, double defaultZoom,
              int style) {
-        Runtime.getRuntime().addShutdownHook(shutdownHook);
-        this.prefs = prefs;
-        int x = prefs.getInt("x", -1);
-        int y = prefs.getInt("y", -1);
         int width = prefs.getInt("width", defaultWidth);
         int height = prefs.getInt("height", defaultHeight);
         double zoom = prefs.getDouble("zoom2", defaultZoom);
@@ -42,9 +34,6 @@ public class WebFrame {
             shell.setImage(new Image(display, getClass().getResourceAsStream("/icon-small2.png")));
             shell.setText(Strings.nullToEmpty(title));
             shell.setSize(width, height);
-            if (x != -1 || y != -1) {
-                shell.setLocation(x, y);
-            }
             shell.setBackground(new Color(Display.getCurrent(), 0, 0, 0));
 
             GridLayout layout = new GridLayout();
@@ -62,13 +51,11 @@ public class WebFrame {
                     addMenuItem(menu, msgs.getString("close"), shell::close);
                 }
             };
-
-            shell.addShellListener(new ShellAdapter() {
-                @Override
-                public void shellClosed(ShellEvent e) {
-                    Runtime.getRuntime().removeShutdownHook(shutdownHook);
-                    savePrefs();
-                }
+            webBrowser.setZoomListener(newValue -> prefs.putDouble("zoom2", newValue));
+            shell.addListener(SWT.Resize, event -> {
+                Rectangle bounds = shell.getBounds();
+                prefs.putInt("height", bounds.height);
+                prefs.putInt("width", bounds.width);
             });
 
             onBeforeOpen(shell, webBrowser);
@@ -94,16 +81,5 @@ public class WebFrame {
 
     public boolean isDisposed() {
         return shell == null || shell.isDisposed();
-    }
-
-    private void savePrefs() {
-        shell.getDisplay().syncExec(() -> {
-            Rectangle bounds = shell.getBounds();
-            prefs.putDouble("zoom2", webBrowser.getZoom());
-            prefs.putInt("height", bounds.height);
-            prefs.putInt("width", bounds.width);
-            prefs.putInt("x", bounds.x);
-            prefs.putInt("y", bounds.y);
-        });
     }
 }

@@ -142,31 +142,22 @@ public class USongApplication extends Application<Configuration> implements Serv
             System.exit(-1);
             return;
         }
-        PreviewFrame previewFrame = new PreviewFrame();
         jersey.register(new RootResource());
         jersey.register(songResource);
         jersey.register(new SettingsResource(sbSettings, songParser, songResource));
-        jersey.register(new StatusResource(songbeamerActionListener, songResource, songParser, previewFrame,
-                sbSettings.version));
+        jersey.register(new StatusResource(songbeamerActionListener, songResource, songParser, sbSettings.version));
         lifecycle.manage(songbeamerActionListener);
-        lifecycle.manage(previewFrame);
-        lifecycle.manage(new UsongTray(previewFrame));
         lifecycle.addServerLifecycleListener(this);
     }
 
     @Override
     public void serverStarted(Server server) {
+        UsongTray.start();
         SplashWindow.started();
         Preferences prefs = Preferences.userNodeForPackage(USongApplication.class);
         if (prefs.getBoolean("first_run", true)) {
             TutorialFrame.showTutorial();
             prefs.putBoolean("first_run", false);
-        }
-        if (GlobalPreferences.isNotifyUpdates()) {
-            UpdateChecker.checkForUpdateAsync();
-        }
-        if (GlobalPreferences.isNotifySongbeamerUpdates() && songbeamerVersion != null) {
-            SongbeamerUpdateChecker.checkForUpdateAsync(songbeamerVersion);
         }
         int showOnDisplay = GlobalPreferences.getFullscreenDisplay();
         if (showOnDisplay != -1) {
@@ -175,6 +166,15 @@ public class USongApplication extends Application<Configuration> implements Serv
             } catch (Exception e) {
                 logger.error("Failed to display in fullscreen mode " + showOnDisplay, e);
             }
+        }
+        if (GlobalPreferences.isShowPreview()) {
+            PreviewFrame.setVisible(true);
+        }
+        if (GlobalPreferences.isNotifyUpdates()) {
+            UpdateChecker.checkForUpdateAsync();
+        }
+        if (GlobalPreferences.isNotifySongbeamerUpdates() && songbeamerVersion != null) {
+            SongbeamerUpdateChecker.checkForUpdateAsync(songbeamerVersion);
         }
     }
 

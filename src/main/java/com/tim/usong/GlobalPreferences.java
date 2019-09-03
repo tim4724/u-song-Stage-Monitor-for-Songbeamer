@@ -101,4 +101,12 @@ public class GlobalPreferences {
     public static int getFullscreenDisplay() {
         return preferences.getInt("fullscreenDisplay", -1);
     }
+
+    public static void setShowPreview(boolean show) {
+        preferences.putBoolean("showPreview", show);
+    }
+
+    public static boolean isShowPreview() {
+        return preferences.getBoolean("showPreview", true);
+    }
 }
