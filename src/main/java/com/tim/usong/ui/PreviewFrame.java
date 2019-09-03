@@ -6,9 +6,7 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import java.awt.*;
@@ -36,7 +34,7 @@ public class PreviewFrame {
             String title = ResourceBundle.getBundle("MessagesBundle").getString("preview");
             String url = "http://localhost/song?admin=true";
 
-            int style = SWT.ON_TOP | SWT.MIN | SWT.RESIZE;
+            int style = SWT.ON_TOP | SWT.MIN | SWT.RESIZE | SWT.NO_FOCUS;
             frame = new WebFrame(title, url, prefs, defaultWidth, height, 3, style) {
                 @Override
                 public void onBeforeOpen(Shell shell, WebBrowser webBrowser) {
@@ -52,13 +50,10 @@ public class PreviewFrame {
 
                     shell.setLocation(x, y);
                     shell.addListener(SWT.Resize, event -> redoLayout(shell, webBrowser));
-                    shell.getDisplay().addFilter(SWT.FocusOut, new Listener() {
-                        @Override
-                        public void handleEvent(Event event) {
-                            Rectangle bounds = shell.getBounds();
-                            prefs.putInt("x", bounds.x);
-                            prefs.putInt("y", bounds.y);
-                        }
+                    shell.getDisplay().addFilter(SWT.FocusOut, event -> {
+                        Rectangle bounds = shell.getBounds();
+                        prefs.putInt("x", bounds.x);
+                        prefs.putInt("y", bounds.y);
                     });
                     shell.addShellListener(new ShellAdapter() {
                         @Override

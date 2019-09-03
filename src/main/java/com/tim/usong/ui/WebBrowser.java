@@ -69,7 +69,7 @@ public class WebBrowser {
         browser.setUrl(url);
     }
 
-    public void onCreateMenu(Menu menu) {
+    void onCreateMenu(Menu menu) {
     }
 
     public void setZoom(double zoom) {

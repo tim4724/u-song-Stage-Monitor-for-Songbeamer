@@ -163,9 +163,6 @@ function main() {
                 }
             }
         },
-        next: function () {
-            simplePostRequest('song/next/');
-        },
         connectToWebSocket: connectToWebSocket,
         clock: function () {
             simplePostRequest('song/clock');

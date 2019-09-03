@@ -70,9 +70,8 @@ main {
 .switch {
     position: relative;
     display: inline-block;
-    height: 2em;
-    width: 3.5em;
-    zoom: 0.7;
+    height: 1.4em;
+    width: 2.45em;
 }
 
 .switch input {
@@ -90,16 +89,16 @@ main {
     bottom: 0;
     background-color: #ccc;
     transition: 0.3s;
-    border-radius: 1.75em;
+    border-radius: 1.5em;
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 1.5em;
-    width: 1.5em;
-    left: 0.25em;
-    bottom: 0.25em;
+    height: 1.05em;
+    width: 1.05em;
+    left: 0.175em;
+    bottom: 0.175em;
     background-color: white;
     transition: 0.3s;
     border-radius: 50%;
@@ -118,7 +117,7 @@ input:checked + .slider {
 }
 
 input:checked + .slider:before {
-    transform: translateX(1.5em);
+    transform: translateX(1.05em);
 }
 
 input[type="text"], input[type="number"] {

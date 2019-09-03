@@ -116,7 +116,7 @@ public class SongResource {
     public SongView getSong(@Context HttpServletRequest request,
                             @QueryParam("admin") boolean admin,
                             @QueryParam("chords") Boolean chords) {
-        return new SongView(song, nextSong, request.getLocale(), admin, chords);
+        return new SongView(song, request.getLocale(), admin, chords);
     }
 
     @POST
@@ -140,25 +140,6 @@ public class SongResource {
             SongWebSocket.songId = song.hashCode();
             SongWebSocket.songType = song.getType();
             SongWebSocket.notifyDataChanged();
-        }
-        return Response.ok().build();
-    }
-
-    @POST
-    @Path("next")
-    public Response setNextSongAsCurrentSong() {
-        if (nextSong != null && nextSong.getFileName() != null
-                && !nextSong.getFileName().equals(song.getFileName())) {
-            if (song.getType() == Song.Type.CLOCK) {
-                // do not change the page number, because we return from the clock
-                song = nextSong;
-                nextSong = null;
-                SongWebSocket.songId = song.hashCode();
-                SongWebSocket.songType = song.getType();
-                SongWebSocket.notifyDataChanged();
-            } else {
-                setSong(nextSong);
-            }
         }
         return Response.ok().build();
     }

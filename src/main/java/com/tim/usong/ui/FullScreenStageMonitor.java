@@ -88,7 +88,7 @@ public class FullScreenStageMonitor {
     }
 
     private FullScreenStageMonitor(Monitor monitor) {
-        shell = new Shell(new Display(), SWT.NO_TRIM | SWT.ON_TOP | SWT.NO_FOCUS);
+        shell = new Shell(new Display(), SWT.NO_TRIM | SWT.ON_TOP);
         shell.setBounds(monitor.getBounds());
         shell.setLayout(new FillLayout());
 
