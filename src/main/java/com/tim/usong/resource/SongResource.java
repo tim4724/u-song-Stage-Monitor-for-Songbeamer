@@ -1,5 +1,6 @@
 package com.tim.usong.resource;
 
+import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.tim.usong.GlobalPreferences;
 import com.tim.usong.core.SongParser;
 import com.tim.usong.core.entity.Song;
@@ -30,8 +31,9 @@ public class SongResource {
 
     public SongResource(SongParser songParser) {
         this.songParser = songParser;
-        song = new Song(messages.getString("waitingForSongbeamer"), Song.Type.INFO);
+        song = new Song(messages.getString("waitingForSongbeamer"), Song.Type.INFO_CLOCK);
         SongWebSocket.songId = song.hashCode();
+        SongWebSocket.title = song.getTitle();
         SongWebSocket.songType = song.getType();
         SongWebSocket.page = -1;
     }
@@ -45,9 +47,9 @@ public class SongResource {
         if (!songFilename.endsWith(".sng")) {
             String title = messages.getString("noSongSelected");
             if (!songFilename.isEmpty()) {
-                title += "<br>\n" + songFilename;
+                title += "\n" + songFilename;
             }
-            setSong(new Song(title, Song.Type.INFO));
+            setSong(new Song(title, Song.Type.INFO_CLOCK));
         } else {
             setSong(songParser.parse(songFilename));
         }
@@ -76,6 +78,7 @@ public class SongResource {
             this.nextSong = null;
             this.song = newSong;
             SongWebSocket.songId = newSong.hashCode();
+            SongWebSocket.title = newSong.getTitle();
             SongWebSocket.songType = newSong.getType();
             if (!sameFileAsCurrent) {
                 SongWebSocket.page = -1;
@@ -93,6 +96,7 @@ public class SongResource {
             this.song = nextSong;
             this.nextSong = null;
             SongWebSocket.songId = this.song.hashCode();
+            SongWebSocket.title = this.song.getTitle();
             SongWebSocket.songType = this.song.getType();
         }
         SongWebSocket.page = page;
@@ -197,14 +201,18 @@ public class SongResource {
         private static final Logger logger = LoggerFactory.getLogger(SongWebSocket.class);
         private static final List<Session> sessions = Collections.synchronizedList(new ArrayList<>());
         private static final List<Session> statusSessions = Collections.synchronizedList(new ArrayList<>());
+        private static final JsonStringEncoder encoder = new JsonStringEncoder();
         private static int songId;
         private static Song.Type songType;
+        private static String title;
         private static int page;
 
         static void notifyDataChanged() {
             int clientsCount = sessions.size();
-            String format = "{\"songId\": %d, \"songType\": \"%s\", \"page\": %d, \"clients\": %d}";
-            String data = String.format(format, songId, songType, page, clientsCount);
+            String format = "{\"songId\": %d, \"title\": \"%s\", \"songType\": \"%s\", " +
+                    "\"page\": %d, \"clients\": %d}";
+            String title = new String(encoder.quoteAsString(SongWebSocket.title));
+            String data = String.format(format, songId, title, songType, page, clientsCount);
             logger.debug("send data to clients");
             synchronized (sessions) {
                 for (Session session : sessions) {

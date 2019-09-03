@@ -84,8 +84,7 @@ public class UsongTray implements Managed {
         String title = USongApplication.APP_NAME;
         String url = "http://localhost/" + path;
         Preferences prefs = Preferences.userNodeForPackage(WebFrame.class).node(path);
-        WebFrame webFrame = new WebFrame(title, url, prefs, 1024, 800, 12);
-        //  webFrame.setVisible(true);
+        new WebFrame(title, url, prefs, 1280, 800, 12);
     }
 
     private String getHostname() {

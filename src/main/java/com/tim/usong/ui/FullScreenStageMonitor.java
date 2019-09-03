@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public class FullScreenStageMonitor {
-    private static final String url = "http://localhost/song";
+    private static final String url = "http://localhost/song?admin=true";
     private static FullScreenStageMonitor INSTANCE;
     private static FullscreenStageMonitorListener listener;
     private final Preferences prefs = Preferences.userNodeForPackage(FullScreenStageMonitor.class)

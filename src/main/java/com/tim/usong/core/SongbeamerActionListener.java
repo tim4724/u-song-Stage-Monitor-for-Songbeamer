@@ -34,7 +34,7 @@ public class SongbeamerActionListener implements Managed, Runnable {
 
     public SongbeamerActionListener(SongResource songResource) throws ParserConfigurationException, IOException {
         this.songResource = songResource;
-        noSongSelected = new Song(messages.getString("noSongSelected"), Song.Type.INFO);
+        noSongSelected = new Song(messages.getString("noSongSelected"), Song.Type.INFO_CLOCK);
         builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         serverSocket = new ServerSocket(19150);
         currentThread = new Thread(this);

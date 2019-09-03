@@ -27,14 +27,12 @@ public class WebBrowser {
         this.zoomListener = listener;
         this.zoom = initialZoom;
         browser = new Browser(parent, SWT.NONE);
+        browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
         browser.setJavascriptEnabled(true);
 
         Menu menu = new Menu(browser);
         onCreateMenu(menu);
         browser.setMenu(menu);
-
-        browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-
 
         browser.addTitleListener(event -> {
             // Reset the zoom
@@ -96,7 +94,8 @@ public class WebBrowser {
             zoomListener.onChanged(this.zoom);
         }
         browser.execute("document.body.parentNode.style.fontSize = \"" + zoom + "px\";" +
-                "if(window.fixOverlappingChords) {fixOverlappingChords();}");
+                "if(window.fixOverlappingChords) {fixOverlappingChords();}" +
+                "if(window.backend && window.backend.fixScroll) {window.backend.fixScroll();}");
     }
 
     public double getZoom() {

@@ -16,7 +16,8 @@ function main() {
     }
 
     function connectToWebSocket() {
-        const songId = parseInt(titleElement.getAttribute('data-songId'));
+        let songId = parseInt(titleElement.getAttribute('data-songId'));
+        let type = titleElement.getAttribute('data-type');
         const ws = new WebSocket('ws://' + location.host + '/song/ws');
         ws.onopen = function () {
             errorElement.style.display = 'none';
@@ -29,6 +30,21 @@ function main() {
         ws.onmessage = function (ev) {
             let data = JSON.parse(ev.data);
             if (songId !== parseInt(data.songId)) {
+                if (data.songType === "INFO_CLOCK" && (type === "CLOCK" || type === "INFO_CLOCK")) {
+                    // do not reload the page if a clock is shown and another song of type "INFO_CLOCK" is next
+                    // just update all the
+                    type = data.songType;
+                    titleElement.setAttribute('data-songId', type);
+                    songId = data.songId;
+                    titleElement.setAttribute('data-songId', songId);
+                    titleElement.innerHTML = data.title.replace("\n", "<br>");
+                    const nextButton = document.getElementById("nextSong");
+                    if (nextButton) {
+                        nextButton.parentNode.removeChild(nextButton);
+                    }
+                    return;
+                }
+
                 // reload page if new song is selected or beamer does show something that is not a song
                 setTimeout(function () {
                     location.reload(true);
@@ -68,7 +84,11 @@ function main() {
         };
     }
 
-    function updatePageNumber(newPageNumber) {
+    function fixScroll() {
+        updatePageNumber(lastPageNumber, 0);
+    }
+
+    function updatePageNumber(newPageNumber, scrollDuration) {
         const oldPage = currentPage;
         const newPage = pages[newPageNumber];
 
@@ -115,8 +135,10 @@ function main() {
                 }
             }
 
-            let duration = isVisible(currentPage) ? 2000 : 300;
-            scroll(scrollTarget, offset, duration);
+            if (scrollDuration === undefined) {
+                scrollDuration = isVisible(currentPage) ? 2000 : 300;
+            }
+            scroll(scrollTarget, offset, scrollDuration);
         }
     }
 
@@ -151,7 +173,8 @@ function main() {
         connectToWebSocket: connectToWebSocket,
         clock: function () {
             simplePostRequest('song/clock');
-        }
+        },
+        fixScroll: fixScroll
     }
 }
 
@@ -189,17 +212,14 @@ function scroll(e, offset, duration) {
     if (typeof zenscroll !== "undefined") {
         zenscroll.setup(duration, offset);
         zenscroll.to(e, duration);
-        setTimeout(function () {
-            if (!zenscroll.moving()) {
-                zenscroll.to(e, duration);
-            }
-        }, 100); // sometimes its buggy and doesn't scroll right away
-        // backup plan
-        setTimeout(function () {
-            if (!zenscroll.moving()) {
-                e.scrollIntoView(true);
-            }
-        }, 200);
+        if (duration > 200) {
+            // just to be sure
+            setTimeout(function () {
+                if (!zenscroll.moving()) {
+                    e.scrollIntoView(true);
+                }
+            }, 200);
+        }
     } else {
         e.scrollIntoView(true);
     }

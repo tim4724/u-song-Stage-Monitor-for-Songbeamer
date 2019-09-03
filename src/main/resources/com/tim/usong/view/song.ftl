@@ -18,8 +18,14 @@
 
 <main>
     <header>
-        <h1 id="title" data-songId="#{song.hashCode()}" <#if song.type.name() == "ERROR"> class="negative" </#if>>
-            ${song.title}
+        <h1 id="title" <#if song.type.name() == "ERROR"> class="negative" </#if>
+            data-songId="#{song.hashCode()}"
+                <#if (song.sections?size == 0)>
+                    style="min-height: 2.3em;"
+                </#if>
+            data-type="${song.type.name()}">
+
+            ${song.title?replace("\n", "\n<br>")}
             <#if isChords() && song.hasChords() && song.keyChord??>
                 <span class="chord">${messages.getString("key")} ${song.keyChord.toHtml()}</span>
             </#if>

@@ -99,7 +99,7 @@ public class Song {
     public enum Type {
         SNG, // Real .sng song from file
         ERROR, // Error message
-        INFO, // Information, like "no song selected"
+        INFO_CLOCK, // Information, like "no song selected"
         CLOCK
     }
 }
