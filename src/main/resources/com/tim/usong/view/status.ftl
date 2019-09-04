@@ -32,12 +32,12 @@
 <body onload="connectToWebSocket()">
 
 <main>
-    <h1 id="title">${messages.getString("status")}</h1>
+    <h1 unselectable="on" id="title">${messages.getString("status")}</h1>
 
     <table>
         <tr>
-            <th>${messages.getString("version")}</th>
-            <td>
+            <th unselectable="on">${messages.getString("version")}</th>
+            <td unselectable="on">
                 <#if status.version??>
                     ${status.version}
                 <#else>
@@ -46,8 +46,8 @@
             </td>
         </tr>
         <tr>
-            <th>${messages.getString("autostart")}</th>
-            <td>
+            <th unselectable="on">${messages.getString("autostart")}</th>
+            <td unselectable="on">
                 <#if status.startWithWindows>
                     ${messages.getString("yes")}
                 <#else>
@@ -56,8 +56,8 @@
             </td>
         </tr>
         <tr>
-            <th>${messages.getString("activeClientsCount")}</th>
-            <td>
+            <th unselectable="on">${messages.getString("activeClientsCount")}</th>
+            <td unselectable="on">
                 <#if status.clientCount == 0 || (status.clientCount == 1 && status.preview)>
                     <span class="negative">#{status.clientCount}</span>
                 <#else>
@@ -66,53 +66,53 @@
             </td>
         </tr>
         <tr>
-            <th>${messages.getString("hostname")}</th>
-            <td>${status.hostname}</td>
+            <th unselectable="on">${messages.getString("hostname")}</th>
+            <td unselectable="on">${status.hostname}</td>
         </tr>
         <tr>
-            <th>${messages.getString("ipAddress")}</th>
-            <td>${status.ipAddress}</td>
+            <th unselectable="on">${messages.getString("ipAddress")}</th>
+            <td unselectable="on">${status.ipAddress}</td>
         </tr>
     </table>
 
     <table>
         <tr>
-            <th>${messages.getString("songbeamerVersion")}</th>
-            <td>${status.sbVersion}</td>
+            <th unselectable="on">${messages.getString("songbeamerVersion")}</th>
+            <td unselectable="on">${status.sbVersion}</td>
         </tr>
         <tr>
-            <th>${messages.getString("songbeamerSender")}</th>
+            <th unselectable="on">${messages.getString("songbeamerSender")}</th>
             <td>
                 <#if !status.connected>
-                    <span class="negative">${messages.getString("notConnected")}</span>
+                    <span unselectable="on" class="negative">${messages.getString("notConnected")}</span>
                 <#else >
-                    <span class="positive">${messages.getString("connected")}</span>
+                    <span unselectable="on" class="positive">${messages.getString("connected")}</span>
                 </#if>
             </td>
         </tr>
         <tr>
-            <th>${messages.getString("songDir")}</th>
-            <td>
+            <th unselectable="on">${messages.getString("songDir")}</th>
+            <td unselectable="on">
                 <#if status.songCount == 0>
-                    <span class="negative"> ${status.songDir} </span>
+                    <span unselectable="on" class="negative"> ${status.songDir} </span>
                 <#else>
                     ${status.songDir}
                 </#if>
             </td>
         </tr>
         <tr>
-            <th>${messages.getString("songCount")}</th>
-            <td>
+            <th unselectable="on">${messages.getString("songCount")}</th>
+            <td unselectable="on">
                 <#if status.songCount == 0>
-                    <span class="negative"> ${status.songCount} </span>
+                    <span unselectable="on" class="negative"> ${status.songCount} </span>
                 <#else>
                     ${status.songCount}
                 </#if>
             </td>
         </tr>
         <tr>
-            <th>${messages.getString("titleHasOwnPage")}</th>
-            <td>
+            <th unselectable="on">${messages.getString("titleHasOwnPage")}</th>
+            <td unselectable="on">
                 <#if status.titelHasOwnPage>
                     ${messages.getString("yes")}
                 <#else>
@@ -121,11 +121,11 @@
             </td>
         </tr>
         <tr>
-            <th>${messages.getString("maxLinesPerPage")}</th>
+            <th unselectable="on">${messages.getString("maxLinesPerPage")}</th>
             <#if (status.maxLinesPerPage > 0) >
-                <td>${status.maxLinesPerPage}</td>
+                <td unselectable="on">${status.maxLinesPerPage}</td>
             <#else>
-                <td>${messages.getString("unlimited")}</td>
+                <td unselectable="on">${messages.getString("unlimited")}</td>
             </#if>
         </tr>
     </table>
@@ -133,33 +133,33 @@
     <table>
         <#if (status.fullscreenDisplay >= 0) >
             <tr>
-                <th>${messages.getString("fullscreenMode")}</th>
-                <td>${messages.getString("display")} ${status.fullscreenDisplay +1}</td>
+                <th unselectable="on">${messages.getString("fullscreenMode")}</th>
+                <td unselectable="on">${messages.getString("display")} ${status.fullscreenDisplay +1}</td>
             </tr>
         </#if>
         <tr>
-            <th>${messages.getString("currentSong")}</th>
-            <td>${status.songTitle}</td>
+            <th unselectable="on">${messages.getString("currentSong")}</th>
+            <td unselectable="on">${status.songTitle}</td>
         </tr>
         <#if status.currentSection?? >
             <tr>
-                <th>${messages.getString("currentSection")}</th>
-                <td>${status.currentSection}</td>
+                <th unselectable="on">${messages.getString("currentSection")}</th>
+                <td unselectable="on">${status.currentSection}</td>
             </tr>
         </#if>
         <tr>
-            <th>${messages.getString("currentPage")}</th>
-            <td><#if status.currentPage == -1>-<#else>${status.currentPage +1}</#if></td>
+            <th unselectable="on">${messages.getString("currentPage")}</th>
+            <td unselectable="on"><#if status.currentPage == -1>-<#else>${status.currentPage +1}</#if></td>
         </tr>
         <#if (status.langCount > 1)>
             <tr>
-                <th>${messages.getString("currentLang")}</th>
-                <td>${status.lang} / ${status.langCount}</td>
+                <th unselectable="on">${messages.getString("currentLang")}</th>
+                <td unselectable="on">${status.lang} / ${status.langCount}</td>
             </tr>
         </#if>
         <tr>
-            <th>${messages.getString("songHasChords")}</th>
-            <td>
+            <th unselectable="on">${messages.getString("songHasChords")}</th>
+            <td unselectable="on">
                 <#if status.songHasChords>
                     ${messages.getString("yes")}
                 <#else>
@@ -170,7 +170,7 @@
     </table>
 </main>
 
-<div id="errorBox">
+<div id="errorBox" unselectable="on">
     &#9888; ${messages.getString("connectionLost")}
 </div>
 

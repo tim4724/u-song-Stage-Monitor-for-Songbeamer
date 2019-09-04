@@ -18,7 +18,7 @@
 
 <main>
     <header>
-        <h1 id="title" <#if song.type.name() == "ERROR"> class="negative" </#if>
+        <h1 unselectable="on" id="title" <#if song.type.name() == "ERROR"> class="negative" </#if>
             data-songId="#{song.hashCode()}"
                 <#if (song.sections?size == 0)>
                     style="min-height: 2.3em;"
@@ -27,7 +27,7 @@
 
             ${song.title?replace("\n", "\n<br>")}
             <#if isChords() && song.hasChords() && song.keyChord??>
-                <span class="chord">${messages.getString("key")} ${song.keyChord.toHtml()}</span>
+                <span unselectable="on" class="chord">${messages.getString("key")} ${song.keyChord.toHtml()}</span>
             </#if>
         </h1>
     </header>
@@ -35,12 +35,12 @@
     <#list song.sections as section>
         <section class="${section.type}">
             <#if section.name??>
-                <div class="sectionName">${section.name}</div>
+                <div unselectable="on" class="sectionName">${section.name}</div>
             </#if>
             <#list section.pages as page>
                 <div class="page">
                     <#if (page.linesCount > 0)>
-                        <div class="pageContent">
+                        <div unselectable="on" class="pageContent">
                             <#noautoesc>
                                 <#if song.hasChords() && isChords()>
                                     ${page.toHtmlWithCords()}
@@ -69,7 +69,7 @@
 <div id="bottomSpacer"></div>
 
 <#if admin>
-    <footer id="controlsWrapper">
+    <footer unselectable="on" id="controlsWrapper">
         <button id="activeClients" class="circleButton" disabled>-</button>
         <#if (song.pageCount > 1)>
             <button type="button" class="circleButton" id="upButton" onclick="backend.pageUp()">&#9650;</button>
@@ -90,7 +90,7 @@
     </footer>
 </#if>
 
-<div id="errorBox">
+<div unselectable="on" id="errorBox">
     &#9888; ${messages.getString("connectionLost")}
 </div>
 

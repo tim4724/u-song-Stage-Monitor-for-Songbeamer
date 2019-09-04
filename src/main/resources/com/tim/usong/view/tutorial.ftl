@@ -11,26 +11,32 @@
 
 <body onload="connectToWebSocket()">
 <main>
-    <h1 id="title">${messages.getString("welcome")}</h1>
+    <h1 unselectable="on" id="title">${messages.getString("welcome")}</h1>
     <#noautoesc>
-        <h2 class="tutorialHeadline"><span class="tutorialNumber">1 </span>${messages.getString("tutorial1")}</h2>
+        <h2 unselectable="on" class="tutorialHeadline">
+            <span unselectable="on" class="tutorialNumber">1 </span>${messages.getString("tutorial1")}
+        </h2>
     </#noautoesc>
-    <img src="/assets/img/tutorial.png">
+    <img unselectable="on" src="/assets/img/tutorial.png">
 
     <div id="tutorialRemote">
-        <h2 class="tutorialHeadline"><span class="tutorialNumber">2a </span>${messages.getString("tutorial2a")}</h2>
+        <h2 unselectable="on" class="tutorialHeadline">
+            <span unselectable="on" class="tutorialNumber">2a </span>${messages.getString("tutorial2a")}
+        </h2>
 
         <div class="setting">
             <a href="http://${hostname}" target="_blank">http://${hostname}</a>
 
             <#if ipAddress != "0.0.0.0" && ipAddress != "127.0.0.1">
-                <div> ${messages.getString("or")} </div>
+                <div unselectable="on"> ${messages.getString("or")} </div>
                 <a href="http://${ipAddress}" target="_blank">http://${ipAddress}</a>
             </#if>
         </div>
     </div>
     <div id="tutorialLocal">
-        <h2 class="tutorialHeadline"><span class="tutorialNumber">2b </span>${messages.getString("tutorial2b")}</h2>
+        <h2 unselectable="on" class="tutorialHeadline">
+            <span unselectable="on" class="tutorialNumber">2b </span>${messages.getString("tutorial2b")}
+        </h2>
         <div class="setting">
             <label>
                 <#if (getScreensCount() > 1) >
@@ -45,7 +51,7 @@
                         </#list>
                     </select>
                 <#else>
-                    <span class="disabled">
+                    <span unselectable="on" class="disabled">
                         ${messages.getString("showFullscreenNotAvailable")}
                     </span>
                 </#if>

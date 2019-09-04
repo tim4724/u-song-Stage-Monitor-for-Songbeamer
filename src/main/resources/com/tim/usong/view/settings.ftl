@@ -11,12 +11,13 @@
 
 <body onload="connectToWebSocket()">
 <main>
-    <h1 id="title">${messages.getString("settings")}</h1>
+    <h1 unselectable="on" id="title">${messages.getString("settings")}</h1>
 
     <section class="settingGroup">
-        <div class="settingGroupTitle">${messages.getString("general")}</div>
+        <div unselectable="on" class="settingGroupTitle">${messages.getString("general")}</div>
+
         <div class="setting">
-            <span class="settingText">${messages.getString("autostart")}</span>
+            <span unselectable="on" class="settingText">${messages.getString("autostart")}</span>
             <label class="switch right">
                 <input id="autoStart" type="checkbox" ${isAutostartEnabled()?then("checked", "")}
                        onchange="new function () {onCheckedChanged('autoStart')}">
@@ -25,7 +26,7 @@
         </div>
 
         <div class="setting">
-            <span class="settingText">${messages.getString("showSplash")}</span>
+            <span unselectable="on" class="settingText">${messages.getString("showSplash")}</span>
             <label class="switch right">
                 <input id="splashScreen" type="checkbox" ${isShowSplash()?then("checked", "")}
                        onchange="new function () {onCheckedChanged('splashScreen')}">
@@ -34,7 +35,7 @@
         </div>
 
         <div class="setting">
-            <span class="settingText">${messages.getString("checkUpdates")}</span>
+            <span unselectable="on" class="settingText">${messages.getString("checkUpdates")}</span>
             <label class="switch right">
                 <input id="checkUpdates" type="checkbox" ${isNotifyUpdates()?then("checked", "")}
                        onchange="new function() {onCheckedChanged('checkUpdates')};">
@@ -44,7 +45,7 @@
 
         <#if showNotifyUpdatesSongbeamer()>
             <div class="setting">
-                <span class="settingText">${messages.getString("checkUpdatesSongbeamer")}</span>
+                <span unselectable="on" class="settingText">${messages.getString("checkUpdatesSongbeamer")}</span>
                 <label class="switch right">
                     <input id="checkSongbeamerUpdates"
                            type="checkbox" ${isNotifySongbeamerUpdates()?then("checked", "")}
@@ -56,10 +57,10 @@
     </section>
 
     <section class="settingGroup">
-        <div class="settingGroupTitle">${messages.getString("presentation")}</div>
+        <div unselectable="on" class="settingGroupTitle">${messages.getString("presentation")}</div>
 
         <div class="setting">
-            <span class="settingText">${messages.getString("showFullscreen")}</span>
+            <span unselectable="on" class="settingText">${messages.getString("showFullscreen")}</span>
             <label class="right">
                 <#if (getScreensCount() > 1)>
                     <select id="showOnDisplay" onchange="new function() {onInputChanged('showOnDisplay')};">
@@ -73,7 +74,7 @@
                         </#list>
                     </select>
                 <#else>
-                    <span class="disabled">
+                    <span unselectable="on" class="disabled">
                         ${messages.getString("showFullscreenNotAvailable")}
                     </span>
                 </#if>
@@ -81,7 +82,7 @@
         </div>
 
         <div class="setting">
-            <span class="settingText">${messages.getString("showClockInSong")}</span>
+            <span unselectable="on" class="settingText">${messages.getString("showClockInSong")}</span>
             <label class="switch right">
                 <input id="showClockInSong" type="checkbox" ${isShowClockInSong()?then("checked", "")}
                        onchange="new function() {onCheckedChanged('showClockInSong')};">
@@ -90,7 +91,7 @@
         </div>
 
         <div class="setting">
-            <span class="settingText">${messages.getString("showChords")}</span>
+            <span unselectable="on" class="settingText">${messages.getString("showChords")}</span>
             <label class="switch right">
                 <input id="chords" type="checkbox" ${isShowChords()?then("checked", "")}
                        onchange="new function() {onCheckedChanged('chords')};">
@@ -100,9 +101,9 @@
     </section>
 
     <section class="settingGroup">
-        <div class="settingGroupTitle">${messages.getString("songbeamer")}</div>
+        <div unselectable="on" class="settingGroupTitle">${messages.getString("songbeamer")}</div>
         <div class="setting">
-            <span class="settingText">${messages.getString("songDir")}</span>
+            <span unselectable="on" class="settingText">${messages.getString("songDir")}</span>
             <span class="right">
                 <#if isAllowSetSongDir()>
                     ${getSongDir()}
@@ -110,13 +111,13 @@
                         ${messages.getString("select")}
                     </button>
                 <#else>
-                    <span class="disabled">${getSongDir()}</span>
+                    <span unselectable="on" class="disabled">${getSongDir()}</span>
                 </#if>
             </span>
         </div>
 
         <div class="setting">
-            <span class="settingText">${messages.getString("titleHasOwnPage")}</span>
+            <span unselectable="on" class="settingText">${messages.getString("titleHasOwnPage")}</span>
             <label class="switch right ${isAllowSetTitleHasOwnPage()?then("", "disabled")}">
                 <input id="titleHasPage" ${isTitleOwnPage()?then("checked", "")}
                        type="checkbox" ${isAllowSetTitleHasOwnPage()?then("", "disabled")}
@@ -126,14 +127,14 @@
         </div>
 
         <div class="setting">
-            <span class="settingText">${messages.getString("maxLinesPerPage")}</span>
+            <span unselectable="on" class="settingText">${messages.getString("maxLinesPerPage")}</span>
             <label class="right">
                 <#if isAllowSetMaxLinesPerPage()>
                     <input id="maxLinesPage" type="number" name="maxLinesPage" min="0" max="10"
                            value="${getMaxLinesPage()}"
                            onchange="new function() {onInputChanged('maxLinesPage')};">
                 <#else>
-                    <span class="disabled">
+                    <span unselectable="on" class="disabled">
                         ${(getMaxLinesPage() == 0)?then("-", "" + getMaxLinesPage())}
                     </span>
                 </#if>
@@ -141,11 +142,11 @@
         </div>
 
         <#noautoesc>
-            <div class="warning">${messages.getString("restartSongbeamerWarning")}</div>
+            <div unselectable="on" class="warning">${messages.getString("restartSongbeamerWarning")}</div>
         </#noautoesc>
     </section>
 
-    <div id="savedHint" class="invisible">
+    <div unselectable="on" id="savedHint" class="invisible">
         ${messages.getString("saved")} &#x1f4be;
     </div>
 </main>

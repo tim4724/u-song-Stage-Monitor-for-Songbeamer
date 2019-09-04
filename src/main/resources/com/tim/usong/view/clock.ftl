@@ -4,8 +4,7 @@
                 opacity: 0;
                 transition: opacity 2s linear'>
     <span style='font-size: 4em;'>
-    <span id="timeHoursMinutes"></span><span id='timeSeconds'
-                                             style="font-size: 0.7em;
+    <span unselectable="on" id="timeHoursMinutes"></span><span unselectable="on" id='timeSeconds' style="font-size: 0.7em;
                                              margin-left: 0.1em;
                                              color: #C1C1C1;"></span>
     </span>
@@ -37,7 +36,4 @@
     };
     updateTime();
     const updateClockInterval = setInterval(updateTime, 1000);
-    const clockStopUpdating = function () {
-        clearInterval(updateClockInterval);
-    }
 </script>

@@ -7,6 +7,11 @@ body {
     text-align: center;
     background: #000;
     font-size: 1.2em;
+    user-select: none;
+}
+
+span, div, h1, th, td  {
+    cursor: default;
 }
 
 #title {

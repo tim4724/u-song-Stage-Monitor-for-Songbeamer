@@ -8,6 +8,11 @@ body {
     background: #000;
     color: white;
     font-size: 1.2em;
+    user-select: none;
+}
+
+span, div, h1  {
+    cursor: default;
 }
 
 #title {

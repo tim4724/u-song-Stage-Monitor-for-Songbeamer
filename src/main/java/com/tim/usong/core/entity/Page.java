@@ -49,7 +49,9 @@ public class Page {
                         offset += 6;
                     }
                     String insertText = String.format(
-                            "<span class=\"chordPos\"><span class=\"chord\">%s</span></span>",
+                            "<span unselectable=\"on\" class=\"chordPos\">" +
+                                    "<span unselectable=\"on\" class=\"chord\">%s</span>" +
+                                    "</span>",
                             c.toHtml());
                     htmlBuilder.insert(insertIndex, insertText);
                     offset += insertText.length();

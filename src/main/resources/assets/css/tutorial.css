@@ -8,6 +8,11 @@ body {
     background: #000;
     color: white;
     max-width: calc(100vw - 2em);
+    user-select: none;
+}
+
+span, div, h1, h2 {
+    cursor: default;
 }
 
 #title {
