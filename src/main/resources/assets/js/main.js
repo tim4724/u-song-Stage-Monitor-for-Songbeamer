@@ -132,7 +132,7 @@ function main() {
             }
 
             if (scrollDuration === undefined) {
-                scrollDuration = isVisible(currentPage) ? 2000 : 300;
+                scrollDuration = isVisible(currentPage) ? 1500 : 300;
             }
             scroll(scrollTarget, offset, scrollDuration);
         }
@@ -209,6 +209,7 @@ function scroll(e, offset, duration) {
             // just to be sure
             setTimeout(function () {
                 if (!zenscroll.moving()) {
+                    // TODO make better
                     e.scrollIntoView(true);
                 }
             }, 200);

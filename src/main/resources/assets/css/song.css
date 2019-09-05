@@ -35,7 +35,9 @@ span, div, h1 {
     color: #ff7c00;
     font-weight: normal;
     font-size: 3em;
-    margin: 0.2em 0.2em 0.02em;
+    margin: 0;
+    padding-top: 0.4em;
+    padding-bottom: 0.1em;
 }
 
 @keyframes enterAnimation {
