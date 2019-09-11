@@ -1,3 +1,4 @@
+<#ftl encoding='UTF-8'>
 <section id='timeBox'
          class='currentSection currentPage'
          style='border-color: #00a39d;

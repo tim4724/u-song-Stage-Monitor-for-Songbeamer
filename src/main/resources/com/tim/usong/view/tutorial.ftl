@@ -1,8 +1,10 @@
+<#ftl encoding='UTF-8'>
 <!DOCTYPE html>
 <#-- @ftlvariable name="" type="com.tim.usong.view.TutorialView" -->
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=0.15, maximum-scale=0.15, user-scalable=0"/>
+    <meta charset="UTF-8">
     <link rel="shortcut icon" href="/assets/favicon.ico">
     <link rel="stylesheet" href="/assets/css/tutorial.css">
     <script src="/assets/js/settings.js"></script>
