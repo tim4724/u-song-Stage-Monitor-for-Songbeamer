@@ -9,7 +9,9 @@ import com.tim.usong.core.entity.Song;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
@@ -61,14 +63,13 @@ public class SongParser {
 
         // Check if this file is utf8 encoded
         boolean utf8 = false;
-        try {
-            FileInputStream fileIs = new FileInputStream(songFile.getAbsolutePath());
-            BufferedReader r;
-            r = new BufferedReader(new InputStreamReader(fileIs, StandardCharsets.UTF_8.name()));
-            if (r.readLine().startsWith("\uFEFF")) {
-                utf8 = true;
+        try (FileInputStream fileIs = new FileInputStream(songFile.getAbsolutePath())) {
+            byte[] bom = new byte[3];
+            if (fileIs.read(bom) == 3) {
+                // If a file is utf8 encoded it will start with 0xEFBBBF
+                utf8 = ((bom[0] & 0xFF) << 16 | (bom[1] & 0xFF) << 8 | bom[2] & 0xFF) == 0xEFBBBF;
             }
-        }catch (Exception ignore){
+        } catch (Exception ignore) {
         }
 
         List<String> pages = new ArrayList<>();
@@ -83,7 +84,7 @@ public class SongParser {
 
         String firstPage;
         // Remove the bom
-        if(utf8 && pages.size() > 0 && (firstPage = pages.get(0)).startsWith("\uFEFF")){
+        if (utf8 && pages.size() > 0 && (firstPage = pages.get(0)).startsWith("\uFEFF")) {
             pages.remove(0);
             pages.add(0, firstPage.replaceFirst("\uFEFF", ""));
         }
