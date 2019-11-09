@@ -8,10 +8,7 @@ import com.tim.usong.resource.SettingsResource;
 import com.tim.usong.resource.SongResource;
 import com.tim.usong.resource.StatusResource;
 import com.tim.usong.ui.*;
-import com.tim.usong.util.AutoStart;
-import com.tim.usong.util.Setup;
-import com.tim.usong.util.SongbeamerUpdateChecker;
-import com.tim.usong.util.UpdateChecker;
+import com.tim.usong.util.*;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.assets.AssetsBundle;
@@ -25,6 +22,7 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import io.dropwizard.websockets.WebsocketBundle;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.swt.widgets.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +47,33 @@ public class USongApplication extends Application<Configuration> implements Serv
         if (GlobalPreferences.isShowSplashScreen()) {
             SplashWindow.showSplash();
         }
+
+        // Check if current swt version (32 or 64) Bit can run on the installed jvm
+        try {
+            Display d = new Display();
+            d.dispose();
+        } catch (Error e) {
+            SplashWindow.error();
+            // User need to load correct 32 or 64 Bit version!
+            ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
+            String message = messages.getString("fatalErrorWrongArchitecture");
+            Object[] options = {messages.getString("yes"), messages.getString("exit")};
+            int result = JOptionPane.showOptionDialog(null,
+                    message + "\n\n" + e.toString(),
+                    APP_NAME,
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.ERROR_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+            if (result == 0) {
+                Browse.open("https://github.com/tim4724/u-song-Stage-Monitor-for-Songbeamer/releases");
+            }
+            Logger logger = LoggerFactory.getLogger(USongApplication.class);
+            logger.error("SWT LOAD FAILURE", e);
+            System.exit(-1);
+        }
+
         Setup.setUpRequiredExternalFiles();
         if (args.length == 0) {
             args = new String[]{"server", LOCAL_DIR + "usong.yml"};

@@ -68,32 +68,21 @@ public class UpdateChecker {
             return;
         }
 
-        String downloadUrl = null;
-        for (JsonNode asset : latestRelease.get("assets")) {
-            String name = asset.get("name").asText();
-            if (name.endsWith(tagName + ".jar")) {
-                downloadUrl = asset.get("browser_download_url").asText();
-                break;
-            }
-        }
-
         ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle");
-        if (downloadUrl != null) {
-            String title = USongApplication.APP_NAME;
-            String body = messages.getString("updateAvailable");
-            body = String.format(body, tagName, currentVersion);
+        String title = USongApplication.APP_NAME;
+        String body = messages.getString("updateAvailable");
+        body = String.format(body, tagName, currentVersion);
 
-            Object[] options = {messages.getString("yes"), messages.getString("notNow"),
-                    messages.getString("never"),};
+        Object[] options = {messages.getString("yes"), messages.getString("notNow"),
+                messages.getString("never"),};
 
-            int result = JOptionPane.showOptionDialog(null, body, title, JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        int result = JOptionPane.showOptionDialog(null, body, title, JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-            if (result == 0) {
-                Browse.open(downloadUrl);
-            } else if (result == 2) {
-                prefs.put("do_not_ask_update", tagName);
-            }
+        if (result == 0) {
+            Browse.open("https://github.com/tim4724/u-song-Stage-Monitor-for-Songbeamer/releases");
+        } else if (result == 2) {
+            prefs.put("do_not_ask_update", tagName);
         }
     }
 }
