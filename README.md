@@ -39,6 +39,10 @@ Man kann das Vorschau Fenster über das System Tray aufrufen (oder "http://&lt;h
 * Unabhängig von SongBeamer scrollen
 * Anzahl aktiver und aktueller Clients anzeigen
 
+## Zeige Foliennummern
+Rufe "http://&lt;hostname&gt;/song?showPageNumbers=true" or "http://&lt;hostname&gt;/song?admin=true&showPageNumbers=true"
+auf um die Foliennummer in Pink einzublenden.
+
 ## Style ändern?
 Man kann das css überschreiben. Einfache eine Datei "song.css" im gleichen Ordner hinterlegen.
 

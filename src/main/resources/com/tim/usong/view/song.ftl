@@ -34,13 +34,22 @@
         </h1>
     </header>
 
+    <#assign pageCounter = 1>
+
     <#list song.sections as section>
+
         <section class="${section.type}">
             <#if section.name??>
                 <div unselectable="on" class="sectionName">${section.name}</div>
             </#if>
             <#list section.pages as page>
                 <div class="page">
+                    <#if showPageNumbers>
+                    <div class="pageNumber">
+                        ${pageCounter}
+                        <#assign pageCounter++>
+                    </div>
+                    </#if>
                     <#if (page.linesCount > 0)>
                         <div unselectable="on" class="pageContent">
                             <#noautoesc>

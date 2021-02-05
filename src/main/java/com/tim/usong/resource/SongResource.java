@@ -115,8 +115,9 @@ public class SongResource {
     @Produces(MediaType.TEXT_HTML)
     public SongView getSong(@Context HttpServletRequest request,
                             @QueryParam("admin") boolean admin,
-                            @QueryParam("chords") Boolean chords) {
-        return new SongView(song, request.getLocale(), admin, chords);
+                            @QueryParam("chords") Boolean chords,
+                            @QueryParam("showPageNumbers") boolean showPageNumbers) {
+        return new SongView(song, request.getLocale(), admin, chords, showPageNumbers);
     }
 
     @POST

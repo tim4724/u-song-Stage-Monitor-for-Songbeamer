@@ -71,6 +71,20 @@ section {
     animation-fill-mode: backwards;
 }
 
+.page {
+    position: relative;
+}
+
+.pageNumber {
+    position: absolute;
+    left: 0.3em;
+    color: #ff00ff;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 500;
+    font-size: 1.4em;
+}
+
 .pageContent {
     border-left: 0.0625em solid #000000;
     border-right: 0.0625em solid #000000;

@@ -10,10 +10,11 @@ import java.util.ResourceBundle;
 public class SongView extends View {
     private final ResourceBundle messages;
     private final Song song;
+    private final boolean showPageNumbers;
     private final boolean admin;
     private final boolean chords;
 
-    public SongView(Song song, Locale locale, boolean admin, Boolean chords) {
+    public SongView(Song song, Locale locale, boolean admin, Boolean chords, boolean showPageNumbers) {
         super("song.ftl");
         if (chords == null) {
             chords = GlobalPreferences.getShowChords();
@@ -22,6 +23,7 @@ public class SongView extends View {
         this.song = song;
         this.admin = admin;
         this.chords = chords;
+        this.showPageNumbers = showPageNumbers;
     }
 
     public ResourceBundle getMessages() {
@@ -34,6 +36,10 @@ public class SongView extends View {
 
     public boolean isAdmin() {
         return admin;
+    }
+
+    public boolean isShowPageNumbers() {
+        return showPageNumbers;
     }
 
     public boolean isChords() {

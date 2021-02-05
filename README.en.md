@@ -31,6 +31,10 @@ Click on "previewFrame window" in the status tray icon context menu or access "h
 * You can scroll up or down independent of Songbeamer and of what is displayed on the beamer
 * You can see the number of active and up-to-date clients connected
 
+## Show Page Numbers
+Access "http://&lt;hostname&gt;/song?showPageNumbers=true" or "http://&lt;hostname&gt;/song?admin=true&showPageNumbers=true" 
+to display the page numbers in pink.
+
 ## Don't like the style?
 You can override my css by providing your own "song.css" file in the same directory as the usong-server.x.y.jar.
 
