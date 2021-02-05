@@ -30,10 +30,14 @@ public class SongParser {
     // This can be selected in songbeamer: "Extras" -> "Options" -> "Song" -> "Title: " -> "on the first page"
     private boolean titleHasOwnPage;
 
-    public SongParser(File songDir, boolean titleHasOwnPage, int maxLinesPerPage) {
+    // Some versions of songbeamer allow the last page to have 1 more line, than defined by maxLinesPerPage
+    private boolean lastSlideOneMoreLine;
+
+    public SongParser(File songDir, boolean titleHasOwnPage, int maxLinesPerPage, boolean lastSlideOneMoreLine) {
         this.songDir = songDir;
         this.titleHasOwnPage = titleHasOwnPage;
         this.maxLinesPerPage = maxLinesPerPage;
+        this.lastSlideOneMoreLine = lastSlideOneMoreLine;
     }
 
     public void setLangForSong(String fileName, int lang) {
@@ -201,16 +205,20 @@ public class SongParser {
                 pureLineCounter++;
             }
 
-            // Somehow there is an exception if the last page in the song contains only 1 line.
-            // Then this line is added to the previous page
-            // But only if the last page is a result of "maxLinesPerPage"
-            boolean lastPageOfSong = (i == (pages.size() - 1));
-            if (lastPageOfSong && newPages.size() > 1) {
-                //TODO: Different compared to songbeamer in some rare cases with empty lines
-                Page lastPage = lastOf(newPages);
-                if (lastPage.getLinesCount() == 1 && lines.length > 1) {
-                    newPages.remove(newPages.size() - 1);
-                    lastOf(newPages).addLinesFromPage(lastPage);
+            // Only some versions of songbeamer have this Behaviour
+            if (this.lastSlideOneMoreLine) {
+                // Somehow there is an exception if the last page in the song contains only 1 line.
+                // Then this line is added to the previous page
+                // But only if the last page is a result of "maxLinesPerPage"
+
+                boolean lastPageOfSong = (i == (pages.size() - 1));
+                if (lastPageOfSong && newPages.size() > 1) {
+                    //TODO: Different compared to songbeamer in some rare cases with empty lines
+                    Page lastPage = lastOf(newPages);
+                    if (lastPage.getLinesCount() == 1 && lines.length > 1) {
+                        newPages.remove(newPages.size() - 1);
+                        lastOf(newPages).addLinesFromPage(lastPage);
+                    }
                 }
             }
 

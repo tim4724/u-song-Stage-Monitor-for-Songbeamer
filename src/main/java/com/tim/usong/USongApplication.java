@@ -156,7 +156,16 @@ public class USongApplication extends Application<Configuration> implements Serv
             GlobalPreferences.setChordsUseBNatural(sbSettings.chordsUseBNatural);
         }
 
-        SongParser songParser = new SongParser(songDir, titleHasOwnPage, maxLinesPerPage);
+        boolean lastSlideOneMoreLine = false;
+        if (songbeamerVersion != null && songbeamerVersion.length() > 0
+                && songbeamerVersion.startsWith("5.")
+                && songbeamerVersion.compareTo("5.07") < 0) {
+            // Old versions of songbeamer allow one more line on the last page
+            // Instead of what is defined by maxLinesPerPage
+            lastSlideOneMoreLine = true;
+        }
+
+        SongParser songParser = new SongParser(songDir, titleHasOwnPage, maxLinesPerPage, lastSlideOneMoreLine);
         SongResource songResource = new SongResource(songParser);
         SongbeamerActionListener songbeamerActionListener;
         try {
