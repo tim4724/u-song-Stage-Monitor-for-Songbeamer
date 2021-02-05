@@ -69,6 +69,7 @@ section {
     animation-name: enterAnimation;
     animation-duration: 0.5s;
     animation-fill-mode: backwards;
+    z-index: 100;
 }
 
 .page {
