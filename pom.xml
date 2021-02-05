@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>usong-server</artifactId>
-    <version>2.2.2</version>
+    <version>2.2.3</version>
     <groupId>de.tim</groupId>
     <name>U-Song Server</name>
 
